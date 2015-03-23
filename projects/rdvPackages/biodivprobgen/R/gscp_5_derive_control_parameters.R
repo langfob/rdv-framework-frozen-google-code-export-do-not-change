@@ -41,9 +41,17 @@ if (parameters$use_unif_rand_p__prop_of_links_between_groups)
 r__density = parameters$r__density
 if (parameters$use_unif_rand_r__density)
     {
+        #  BTL - 2015 03 19
+        #  Not sure why these bounds on r__density said p__r__... instead 
+        #  of just r__...
+        #  So, replacing the p__r__... in gscp_3..., gscp_5..., and in 
+        #  project.yaml.
+
     r__density = runif (1, 
-                        min = parameters$p__r__density_lower_bound,
-                        max = parameters$p__r__density_upper_bound
+#                        min = parameters$p__r__density_lower_bound,
+                        min = parameters$r__density_lower_bound,
+#                        max = parameters$p__r__density_upper_bound
+                        max = parameters$r__density_upper_bound
                         )
     }
 
@@ -270,6 +278,8 @@ if ((num_links_within_one_group < 1) | (tot_num_links_inside_groups < 1))
 #     quit (too_big_failure_msg, status=1)
 #     }
 
+if (FALSE)    #  Temporary, until I know the num_spp test works.  2015 03 13 - BTL
+{
 if (max_possible_tot_num_links > parameters$max_allowed_possible_tot_num_links)
     {
     cat ("\n\nFailing:  max_possible_tot_num_links (", 
@@ -299,6 +309,7 @@ if (max_possible_tot_num_links > parameters$max_allowed_possible_tot_num_links)
     
     quit (status=20)
     }
+}
 
 #===============================================================================
 

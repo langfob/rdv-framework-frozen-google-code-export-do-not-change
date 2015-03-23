@@ -88,7 +88,7 @@ bpm =
 
 #===============================================================================
 
-    #  Verify that the the generated optimal solution really is a solution.
+    #  Verify that the generated optimal solution really is a solution.
     #  Theoretically, this should not be necessary, but checking it here to 
     #  make sure that the implementation is working correctly.
     #  Correct solutions will have every species attaining a representation 
@@ -99,7 +99,16 @@ spp_rep_targets = rep (1, num_spp)
 spp_rep_fracs = compute_rep_fraction (bpm, 
                                       dependent_node_IDs, 
                                       spp_rep_targets)
-stopifnot (spp_rep_fracs >= 1)
+
+unmet_spp_rep_frac_indices = which (spp_rep_fracs < 1)
+if (length (unmet_spp_rep_frac_indices) > 0)
+    {
+    cat ("\n\nSERIOUS ERROR: The generated optimal solution is not a solution.",
+         "\n               Species at the following indices in spp_rep_fracs have representation < 1:\n", 
+         "\n               ")
+    print (unmet_spp_rep_frac_indices)
+    cat ("\n")
+    }
 
 solution_cost = compute_solution_cost (dependent_node_IDs, rep (1, num_PUs))
 #browser()
