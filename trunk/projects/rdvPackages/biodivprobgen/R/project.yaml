@@ -28,6 +28,8 @@ libraries:
 
     #  Cloned from project.yaml in example-R-pop-model.
     
+    #--------------------
+
 base_params:
 
         #  BTL - 2014 12 28
@@ -40,9 +42,10 @@ base_params:
         #  you need to add it back into any of those that you re-use under  
         #  emulation.  That's not so likely though, since they're generally 
         #  doing zillions of runs and you don't generally do that under 
-        #  emulation.
+        #  emulation.  Currently limiting number of species to 1500.
     fullOutputDirWithSlash: $$output_path$$
 
+    #--------------------
 
         #  SET THIS VALUE EVERY TIME...
             #  Runset description to print in output since the runset name has 
@@ -51,39 +54,24 @@ base_params:
             #  If you don't want the newlines (i.e., you want one long string), 
             #  then use a ">" in place of the "|".
     runset_description: |
-        This runset is a simple biodivprobgen test for generating 1 run  
-        where the pr, r, n, and a values are all chosen from uniform random 
-        distributions with a random seed of 701.  The random values chosen 
-        are limited to try to be in the neighborhood of the phase transition 
+        This runset is a small biodivprobgen test for generating 100 runs  
+        where the pr, r, n, and a values are all chosen to mimic the parameter 
+        regions of difficulty in 3 scenarios from Xu et al's simple model paper 
+        using a random seed of 1001 .  The random values chosen are limited 
+        to try to be in the neighborhood of the phase transition in that paper 
         to see if there are large errors there.  
         
-#  In "simple model ..." paper, they use:
-#       n in [8..100] while alpha = 0.52, r = 1
-#       r in [0.8..2.5] while n = 20, alpha = 0.77
-#       alpha in [0.2..1] while n = 20, r = 2.5
-#  In all 3 cases, best fit to the theory was when the parameter
-#  was at the top of its range.  See figure 1 in the paper.
-#
-#  Values in the paper for propOfLinksBetweenGroups were more variable.
-#  See figures 2 and 3 and text in column 2 of page 4.
-#  In those examples, they had:
-#       Figure 2:   k=2, alpha=0.8, r=3, n in {20,30,40}
-#                   p in [0.14..0.36] w/ critical value Pcr ~ 0.23
-
-
-
-    #  SET THIS VALUE EVERY TIME...
-        #  Looks like there is currently no tzar wildcard to capture the 
-        #  the runset name, but it's very useful to add it to lines of 
-        #  output that will be combined with output from other runsets.
-#    runset_name: simple_test_unifRand_p_r_n_a_seed_701_in_phase_transition_area
     runset_name: $$runset$$
-#    runset_abbrev: st701phase
-    runset_abbrev: "uninitialized_runset_abbrev"
+    runset_abbrev: "bdpg100run3sce1001ran"
 
-        #  Temporarily bumping this up to 10000 to see how long runs take...
-        #  BTL - 2015 03 09
-    max_allowed_possible_tot_num_links: 2000
+    run_id: $$run_id$$
+
+    #--------------------
+
+    max_allowed_possible_tot_num_links: 1500
+    max_allowed_num_spp: 1500
+
+    #--------------------
 
         #  NOTE that the choice of random seed in the yaml file is important 
         #  for this single run test because the example creates a test problem 
@@ -99,36 +87,33 @@ base_params:
 
     seed: 701
 
-            #  1 - num_groups = tot cost, so increase n to reduce cost
-            #  What is a reasonable range?
-            #  Xu uses ???
-            #
+    #--------------------
+
+            #  1 - num_groups = tot cost
+            #                   (when num_independent_nodes_per_group = 1), 
+            #  so increase n to reduce cost
             #      num_nodes_per_group = integerize (n__num_groups ^ alpha__)
+            
+    num_independent_nodes_per_group: 1
+    
     n__num_groups: 10
-#####    n__num_groups: 30
-#    n__num_groups: 5
-#####    use_unif_rand_n__num_groups: FALSE
-    use_unif_rand_n__num_groups: TRUE
+    use_unif_rand_n__num_groups: FALSE
     n__num_groups_lower_bound: 20
     n__num_groups_upper_bound: 40
     
+    #--------------------
+
             #  Drives the number of PUs per group and so, tot num PUs
-            #  What is a reasonable range?
-            #  Xu uses ???
-            #
             #  Increase alpha to increase num of PUs.
             #      tot_num_nodes = n__num_groups * num_nodes_per_group
     alpha__: 0.25
-#    alpha__: 0.8
-#####    use_unif_rand_alpha__: FALSE
-    use_unif_rand_alpha__: TRUE
+    use_unif_rand_alpha__: FALSE
     alpha___lower_bound: 0
     alpha___upper_bound: 1
 
+    #--------------------
+
             #  p and r drive num of spp (increase p to increase num of spp)
-            #  What is a reasonable range?
-            #  Xu uses ???
-            #
             #     target_num_links_between_2_groups_per_round = 
             #         integerize (p__prop_of_links_between_groups * num_nodes_per_group)          
             #     num_rounds_of_linking_between_groups = integerize (r__density * n__num_groups * log (n__num_groups))            
@@ -136,40 +121,23 @@ base_params:
             #         integerize (target_num_links_between_2_groups_per_round * num_rounds_of_linking_between_groups)
             #     max_possible_tot_num_links = integerize (tot_num_links_inside_groups + max_possible_num_links_between_groups)
 
-#    p__prop_of_links_between_groups: 0.8
-    p__prop_of_links_between_groups: 0.28
-#####    use_unif_rand_p__prop_of_links_between_groups: FALSE
     use_unif_rand_p__prop_of_links_between_groups: TRUE
     p__prop_of_links_between_groups_lower_bound: 0.20
     p__prop_of_links_between_groups_upper_bound: 0.36
 
-
     r__density: 0.8
-#    r__density: 0.5
-#####    use_unif_rand_r__density: FALSE
-    use_unif_rand_r__density: TRUE
+    use_unif_rand_r__density: FALSE
     p__r__density_lower_bound: 2
     p__r__density_upper_bound: 5
 
+    #--------------------
 
-
-#    n__num_groups: 12
-#    alpha__: 1.5
-#    p__prop_of_links_between_groups: 0.3
-#    r__density: 0.8
-
-
-        #  2014 12 11 - BTL - Added.
-    num_independent_nodes_per_group: 1
     integerize_string: "round"
+    
     base_for_target_num_links_between_2_groups_per_round: "num_nodes_per_group"
 #    base_for_target_num_links_between_2_groups_per_round: "num_dependent_nodes_per_group"
-#    at_least_1_for_target_num_links_between_2_groups_per_round: TRUE
+
     at_least_1_for_target_num_links_between_2_groups_per_round: FALSE
-
-
-    
-    run_id: $$run_id$$
     
     #---------------------------------------------------------------------------
         #  marxan control parameters
@@ -184,7 +152,6 @@ base_params:
     
 #    marxan_input_parameters_file_name: "/Users/bill/D/Marxan/input.dat"
     marxan_input_parameters_file_name: "$$library_path(marxanLibrary)$$input.dat"
-#    marxan_input_parameters_file_name: "input.dat"
 
     marxan_dir: "$$library_path(marxanLibrary)$$"
 #    marxan_input_dir: "$$library_path(marxanLibrary)$$input/"
@@ -201,7 +168,7 @@ base_params:
         #  quotes so that they are written out to marxan's liking.
 
     marxan_num_reps: 100
-    marxan_num_iterations: "2000000"
+    marxan_num_iterations: "1000000"
 
     #---------------------------------------------------------------------------
         #  marxan spf value
@@ -218,11 +185,9 @@ base_params:
         #  here, it is ignored.
         
     marxan_spf_rule: "POWER_OF_10"
-
 #    marxan_spf_rule: "CONSTANT"
-    marxan_spf_const: 10
+#    marxan_spf_const: 10
 
-#    marxan_spf_rule: "a bad spf rule that should cause an error"
     #---------------------------------------------------------------------------
     
         # Outputs
@@ -231,23 +196,119 @@ base_params:
 
     summary_filename: $$output_path$$prob_diff_results.csv
     summary_without_run_id_filename: $$output_path$$prob_diff_results_with_0_run_id.csv
-#    output.plot : $$output_path$$poptraj
-#    output.dump : $$output_path$$projtraj.R
 
     too_many_possible_links_error_flag_file_name: $$output_path$$too_many_possible_links_error_flag_file.txt
 
+    #---------------------------------------------------------------------------
+    
+        #  In "simple model ..." paper, they use:
+        #       n in [8..100] while alpha = 0.52, r = 1
+        #       r in [0.8..2.5] while n = 20, alpha = 0.77
+        #       alpha in [0.2..1] while n = 20, r = 2.5
+        #  In all 3 cases, best fit to the theory was when the parameter
+        #  was at the top of its range.  See figure 1 in the paper.
+        #
+        #  Values in the paper for propOfLinksBetweenGroups were more variable.
+        #  See figures 2 and 3 and text in column 2 of page 4.
+        #  In those examples, they had:
+        #       Figure 2:   k=2, alpha=0.8, r=3, n in {20,30,40}
+        #                   p in [0.14..0.36] w/ critical value Pcr ~ 0.23
 
+#    p: [0.14..0.36]    #  w/ critical value Pcr ~ 0.23
+    use_unif_rand_p__prop_of_links_between_groups: TRUE
+    p__prop_of_links_between_groups_lower_bound: 0.14    #  0
+    p__prop_of_links_between_groups_upper_bound: 0.36    #  1
+
+    
+#scenarios:
+#    - name: easy
+#        parameters: 
+#            variables: 
+#                n__num_cliques: 5
+#                alpha__: 0.8
+#                p__prop_of_links_between_cliques: 0.5
+#                r__density: 0.5
+
+#    - name: harder
+#        parameters: 
+#            variables: 
+#                n__num_cliques: 12
+#                alpha__: 1.5
+#                p__prop_of_links_between_cliques: 0.3
+#                r__density: 0.8
+
+#    - name: hardest
+#        parameters: 
+#            variables: 
+#                n__num_cliques: 20
+#                alpha__: 0.1
+#                p__prop_of_links_between_cliques: 0.8
+#                r__density: 0.8
+
+scenarios:
+#    - name: Scenario 1
+#      parameters:
+#            variables:
+#                a_boolean_variable: False
+            
+    - name: Xu_simple_model_paper_scenario_1
+      parameters:
+#            variables:
+##                n__num_groups: [8..100]    #  uniform random
+            use_unif_rand_n__num_groups: TRUE
+            n__num_groups_lower_bound: 8      #  20
+            n__num_groups_upper_bound: 100    #  35
+    
+            use_unif_rand_alpha__: FALSE
+            alpha__: 0.52
+    
+            use_unif_rand_r__density: FALSE
+            r__density: 1
+
+    - name: Xu_simple_model_paper_scenario_2
+      parameters:
+#            variables:
+            use_unif_rand_n__num_groups: FALSE
+            n__num_groups: 20
+        
+            use_unif_rand_alpha__: FALSE
+            alpha__: 0.77
+        
+##            r__density: [0.8..2.5]
+            use_unif_rand_r__density: TRUE
+            r__density_lower_bound: 0.8    #  0
+            r__density_upper_bound: 2.5    #  5
+        
+    - name: Xu_simple_model_paper_scenario_3
+      parameters:
+#            variables:
+            use_unif_rand_n__num_groups: FALSE
+            n__num_groups: 20
+        
+            use_unif_rand_alpha__: TRUE
+##            alpha__: [0.2..1]
+            alpha___lower_bound: 0.2    #  0
+            alpha___upper_bound: 1
+        
+            use_unif_rand_r__density: FALSE
+            r__density: 2.5
+
+    #---------------------------------------------------------------------------
+    
 repetitions:
     generators:
         - key: seed
           generator_type: linear_step
           start: 1001
           step_size: 1
-          count: 200    #  500
-
+          count: 100    #  200    #  500
           
-#concatenate:
-#  heading_row: true
-#  input_filename: prob_diff_results.csv
-#  output_filename: all_results_prob_diff.csv
+    #---------------------------------------------------------------------------
+    
+concatenate:
+    heading_row: true
+    input_filename: prob_diff_results.csv
+    output_filename: all_results_prob_diff.csv
 
+    #---------------------------------------------------------------------------
+    

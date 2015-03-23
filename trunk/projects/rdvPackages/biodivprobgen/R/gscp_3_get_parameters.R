@@ -35,8 +35,18 @@ local_build_parameters_list = function ()
     parameters$p__prop_of_links_between_groups_upper_bound = NA
     parameters$r__density = NA
     parameters$use_unif_rand_r__density = NA
-    parameters$p__r__density_lower_bound = NA
-    parameters$p__r__density_upper_bound = NA
+    
+        #  BTL - 2015 03 19
+        #  Not sure why these bounds on r__density said p__r__... instead 
+        #  of just r__...
+        #  So, replacing the p__r__... in gscp_3..., gscp_5..., and in 
+        #  project.yaml.
+
+#    parameters$p__r__density_lower_bound = NA
+    parameters$r__density_lower_bound = NA
+#    parameters$p__r__density_upper_bound = NA
+    parameters$r__density_upper_bound = NA
+    
     parameters$base_for_target_num_links_between_2_groups_per_round = NA
     parameters$at_least_1_for_target_num_links_between_2_groups_per_round = NA
     parameters$marxan_spf_const = NA

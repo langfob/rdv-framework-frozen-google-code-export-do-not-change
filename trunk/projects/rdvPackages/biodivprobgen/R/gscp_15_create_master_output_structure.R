@@ -142,6 +142,9 @@ num_runs = 1
 results_df = 
     data.frame (runset_abbrev = rep (NA, num_runs), 
                 run_ID = rep (NA, num_runs), 
+                
+                exceeded_thresh_for_num_spp = rep (NA, num_runs), 
+                
                 num_PUs = rep (NA, num_runs), 
                 num_spp = rep (NA, num_runs), 
                 num_spp_per_PU = rep (NA, num_runs), 
@@ -213,6 +216,8 @@ cur_result_row = cur_result_row + 1
     #  by tzar.  Not sure what I'll do in the long run.
     #  2015 03 09 - BTL
 results_df$runset_abbrev [cur_result_row]                                    = parameters$runset_name    #  parameters$runset_abbrev
+
+results_df$exceeded_thresh_for_num_spp                                       = FALSE
 
 results_df$num_PUs [cur_result_row]                                          = num_PUs
 results_df$num_spp [cur_result_row]                                          = num_spp
@@ -291,22 +296,7 @@ results_df = cbind (results_df,
                     bipartite_metrics_from_igraph_package_df
                     )
 
-    #  Write the results out to 2 separate and nearly identical files.
-    #  The only difference between the two files is that the run ID in 
-    #  one of them is always set to 0 and in the other, it's the correct 
-    #  current run ID.  This is done to make it easier to automatically 
-    #  compare the output csv files of different runs when the only thing 
-    #  that should be different between the two runs is the run ID.  
-    #  Having different run IDs causes diff or any similar comparison to 
-    #  think that the run outputs don't match.  If they both have 0 run ID, 
-    #  then diff's output will correctly flag whether there are differences 
-    #  in the outputs.
-
-results_df$run_ID [cur_result_row] = 0
-write.csv (results_df, file = parameters$summary_without_run_id_filename, row.names = FALSE)
-
-results_df$run_ID [cur_result_row] = parameters$run_id
-write.csv (results_df, file = parameters$summary_filename, row.names = FALSE)
+write_results_to_files (results_df, parameters)
 
 #===============================================================================
 
