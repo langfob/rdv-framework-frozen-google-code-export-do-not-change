@@ -54,15 +54,18 @@ base_params:
             #  If you don't want the newlines (i.e., you want one long string), 
             #  then use a ">" in place of the "|".
     runset_description: |
-        This runset is a small biodivprobgen test for generating 100 runs  
+        This runset is a 2nd small biodivprobgen test for generating 100 runs  
         where the pr, r, n, and a values are all chosen to mimic the parameter 
         regions of difficulty in 3 scenarios from Xu et al's simple model paper 
-        using a random seed of 1001 .  The random values chosen are limited 
+        using a random seed of 2001 .  The random values chosen are limited 
         to try to be in the neighborhood of the phase transition in that paper 
-        to see if there are large errors there.  
+        to see if there are large errors there.  The first set had a problem 
+        with still failing when the allowable number of species was exceeded 
+        because I had forgotten to commit the new code file 11a for that.
+        Hopefully, this is fixed now.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg100run3sce1001ran"
+    runset_abbrev: "bdpg100run3sce2001ran"
 
     run_id: $$run_id$$
 
@@ -299,7 +302,7 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 1001
+          start: 2001
           step_size: 1
           count: 100    #  200    #  500
           
