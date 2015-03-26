@@ -54,18 +54,15 @@ base_params:
             #  If you don't want the newlines (i.e., you want one long string), 
             #  then use a ">" in place of the "|".
     runset_description: |
-        This runset is a 2nd small biodivprobgen test for generating 100 runs  
-        where the pr, r, n, and a values are all chosen to mimic the parameter 
-        regions of difficulty in 3 scenarios from Xu et al's simple model paper 
-        using a random seed of 2001 .  The random values chosen are limited 
-        to try to be in the neighborhood of the phase transition in that paper 
-        to see if there are large errors there.  The first set had a problem 
-        with still failing when the allowable number of species was exceeded 
-        because I had forgotten to commit the new code file 11a for that.
-        Hopefully, this is fixed now.
+        This runset is uses the rough bounds on the range of Xu parameters 
+        that led to errors in Marxan in the early exploratory tests.  The 
+        idea is to generate a more dense set of errors to learn from since 
+        the random ranges of parameters didn't generate enough errors to 
+        use as learning input.  It also focuses on just one number of planning 
+        units (40) and one optimal fraction (0.5).
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg100run3sce2001ran"
+    runset_abbrev: "bdpg500run1sce3001ran"
 
     run_id: $$run_id$$
 
@@ -249,52 +246,22 @@ base_params:
 #                r__density: 0.8
 
 scenarios:
-#    - name: Scenario 1
-#      parameters:
-#            variables:
-#                a_boolean_variable: False
             
-    - name: Xu_simple_model_paper_scenario_1
+    - name: 40_PUs_all_vars_in_error_early_tests_error_range
       parameters:
-#            variables:
-##                n__num_groups: [8..100]    #  uniform random
-            use_unif_rand_n__num_groups: TRUE
-            n__num_groups_lower_bound: 8      #  20
-            n__num_groups_upper_bound: 100    #  35
-    
-            use_unif_rand_alpha__: FALSE
-            alpha__: 0.52
-    
-            use_unif_rand_r__density: FALSE
-            r__density: 1
-
-    - name: Xu_simple_model_paper_scenario_2
-      parameters:
-#            variables:
             use_unif_rand_n__num_groups: FALSE
-            n__num_groups: 20
-        
+            n__num_groups: 20      #  20
+    
             use_unif_rand_alpha__: FALSE
-            alpha__: 0.77
-        
-##            r__density: [0.8..2.5]
+            alpha__: 0.23137821316
+    
             use_unif_rand_r__density: TRUE
-            r__density_lower_bound: 0.8    #  0
-            r__density_upper_bound: 2.5    #  5
-        
-    - name: Xu_simple_model_paper_scenario_3
-      parameters:
-#            variables:
-            use_unif_rand_n__num_groups: FALSE
-            n__num_groups: 20
-        
-            use_unif_rand_alpha__: TRUE
-##            alpha__: [0.2..1]
-            alpha___lower_bound: 0.2    #  0
-            alpha___upper_bound: 1
-        
-            use_unif_rand_r__density: FALSE
-            r__density: 2.5
+            r__density_lower_bound: 0.25
+            r__density_upper_bound: 5.0
+
+            use_unif_rand_p__prop_of_links_between_groups: TRUE
+            p__prop_of_links_between_groups_lower_bound: 0.25
+            p__prop_of_links_between_groups_upper_bound: 0.99
 
     #---------------------------------------------------------------------------
     
@@ -302,16 +269,16 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 2001
+          start: 3001
           step_size: 1
-          count: 100    #  200    #  500
+          count: 2    #  200    #  500
           
     #---------------------------------------------------------------------------
     
-concatenate:
-    heading_row: true
-    input_filename: prob_diff_results.csv
-    output_filename: all_results_prob_diff.csv
+#concatenate:
+#    heading_row: true
+#    input_filename: prob_diff_results.csv
+#    output_filename: all_results_prob_diff.csv
 
     #---------------------------------------------------------------------------
     
