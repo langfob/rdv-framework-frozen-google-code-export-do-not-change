@@ -64,7 +64,7 @@ base_params:
         difficult problem.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg500run1sce3001ran"
+    runset_abbrev: "bdpg500run1sce4001ranPUs"
 
     run_id: $$run_id$$
 
