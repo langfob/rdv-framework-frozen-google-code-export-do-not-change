@@ -91,6 +91,15 @@ run_marxan = function (marxan_dir, marxan_executable_name)
         #        http://marxan.net/tutorial/Marxan_net_user_guide_rev2.1.pdf
         #        I'm not sure if it's even in the normal user's manual or 
         #        best practices manual for marxan.)
+    
+        #  BTL - 2015 03 27 
+        #  Marxan mailing list recently pointed to some new marxan materials 
+        #  on github and one of them has an example of some R code that 
+        #  calls marxan with what looks like a specification of the location 
+        #  of the input.dat file.  So, it looks like I can just add the 
+        #  filespec of the input.dat file as an argument after the "-s" 
+        #  argument without having any kind of other dash option specifying 
+        #  that you're giving the path to the input.dat file.  
 
     system.command.run.marxan = paste0 ("./", marxan_executable_name, " -s")   
     cat( "\n\n>>>>>  The system command to run marxan will be:\n'", 
