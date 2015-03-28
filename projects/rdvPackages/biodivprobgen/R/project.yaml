@@ -59,12 +59,12 @@ base_params:
         idea is to generate a more dense set of errors to learn from since 
         the random ranges of parameters didn't generate enough errors to 
         use as learning input.  It also focuses on just one number of planning 
-        units (20) and one optimal fraction (0.5).  This test is also trying 
-        to see whether a very small number of planning units can yield a 
-        difficult problem.
+        units (80) and one optimal fraction (0.5).  This test is also trying 
+        to see whether a larger number of planning units yields a lot more 
+        difficult problems.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg500run1sce4001ranPUs"
+    runset_abbrev: "bdpg500run1sce5001ranPUs"
 
     run_id: $$run_id$$
 
@@ -249,13 +249,13 @@ base_params:
 
 scenarios:
             
-    - name: 20_PUs_all_vars_in_error_early_tests_error_range
+    - name: 40_PUs_all_vars_in_error_early_tests_error_range
       parameters:
             use_unif_rand_n__num_groups: FALSE
-            n__num_groups: 10      #  20
+            n__num_groups: 40      #  20
     
             use_unif_rand_alpha__: FALSE
-            alpha__: 0.301029996
+            alpha__: 0.187901825
     
             use_unif_rand_r__density: TRUE
             r__density_lower_bound: 0.25
@@ -271,7 +271,7 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 4001
+          start: 5001
           step_size: 1
           count: 500
           
