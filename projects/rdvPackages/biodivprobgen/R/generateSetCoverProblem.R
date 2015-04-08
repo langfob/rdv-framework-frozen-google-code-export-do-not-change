@@ -191,6 +191,19 @@ source (paste0 (sourceCodeLocationWithSlash, "gscp_2_tzar_emulation.R"))
 
 #===============================================================================
 
+    #  2015 04 08 - BTL
+    #  I just got bitten very badly by the incredibly annoying behavior of R's 
+    #  sample() function, so here is a replacement function that I need to 
+    #  use everywhere now.
+    #  When I called sample with a vector that sometimes had length n=1, 
+    #  it sampled from 1:n instead of returning the single value.  
+    #  This majorly screwed all kinds of things in a very subtle, very hard 
+    #  to find way.
+
+safe_sample = function (x,...) { if (length (x) == 1) x else sample (x,...) } 
+
+#===============================================================================
+
 source (paste0 (sourceCodeLocationWithSlash, "gscp_3_get_parameters.R"))
 
 #===============================================================================
