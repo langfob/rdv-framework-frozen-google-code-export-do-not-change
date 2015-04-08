@@ -157,7 +157,13 @@ create_Xu_graph = function (num_nodes_per_group,
             }
         }
 
-    
+    if (DEBUG_LEVEL > 0)
+        {
+        cat ("\n\nedge_list (at end of gscp_9a):\n\n")
+        print (edge_list)
+        cat ("\n\n")
+        }
+        
 #    return (edge_list_and_cur_row)
     return (edge_list)
     }
