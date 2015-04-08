@@ -20,12 +20,36 @@ if (parameters$use_unif_rand_n__num_groups)
     }
 
 alpha__ = parameters$alpha__
-if (parameters$use_unif_rand_alpha__)
+if (parameters$derive_alpha_from_n__num_groups_and_opt_frac_0.5)
     {
-    alpha__ = runif (1, 
-                     min = parameters$alpha___lower_bound,
-                     max = parameters$alpha___upper_bound
-                     )
+        #  BTL - 2015 04 08
+        #  This is a special case to summarize the conditions for the 
+        #  main large set of experiments for the biodivprobgen paper.
+        #  In this case, there will be 1 dependent node and 1 independent 
+        #  node for each group, so the optimal solution will use 50% of 
+        #  the total number of nodes (i.e., planning units).  
+        #  I also want to randomly choose from a range of n__num_groups, 
+        #  which will in turn dictate the number of planning units to be 
+        #  twice the number of groups since there are 2 planning units 
+        #  per group in this case.
+        #  Since alpha, n, and num_nodes_per_group are all interlinked, 
+        #  choosing 2 of them will force the value of the third.  
+        #  In this case, I will choose num_nodes_per_group and n__num_groups, 
+        #  so the alpha value will be forced.
+    
+    num_nodes_per_group = 2
+    desired_num_PUs = num_nodes_per_group * n__num_groups
+    alpha__ = log (desired_num_PUs, n__num_groups) - 1
+    
+    } else
+    {
+    if (parameters$use_unif_rand_alpha__)
+        {
+        alpha__ = runif (1, 
+                         min = parameters$alpha___lower_bound,
+                         max = parameters$alpha___upper_bound
+                         )
+        }
     }
 
 p__prop_of_links_between_groups = parameters$p__prop_of_links_between_groups
@@ -141,6 +165,9 @@ num_rounds_of_linking_between_groups = integerize (r__density * n__num_groups * 
 base_for_target_num_links_between_2_groups_per_round = 
     parameters$base_for_target_num_links_between_2_groups_per_round
 
+        #  BTL - 2015 04 08
+        #  Is this variable still used somewhere?
+        #  Can't find it appearing when I grep all of the R files right now...
 at_least_1_for_target_num_links_between_2_groups_per_round = 
     parameters$at_least_1_for_target_num_links_between_2_groups_per_round
 
