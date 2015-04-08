@@ -68,13 +68,13 @@ link_nodes_between_groups =
             group_2_nodes = nodes [(nodes$group_ID == group_2) & (nodes$dependent_set_member), 
                               "node_ID"]
 
-            if (DEBUG_LEVEL > 0)
-                {
-                cat ("\n\n-----\ngroup_1_nodes = : ")
-                print (group_1_nodes)
-                cat ("\ngroup_2_nodes = : ")
-                print (group_2_nodes)
-                }
+#             if (DEBUG_LEVEL > 0)
+#                 {
+#                 cat ("\n\n-----\ngroup_1_nodes = : ")
+#                 print (group_1_nodes)
+#                 cat ("\ngroup_2_nodes = : ")
+#                 print (group_2_nodes)
+#                 }
 
             #***----------------------------------------------------------------------------
             
