@@ -85,7 +85,7 @@ link_nodes_between_groups =
             safe_sample (group_2_nodes, target_num_links_between_2_groups_per_round, 
                   replace=TRUE)
 
-            if (DEBUG_LEVEL > 0)
+            if (DEBUG_LEVEL > 1)
                 {
                 cat ("\n\n-----\ngroup_1_sampled_nodes = : ")
                 print (group_1_sampled_nodes)
@@ -99,7 +99,7 @@ link_nodes_between_groups =
                 {                
                 edge_list [cur_row, 1] = group_1_sampled_nodes [cur_node_pair_idx]
                 edge_list [cur_row, 2] = group_2_sampled_nodes [cur_node_pair_idx]
-                if (DEBUG_LEVEL > 0)
+                if (DEBUG_LEVEL > 1)
                     {
                     cat ("\n\n-----\ncur_node_pair_idx = : ")
                     print (cur_node_pair_idx)

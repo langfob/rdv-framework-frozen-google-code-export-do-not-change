@@ -150,7 +150,7 @@
     #  debugging level: 0 means don't output debugging write statements.
     #  Having this as an integer instead of binary so that I can have 
     #  multiple levels of detail if I want to.
-DEBUG_LEVEL = 0
+DEBUG_LEVEL = 1
 
 #===============================================================================
 
