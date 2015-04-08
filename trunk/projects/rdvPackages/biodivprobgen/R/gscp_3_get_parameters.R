@@ -15,6 +15,16 @@
     #  editing the resulting lines:
     #       grep 'parameters\$' generateSetCoverProblem.R
 
+    #  2015 04 08 - BTL
+    #  Note that the variables listed in this routine are very likely to be 
+    #  out of date due to the constant evolution of the rest of the code 
+    #  for this project.  
+    #  If you're going to use this local_build_parameters_list() function, 
+    #  you should rebuild it to match the variables currently used in the 
+    #  rest of the code.  The code shown here for this function is only here 
+    #  to provide an example of what it might look like based on the parameters 
+    #  that were in use when it was first generated.  
+
 local_build_parameters_list = function ()
     {   
     parameters = list()

@@ -22,7 +22,7 @@ libraries:
 
 #####
 #####  2014 12 11 - BTL
-#####  Note that all variables containing the word "group" have been 
+#####  Note that all variables containing the word "clique" have been 
 #####  changed to use the word "group" instead.
 #####
 
@@ -54,17 +54,20 @@ base_params:
             #  If you don't want the newlines (i.e., you want one long string), 
             #  then use a ">" in place of the "|".
     runset_description: |
-        This runset is uses the rough bounds on the range of Xu parameters 
-        that led to errors in Marxan in the early exploratory tests.  The 
-        idea is to generate a more dense set of errors to learn from since 
-        the random ranges of parameters didn't generate enough errors to 
-        use as learning input.  It also focuses on just one number of planning 
-        units (80) and one optimal fraction (0.5).  This test is also trying 
-        to see whether a larger number of planning units yields a lot more 
-        difficult problems.
+        This is a large runset that generates problems with even numbers of 
+        planning units randomly chosen to be between 10 and 50.  It forces 
+        the optimal solution fraction to be 0.5 for all generated problems.  
+        It derives the alpha value from the combination of the 0.5 solution 
+        fraction and the randomly chosen number of groups.  The r and p values 
+        are chosen randomly across a wide range rather than focusing on the 
+        areas where the Xu papers found errors.  The idea is to generate 
+        a broad variety of problems but make sure that it doesn't end up with 
+        just a few problems that generate errors.  It is also trying very 
+        small numbers of planning units to see whether hard problems can occur 
+        there as well.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg500run1sce5001ranPUs"
+    runset_abbrev: "bdpg10kruns1sce10001ranSeed10to60ranPUs"
 
     run_id: $$run_id$$
 
@@ -138,6 +141,10 @@ base_params:
     
     base_for_target_num_links_between_2_groups_per_round: "num_nodes_per_group"
 #    base_for_target_num_links_between_2_groups_per_round: "num_dependent_nodes_per_group"
+
+        #  BTL - 2015 04 08
+        #  Is this variable still used somewhere?
+        #  Can't find it appearing when I grep all of the R files right now...
 
     at_least_1_for_target_num_links_between_2_groups_per_round: FALSE
     
@@ -249,20 +256,20 @@ base_params:
 
 scenarios:
             
-    - name: 40_PUs_all_vars_in_error_early_tests_error_range
+    - name: scen_rand_10_to_60_PUs_0.5_optFrac_random_r_and_p
       parameters:
-            use_unif_rand_n__num_groups: FALSE
-            n__num_groups: 40      #  20
-    
-            use_unif_rand_alpha__: FALSE
-            alpha__: 0.187901825
+            derive_alpha_from_n__num_groups_and_opt_frac_0.5: TRUE
+            
+            use_unif_rand_n__num_groups: TRUE
+            n__num_groups_lower_bound: 5
+            n__num_groups_upper_bound: 30
     
             use_unif_rand_r__density: TRUE
-            r__density_lower_bound: 0.25
+            r__density_lower_bound: 0.01
             r__density_upper_bound: 5.0
 
             use_unif_rand_p__prop_of_links_between_groups: TRUE
-            p__prop_of_links_between_groups_lower_bound: 0.25
+            p__prop_of_links_between_groups_lower_bound: 0.01
             p__prop_of_links_between_groups_upper_bound: 0.99
 
     #---------------------------------------------------------------------------
@@ -271,9 +278,9 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 5001
+          start: 6001
           step_size: 1
-          count: 500
+          count: 5
           
     #---------------------------------------------------------------------------
     
