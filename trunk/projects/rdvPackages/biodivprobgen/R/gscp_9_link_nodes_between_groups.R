@@ -79,13 +79,13 @@ link_nodes_between_groups =
             #***----------------------------------------------------------------------------
             
             group_1_sampled_nodes = 
-            safe_sample (group_1_nodes, target_num_links_between_2_groups_per_round, 
-                  replace=TRUE)
+                safe_sample (group_1_nodes, target_num_links_between_2_groups_per_round, 
+                      replace=TRUE)
             group_2_sampled_nodes = 
-            safe_sample (group_2_nodes, target_num_links_between_2_groups_per_round, 
-                  replace=TRUE)
+                safe_sample (group_2_nodes, target_num_links_between_2_groups_per_round, 
+                      replace=TRUE)
 
-            if (DEBUG_LEVEL > 1)
+            if (DEBUG_LEVEL > 0)
                 {
                 cat ("\n\n-----\ngroup_1_sampled_nodes = : ")
                 print (group_1_sampled_nodes)
@@ -99,7 +99,7 @@ link_nodes_between_groups =
                 {                
                 edge_list [cur_row, 1] = group_1_sampled_nodes [cur_node_pair_idx]
                 edge_list [cur_row, 2] = group_2_sampled_nodes [cur_node_pair_idx]
-                if (DEBUG_LEVEL > 1)
+                if (DEBUG_LEVEL > 0)
                     {
                     cat ("\n\n-----\ncur_node_pair_idx = : ")
                     print (cur_node_pair_idx)
@@ -111,9 +111,9 @@ link_nodes_between_groups =
                     print (edge_list [cur_row, 2])
                     }
                 cur_row = cur_row + 1
-                }
-            }        
-        }
+                }  #  end for - cur_node_pair_idx
+            }  #  end for - cur_round      
+        }  #  end if - (target_num_links_between_2_groups_per_round >= 1)
     
     if (DEBUG_LEVEL > 0)
         {
