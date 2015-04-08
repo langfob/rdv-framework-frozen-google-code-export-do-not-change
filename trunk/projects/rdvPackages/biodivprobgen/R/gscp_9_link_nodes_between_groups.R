@@ -39,6 +39,15 @@ link_nodes_between_groups =
                 #  Draw a random pair of groups to link in this round.
             cur_group_pair = sample (1:n__num_groups, 2, replace=FALSE)
             
+                #  Find all dependent set nodes in each group of the current 
+                #  group pair.  
+                #  Note that ONLY dependent set nodes are allowed.  Otherwise, 
+                #  you might get links between members of the independent set. 
+                #  Also, if you allowed a link from the independent set to a 
+                #  node outside its group, you could violate the constraint 
+                #  that insures that every node in the dependent set is 
+                #  necessary in the solution.
+            
                 #  I'm using min and max here because smaller group IDs were 
                 #  filled with smaller node IDs, so every node ID in the 
                 #  smaller group ID should be the smaller node ID of any pairing 
@@ -58,7 +67,15 @@ link_nodes_between_groups =
             group_2 = max (cur_group_pair)
             group_2_nodes = nodes [(nodes$group_ID == group_2) & (nodes$dependent_set_member), 
                               "node_ID"]
-            
+
+            if (DEBUG_LEVEL > 0)
+                {
+                cat ("\n\n-----\ngroup_1_nodes = : ")
+                print (group_1_nodes)
+                cat ("\ngroup_2_nodes = : ")
+                print (group_2_nodes)
+                }
+
             #***----------------------------------------------------------------------------
             
             group_1_sampled_nodes = 
@@ -79,6 +96,8 @@ link_nodes_between_groups =
     
     if (DEBUG_LEVEL > 0)
         {
+        cat ("\n\nnodes (in gscp_9...):\n\n")
+        print (nodes)
         cat ("\n\nedge_list (fully loaded at end of gscp_9...):\n\n")
         print (edge_list)
         cat ("\n\n")
