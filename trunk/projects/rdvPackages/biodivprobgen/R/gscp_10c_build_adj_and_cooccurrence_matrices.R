@@ -109,7 +109,11 @@ if (length (unmet_spp_rep_frac_indices) > 0)
     print (spp_rep_fracs [unmet_spp_rep_frac_indices])
     cat ("\n\nAll spp rep fracs = \n")
     print (spp_rep_fracs)
-    cat ("\n\n")
+    cat ("\n\ndependent_node_IDs = \n")
+    print (dependent_node_IDs)
+    cat ("\n\nbpm = \n")
+    print (bpm)
+    
     
     stop()
     }

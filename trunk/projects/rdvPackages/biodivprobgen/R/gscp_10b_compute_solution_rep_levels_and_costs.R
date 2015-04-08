@@ -4,8 +4,8 @@
 
 #===============================================================================
 
-VERBOSE = FALSE
-TESTING = FALSE
+VERBOSE = TRUE
+TESTING = TRUE
 
 #===============================================================================
 
@@ -28,7 +28,7 @@ timepoints_df =
 ###  PU columns adjacency matrix.
 
 compute_rep_fraction = 
-    function (spp_rows_by_PU_cols_adj_matrix, 
+    function (spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU, 
               PU_set_to_test,
               spp_rep_targets = 1  #  replace with vector if not all 1s
               )
@@ -38,20 +38,20 @@ compute_rep_fraction =
         #  Once that's done, summing each spp row will tell you how much 
         #  representation each spp achieves in the proposed solution.
 #browser()
-    selected_PUs_adj_matrix = 
-#        spp_rows_by_PU_cols_adj_matrix [ , which (PU_set_to_test)]
-        spp_rows_by_PU_cols_adj_matrix [ , PU_set_to_test, drop=FALSE]
-    spp_rep_cts = apply (selected_PUs_adj_matrix, 1, sum)
+    selected_PUs_matrix_of_spp_cts_per_PU = 
+#        spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU [ , which (PU_set_to_test)]
+        spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU [ , PU_set_to_test, drop=FALSE]
+    spp_rep_cts = apply (selected_PUs_matrix_of_spp_cts_per_PU, 1, sum)
     spp_rep_fracs = 1 + ((spp_rep_cts - spp_rep_targets) / spp_rep_targets)
     
     if (VERBOSE)
         {
         if (length (spp_rep_targets) == 1)
             spp_rep_targets = rep (spp_rep_targets, 
-                                   dim (selected_PUs_adj_matrix) [1])
+                                   dim (selected_PUs_matrix_of_spp_cts_per_PU) [1])
         display_matrix = 
-            cbind (selected_PUs_adj_matrix, spp_rep_cts, spp_rep_targets, spp_rep_fracs)
-        cat ("selected_PUs_adj_matrix with cts, targets, and fracs appended = \n")
+            cbind (selected_PUs_matrix_of_spp_cts_per_PU, spp_rep_cts, spp_rep_targets, spp_rep_fracs)
+        cat ("\nIn compute_rep_fraction():\nselected_PUs_matrix_of_spp_cts_per_PU with cts, targets, and fracs appended = \n")
         print (display_matrix)
         }
     
@@ -76,55 +76,58 @@ compute_solution_cost =
 test_compute_rep_fraction = 
     function ()
     {
-        #  Create adjacency matrix with 5 spp and 4 PUs.
-    adj_matrix = 
+    
+        #  Create a solution set to test that includes 2 PUs out of 4.
+    num_PUs = 4
+    solution_set = c (1, 3)
+    
+        #  Create a set of target levels for each of 5 spp.
+    num_spp = 5
+    spp_target_levels = c (20, 10, 30, 10, 0)
+    
+        #  Create adjacency matrix with 5 spp rows and 4 PU columns.
+    matrix_of_spp_cts_per_PU = 
         matrix (c ( 1, 2, 3, 4,
                     5, 6, 7, 8, 
                     9, 10, 11, 12,
                     13, 14, 15, 16, 
                     17, 18, 19, 20), 
-                nrow=5, ncol=4, byrow=TRUE
+                nrow=num_spp, ncol=num_PUs, byrow=TRUE
                 )
     
-        #  Create a solution set to test that includes 2 PUs.
- #   solution_set = c (TRUE, FALSE, TRUE, FALSE)
-    solution_set = c (1, 3)
-    
-        #  Create a set of spp target levels.
-    spp_target_levels = c (20, 10, 30, 10, 0)
-    
-    num_spp = 5
-    num_PUs = 4
-    
         #  Test with default targets of all 1s.
+    if (VERBOSE)  cat ("\n\nCASE:  default targets all 1s.")
     correct_answer = c (4, 12, 20, 28, 36)
-    answer = compute_rep_fraction (adj_matrix, solution_set, 1)
+    answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, solution_set, 1)
     if (isTRUE (all.equal (correct_answer, answer))) cat (".") else cat ("F")
     if (VERBOSE)
         {
-        cat ("\n\ncorrect answer = ", correct_answer)
+        cat ("\ncorrect answer = ", correct_answer)
         cat ("\nanswer         = ", answer, "\n")
         }
     
         #  Test with targets of all 20s.
+    if (VERBOSE)  cat ("\n\nCASE:  default targets all 20s.")
     correct_answer = c (0.2, 0.6, 1.0, 1.4, 1.8)
-    answer = compute_rep_fraction (adj_matrix, solution_set, 20)
+    answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, solution_set, 20)
     if (isTRUE (all.equal (correct_answer, answer))) cat (".") else cat ("F")
     if (VERBOSE)
         {
-        cat ("\n\ncorrect answer = ", correct_answer)
+        cat ("\ncorrect answer = ", correct_answer)
         cat ("\nanswer         = ", answer, "\n")
         }
     
+        #  Test with spp_target_levels = c (20, 10, 30, 10, 0)
+    if (VERBOSE)  cat ("\n\nCASE:  spp_target_levels = c (20, 10, 30, 10, 0).")
     correct_answer = c (0.2, 1.2, 0.6666667, 2.8, Inf)
-    answer = compute_rep_fraction (adj_matrix, solution_set, spp_target_levels)
+    answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, solution_set, spp_target_levels)
     if (isTRUE (all.equal (correct_answer, answer, tolerance = 1e-6))) cat (".") else cat ("F")
     if (VERBOSE)
         {
-        cat ("\n\ncorrect answer = ", correct_answer)
+        cat ("\ncorrect answer = ", correct_answer)
         cat ("\nanswer         = ", answer, "\n")
-        ae = all.equal (correct_answer, answer, tolerance = 1e-6)
-        cat ("\nae = ", ae)
+        all.equal_result = all.equal (correct_answer, answer, tolerance = 1e-6)
+        cat ("\nall.equal_result = ", all.equal_result)
         
         #  http://www.johnmyleswhite.com/notebook/2012/04/13/floating-point-arithmetic-and-the-descent-into-madness/
         #  From one of the comments:
@@ -167,15 +170,15 @@ test_compute_rep_fraction =
         #  c_a - a =  5.551115e-17,  0,  3.333333e-08,  0,  NaN 
         #  
         
-        cat ("\nc_a - a = ", (correct_answer - answer), "\n")
+        cat ("\ncorrect_answer - answer = ", (correct_answer - answer), "\n")
         for (iii in 1:length(correct_answer))
             {
             kkk = all.equal (correct_answer[iii], answer[iii], tolerance = 1e-6)
             cat ("\niii = ", iii, 
                  ":  all.equal", kkk, 
                      ":  ==", (correct_answer[iii] == answer[iii]), 
-                 ":  c_a = ", correct_answer[iii], 
-                 "  a = ", answer[iii])
+                 ":  correct_answer = ", correct_answer[iii], 
+                 "  answer = ", answer[iii])
             }
         cat ("\n")
         }
