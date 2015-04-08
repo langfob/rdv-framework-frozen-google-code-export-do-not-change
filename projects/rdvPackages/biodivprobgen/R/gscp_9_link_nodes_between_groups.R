@@ -78,27 +78,31 @@ link_nodes_between_groups =
 
             #***----------------------------------------------------------------------------
             
-            group_1_sampled_nodes = 
-                safe_sample (group_1_nodes, target_num_links_between_2_groups_per_round, 
-                      replace=TRUE)
-            group_2_sampled_nodes = 
-                safe_sample (group_2_nodes, target_num_links_between_2_groups_per_round, 
-                      replace=TRUE)
-
-            if (DEBUG_LEVEL > 0)
-                {
-                cat ("\n\n-----\ngroup_1_sampled_nodes = : ")
-                print (group_1_sampled_nodes)
-                cat ("\ngroup_2_sampled_nodes = : ")
-                print (group_2_sampled_nodes)
-                cat ("\ntarget_num_links_between_2_groups_per_round = : ")
-                print (target_num_links_between_2_groups_per_round)
-                }
+#             group_1_sampled_nodes = 
+#                 safe_sample (group_1_nodes, target_num_links_between_2_groups_per_round, 
+#                       replace=TRUE)
+#             group_2_sampled_nodes = 
+#                 safe_sample (group_2_nodes, target_num_links_between_2_groups_per_round, 
+#                       replace=TRUE)
+# 
+#             if (DEBUG_LEVEL > 0)
+#                 {
+#                 cat ("\n\n-----\ngroup_1_sampled_nodes = : ")
+#                 print (group_1_sampled_nodes)
+#                 cat ("\ngroup_2_sampled_nodes = : ")
+#                 print (group_2_sampled_nodes)
+#                 cat ("\ntarget_num_links_between_2_groups_per_round = : ")
+#                 print (target_num_links_between_2_groups_per_round)
+#                 }
 
             for (cur_node_pair_idx in 1:target_num_links_between_2_groups_per_round)
                 {                
-                edge_list [cur_row, 1] = group_1_sampled_nodes [cur_node_pair_idx]
-                edge_list [cur_row, 2] = group_2_sampled_nodes [cur_node_pair_idx]
+#                edge_list [cur_row, 1] = group_1_sampled_nodes [cur_node_pair_idx]
+                edge_list [cur_row, 1] = safe_sample (group_1_nodes, 1)
+                
+#                edge_list [cur_row, 2] = group_2_sampled_nodes [cur_node_pair_idx]
+                edge_list [cur_row, 2] = safe_sample (group_2_nodes, 1)
+                
                 if (DEBUG_LEVEL > 0)
                     {
                     cat ("\n\n-----\ncur_node_pair_idx = : ")
