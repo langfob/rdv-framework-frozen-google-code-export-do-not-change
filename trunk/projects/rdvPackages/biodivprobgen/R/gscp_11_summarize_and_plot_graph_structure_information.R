@@ -70,11 +70,11 @@ dev.off()
 
 #-------------------------------------------------------------------------------
 
-if (DEBUG_LEVEL > 0)
-    {
-    cat ("\n\nNumber of nodes per link BEFORE intergroup linking:\n")
-    print (initial_node_counts_for_each_link)
-    }
+# if (DEBUG_LEVEL > 0)
+#     {
+#     cat ("\n\nNumber of nodes per link BEFORE intergroup linking:\n")
+#     print (initial_node_counts_for_each_link)
+#     }
 
 final_node_counts_for_each_link = count (PU_spp_pair_indices, vars=spp_col_name)
 #final_node_counts_for_each_link = count (PU_spp_pair_names, vars=spp_col_name)
