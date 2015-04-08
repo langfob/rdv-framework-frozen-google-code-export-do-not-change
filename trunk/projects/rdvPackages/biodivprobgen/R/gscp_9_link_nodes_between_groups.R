@@ -77,6 +77,14 @@ link_nodes_between_groups =
             }        
         }
     
+    if (DEBUG_LEVEL > 0)
+        {
+        cat ("\n\nedge_list (fully loaded at end of gscp_9...):\n\n")
+        print (edge_list)
+        cat ("\n\n")
+        }
+    
+    
 #     return (list (edge_list=edge_list, 
 #                   cur_row=cur_row))
     return (edge_list)
