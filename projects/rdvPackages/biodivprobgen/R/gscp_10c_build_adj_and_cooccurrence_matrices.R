@@ -106,8 +106,12 @@ if (length (unmet_spp_rep_frac_indices) > 0)
     cat ("\n\nSERIOUS ERROR: The generated optimal solution is not a solution.",
          "\n               Species at the following indices in spp_rep_fracs have representation < 1:\n", 
          "\n               ")
-    print (unmet_spp_rep_frac_indices)
-    cat ("\n")
+    print (spp_rep_fracs [unmet_spp_rep_frac_indices])
+    cat ("\n\nAll spp rep fracs = \n")
+    print (spp_rep_fracs)
+    cat ("\n\n")
+    
+    stop()
     }
 
 solution_cost = compute_solution_cost (dependent_node_IDs, rep (1, num_PUs))
