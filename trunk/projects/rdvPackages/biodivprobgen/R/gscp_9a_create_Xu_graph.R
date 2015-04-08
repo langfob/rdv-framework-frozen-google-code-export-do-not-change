@@ -65,6 +65,9 @@ sort_within_rows = function (a_2_col_matrix, decreasing=FALSE)
     {
     for (row in 1:dim(a_2_col_matrix)[1])
         {
+cat ("\na_2_col_matrix [", row, ",] = ")
+print (a_2_col_matrix [row,])
+
         a_2_col_matrix [row,] = sort (a_2_col_matrix [row,], decreasing)
         }
     
