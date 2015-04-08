@@ -37,7 +37,7 @@ link_nodes_between_groups =
             cat ("\nRound", cur_round)
             
                 #  Draw a random pair of groups to link in this round.
-            cur_group_pair = sample (1:n__num_groups, 2, replace=FALSE)
+            cur_group_pair = safe_sample (1:n__num_groups, 2, replace=FALSE)
             
                 #  Find all dependent set nodes in each group of the current 
                 #  group pair.  
@@ -79,10 +79,10 @@ link_nodes_between_groups =
             #***----------------------------------------------------------------------------
             
             group_1_sampled_nodes = 
-            sample (group_1_nodes, target_num_links_between_2_groups_per_round, 
+            safe_sample (group_1_nodes, target_num_links_between_2_groups_per_round, 
                   replace=TRUE)
             group_2_sampled_nodes = 
-            sample (group_2_nodes, target_num_links_between_2_groups_per_round, 
+            safe_sample (group_2_nodes, target_num_links_between_2_groups_per_round, 
                   replace=TRUE)
 
             if (DEBUG_LEVEL > 0)
@@ -91,6 +91,8 @@ link_nodes_between_groups =
                 print (group_1_sampled_nodes)
                 cat ("\ngroup_2_sampled_nodes = : ")
                 print (group_2_sampled_nodes)
+                cat ("\ntarget_num_links_between_2_groups_per_round = : ")
+                print (target_num_links_between_2_groups_per_round)
                 }
 
             for (cur_node_pair_idx in 1:target_num_links_between_2_groups_per_round)

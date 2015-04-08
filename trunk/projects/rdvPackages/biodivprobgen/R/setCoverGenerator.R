@@ -14,6 +14,19 @@
 
 #===============================================================================
 
+    #  2015 04 08 - BTL
+    #  I just got bitten very badly by the incredibly annoying behavior of R's 
+    #  sample() function, so here is a replacement function that I need to 
+    #  use everywhere now.
+    #  When I called sample with a vector that sometimes had length n=1, 
+    #  it sampled from 1:n instead of returning the single value.  
+    #  This majorly screwed all kinds of things in a very subtle, very hard 
+    #  to find way.
+
+safe_sample = function (x,...) { if (length (x) == 1) x else sample (x,...) } 
+
+#===============================================================================
+
 #  define initial option and derived values, particularly, array sizes
 #  create dependent set nodes
 #  build set of cliques given a set of clique IDs
@@ -377,7 +390,7 @@ for (curGroupID in 1:numGroups)
 independentSet = rep (0, numGroups)
 for (curGroupID in 1:numGroups)
     {
-    independentSet [curGroupID] = sample (subsetIDsInGroup [curGroupID,], 1)
+    independentSet [curGroupID] = safe_sample (subsetIDsInGroup [curGroupID,], 1)
     }
 
         # A subset pair is an unordered pair of two subsets.
@@ -522,7 +535,7 @@ subsetsColl = buildCliques (numLinks, linkColl, #curLinkID,
 for (curIdx in 1:numIntergroupLinkingRounds)
     {
         #  Randomly select 2 different groups
-    groupPair = sample (1:numGroups, 2, replace=FALSE)
+    groupPair = safe_sample (1:numGroups, 2, replace=FALSE)
     firstGroupID = min (groupPair)
     secondGroupID = max (groupPair)
 
@@ -551,7 +564,7 @@ for (curIdx in 1:numIntergroupLinkingRounds)
 #  value when this is not an integer.  For the moment, I'll just round it.
 targetNumLinksBetweenGroups = round (targetNumLinksBetweenGroups)
     indicesOfLinksToAddToSubsets =
-        sample (linkIndicesToDrawFrom, targetNumLinksBetweenGroups,
+        safe_sample (linkIndicesToDrawFrom, targetNumLinksBetweenGroups,
                 replace=FALSE)
 #browser()
     for (curLinkIdx in indicesOfLinksToAddToSubsets)
