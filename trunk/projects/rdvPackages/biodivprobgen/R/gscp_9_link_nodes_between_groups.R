@@ -68,13 +68,13 @@ link_nodes_between_groups =
             group_2_nodes = nodes [(nodes$group_ID == group_2) & (nodes$dependent_set_member), 
                               "node_ID"]
 
-#             if (DEBUG_LEVEL > 0)
-#                 {
-#                 cat ("\n\n-----\ngroup_1_nodes = : ")
-#                 print (group_1_nodes)
-#                 cat ("\ngroup_2_nodes = : ")
-#                 print (group_2_nodes)
-#                 }
+            if (DEBUG_LEVEL > 0)
+                {
+                cat ("\n\n-----\ngroup_1_nodes = : ")
+                print (group_1_nodes)
+                cat ("\ngroup_2_nodes = : ")
+                print (group_2_nodes)
+                }
 
             #***----------------------------------------------------------------------------
             
@@ -84,11 +84,30 @@ link_nodes_between_groups =
             group_2_sampled_nodes = 
             sample (group_2_nodes, target_num_links_between_2_groups_per_round, 
                   replace=TRUE)
-            
+
+            if (DEBUG_LEVEL > 0)
+                {
+                cat ("\n\n-----\ngroup_1_sampled_nodes = : ")
+                print (group_1_sampled_nodes)
+                cat ("\ngroup_2_sampled_nodes = : ")
+                print (group_2_sampled_nodes)
+                }
+
             for (cur_node_pair_idx in 1:target_num_links_between_2_groups_per_round)
                 {                
                 edge_list [cur_row, 1] = group_1_sampled_nodes [cur_node_pair_idx]
                 edge_list [cur_row, 2] = group_2_sampled_nodes [cur_node_pair_idx]
+                if (DEBUG_LEVEL > 0)
+                    {
+                    cat ("\n\n-----\ncur_node_pair_idx = : ")
+                    print (cur_node_pair_idx)
+                    cat ("\ncur_row = : ")
+                    print (cur_row)
+                    cat ("\nedge_list [cur_row, 1] = : ")
+                    print (edge_list [cur_row, 1])
+                    cat ("\nedge_list [cur_row, 2] = : ")
+                    print (edge_list [cur_row, 2])
+                    }
                 cur_row = cur_row + 1
                 }
             }        
