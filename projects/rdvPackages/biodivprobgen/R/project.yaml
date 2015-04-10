@@ -55,7 +55,7 @@ base_params:
             #  then use a ">" in place of the "|".
     runset_description: |
         This is a large runset that generates problems with even numbers of 
-        planning units randomly chosen to be between 10 and 50.  It forces 
+        planning units randomly chosen to be between 10 and 60.  It forces 
         the optimal solution fraction to be 0.5 for all generated problems.  
         It derives the alpha value from the combination of the 0.5 solution 
         fraction and the randomly chosen number of groups.  The r and p values 
