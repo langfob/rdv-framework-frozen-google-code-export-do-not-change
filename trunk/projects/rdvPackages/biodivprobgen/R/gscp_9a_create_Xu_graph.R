@@ -210,6 +210,8 @@ create_Xu_graph = function (num_nodes_per_group,
                         nrow = max_possible_tot_num_links, 
                         ncol = 2, 
                         byrow = TRUE)
+    
+    colnames (edge_list) = c("from_node", "to_node")
 
     #---------------------------------------------------------------------------
     
