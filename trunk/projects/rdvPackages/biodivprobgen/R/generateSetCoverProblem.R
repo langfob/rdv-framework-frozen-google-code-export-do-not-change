@@ -153,7 +153,7 @@
 DEBUG_LEVEL = 0
 
     #  Turn all R warnings into errors.
-option (warn=2)
+options (warn=2)
 
 #===============================================================================
 
