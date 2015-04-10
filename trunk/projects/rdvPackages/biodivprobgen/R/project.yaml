@@ -67,7 +67,7 @@ base_params:
         there as well.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg10kruns1sce10001ranSeed10to60ranPUs"
+    runset_abbrev: "bdpg1kruns1sce7001ranSeed10to60ranPUs"
 
     run_id: $$run_id$$
 
@@ -278,13 +278,9 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 6043
-#          start: 6001
-#          start: 6004
+          start: 7001
           step_size: 1
-#          count: 100
-#          count: 5
-          count: 1
+          count: 1000
           
     #---------------------------------------------------------------------------
     
