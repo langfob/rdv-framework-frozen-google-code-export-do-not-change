@@ -278,12 +278,13 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 6001
+          start: 6043
+#          start: 6001
 #          start: 6004
           step_size: 1
-          count: 100
+#          count: 100
 #          count: 5
-#          count: 1
+          count: 1
           
     #---------------------------------------------------------------------------
     

@@ -236,6 +236,14 @@ for (cur_run_length in rle_lengths_and_values$lengths)
 
     #--------------------
 
+#  2015 04 10 - BTL
+#  NOTE:  In the following code, the call to loess() occasionally generates a 
+#         warning and that causes everything to fail when I have options(warn=2)
+#         set to turn all warnings into errors.
+#         Since this is unimportant code that is only aimed at giving a bit 
+#         more visualization of the results, I'm going to wrap all of the 
+#         loess() calls in suppressWarnings() to keep things from failing.
+
     #  See http://www.statmethods.net/advgraphs/axes.html and 
     #  http://www.statmethods.net/advgraphs/parameters.html 
     #  for help on plot labelling.
@@ -250,7 +258,7 @@ plot (cost, frac_of_all_spp_meeting_their_target,
       main="Marxan summed solutions\nFraction of spp meeting targets vs. Raw costs", 
       xlab="Solution cost", 
       ylab="Fraction of spp meeting target")
-lines (loess (frac_of_all_spp_meeting_their_target ~ cost))    #  good fit
+lines (suppressWarnings (loess (frac_of_all_spp_meeting_their_target ~ cost)))    #  good fit
 #lines (lowess (cost, frac_of_all_spp_meeting_their_target))    #  terrible fit
 abline (v=correct_optimum_cost, lty=2)
 abline (h=1.0, lty=2)
@@ -262,7 +270,7 @@ plot (landscape_frac_cost, frac_of_all_spp_meeting_their_target,
       main="Marxan summed solutions\nFraction of spp meeting targets vs. Normalized costs", 
       xlab="Solution cost as fraction of total landscape cost", 
       ylab="Fraction of spp meeting target")
-lines (loess (frac_of_all_spp_meeting_their_target ~ landscape_frac_cost))    #  good fit
+lines (suppressWarnings (loess (frac_of_all_spp_meeting_their_target ~ landscape_frac_cost)))    #  good fit
 abline (v=correct_optimum_landscape_frac_cost, lty=4)
 abline (h=1.0, lty=4)
 dev.off()
@@ -282,7 +290,7 @@ plot (optimal_frac_cost, frac_of_all_spp_meeting_their_target,
       main="Marxan summed solutions\nFraction of spp meeting targets vs. Fraction of optimal cost", 
       xlab="Solution cost as fraction of optimal cost", 
       ylab="Fraction of spp meeting target")
-lines (loess (frac_of_all_spp_meeting_their_target ~ optimal_frac_cost))    #  good fit
+lines (suppressWarnings (loess (frac_of_all_spp_meeting_their_target ~ optimal_frac_cost)))    #  good fit
 abline (v=1, lty=5)
 abline (h=1.0, lty=5)
 dev.off()
@@ -293,7 +301,7 @@ plot (optimal_frac_cost, frac_rep_met_over_optimal_frac_cost,
       main="Marxan summed solutions\nRatio: sppFrac/optCostFrac vs. optCostFrac", 
       xlab="Solution cost as fraction of optimal cost", 
       ylab="Fraction of spp meeting target / fraction of optimal cost")
-#lines (loess (frac_of_all_spp_meeting_their_target ~ optimal_frac_cost))    #  good fit
+#lines (suppressWarnings (loess (frac_of_all_spp_meeting_their_target ~ optimal_frac_cost)))    #  good fit
 abline (v=1, lty=6)
 abline (h=1.0, lty=6)
 dev.off()
