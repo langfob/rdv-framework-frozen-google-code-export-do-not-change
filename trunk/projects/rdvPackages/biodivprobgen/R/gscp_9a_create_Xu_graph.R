@@ -4,8 +4,6 @@
 
 #===============================================================================
 
-    #  BTL - 2015 02 25 - Temporary testing code for tzar's rrunner.R
-    #
     #  The following couple of lines were used to test the new version of the 
     #  rrunner.R code in tzar.  
     #  The changes there were done to improve the output when your R code 
@@ -14,6 +12,7 @@
     #  The second was to make it generate a fatal error and crash the program.
     #  I'm going to leave these in here in case I need to go back and test 
     #  rrunner crash behavior under tzar again later.
+    #  BTL - 2015 02 25
 
 #  This should warn...
 #kkkkk = log (-1)
@@ -22,7 +21,6 @@
 #aaaaa = bbbbb
 
 #===============================================================================
-
 
 default_integerize_string = "round"
 integerize_string = default_integerize_string
@@ -63,16 +61,31 @@ timepoints_df =
 
 assert_edge_list_does_not_violate_assumptions = 
     function (edge_list, first_row_of_intergroup_links)
-    {
-    edge_list_error = FALSE
+    {        
+        #--------------------------------------------------------------------
+        #  Set a flag to indicate whether any error at all has occurred in 
+        #  this routine.  Check it at the end of the function.
+        #  Any error that is caught in here will set this flag to TRUE but 
+        #  not cause the routine to fail until it has looked at all edges.
+        #  Doing it this way because I want to catch as many errors as  
+        #  possible in one pass, so that you don't have to keep rerunning 
+        #  the code to get all the errors if there are lots of them.
+        #--------------------------------------------------------------------
+        
+    edge_list_error = FALSE    
     
-        #  Verify that within group links don't violate assumptions.
+        #-------------------------------------------------------------
+        #  Verify that WITHIN group links don't violate assumptions.
+        #-------------------------------------------------------------
+
     for (cur_row in seq (1, (first_row_of_intergroup_links - 1)))
         {
         from_node = edge_list [cur_row, 1]
         to_node   = edge_list [cur_row, 2]
         
+            #-----------------------------------------------
             #  Nodes in an edge must be in the same group.
+            #-----------------------------------------------
         
         if (! (nodes$group_ID [[from_node]] == nodes$group_ID [[to_node]]))
             {
@@ -86,9 +99,11 @@ assert_edge_list_does_not_violate_assumptions =
                  "].")
             }
         
+            #---------------------------------------------------------------
             #  Independent set nodes really are independent, i.e., 
             #  no edge connected to an independent set node can connect to 
             #  another independent set node.
+            #---------------------------------------------------------------
         
         if ((! nodes$dependent_set_member [[from_node]]) & 
             (! nodes$dependent_set_member [[to_node]]))
@@ -99,17 +114,22 @@ assert_edge_list_does_not_violate_assumptions =
                  from_node, ", ", to_node, 
                  "] are both in the independent set.")
             }
-        }
+        }  #  end for - WITHIN group links
     
-        #  Verify that intergroup links don't violate assumptions.
-    
-    for (cur_row in seq (first_row_of_intergroup_links, length (edge_list)))
+        #--------------------------------------------------------------
+        #  Verify that BETWEEN group links don't violate assumptions.
+        #--------------------------------------------------------------
+
+    num_rows_in_edge_list = dim (edge_list) [1]
+    for (cur_row in seq (first_row_of_intergroup_links, num_rows_in_edge_list))
         {
         from_node = edge_list [cur_row, 1]
         to_node   = edge_list [cur_row, 2]
         
+            #----------------------------------------------------------
             #  Nodes in intergroup edges are not allowed to be in the 
             #  independent set.
+            #----------------------------------------------------------
         
         if (! nodes$dependent_set_member [[from_node]])
             {
@@ -128,7 +148,7 @@ assert_edge_list_does_not_violate_assumptions =
                  to_node, 
                  "] is in the independent set.")
             }
-        }
+        }  #  end for - BETWEEN group links
     
     if (edge_list_error)
         stop ("\n\nOne or more fatal errors in building edge_list.\n\n")
