@@ -67,7 +67,7 @@ assert_edge_list_does_not_violate_assumptions =
     edge_list_error = FALSE
     
         #  Verify that within group links don't violate assumptions.
-    for (cur_row in sea (1, (first_row_of_intergroup_links - 1)))
+    for (cur_row in seq (1, (first_row_of_intergroup_links - 1)))
         {
         from_node = edge_list [cur_row, 1]
         to_node   = edge_list [cur_row, 2]
