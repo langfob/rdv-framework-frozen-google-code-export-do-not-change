@@ -61,13 +61,85 @@ timepoints_df =
 
 #===============================================================================
 
+assert_edge_list_does_not_violate_assumptions = 
+    function (edge_list, first_row_of_intergroup_links)
+    {
+    edge_list_error = FALSE
+    
+        #  Verify that within group links don't violate assumptions.
+    for (cur_row in sea (1, (first_row_of_intergroup_links - 1)))
+        {
+        from_node = edge_list [cur_row, 1]
+        to_node   = edge_list [cur_row, 2]
+        
+            #  Nodes in an edge must be in the same group.
+        
+        if (! (nodes$group_ID [[from_node]] == nodes$group_ID [[to_node]]))
+            {
+            edge_list_error = TRUE
+            cat ("\nERROR:  At edge_list row ", cur_row, 
+                 ", within group edge endpoints [", 
+                 from_node, ", ", to_node, 
+                 "] are in different groups [", 
+                 nodes$group_ID [[from_node]], ", ", 
+                 nodes$group_ID [[to_node]], 
+                 "].")
+            }
+        
+            #  Independent set nodes really are independent, i.e., 
+            #  no edge connected to an independent set node can connect to 
+            #  another independent set node.
+        
+        if ((! nodes$dependent_set_member [[from_node]]) & 
+            (! nodes$dependent_set_member [[to_node]]))
+            {
+            edge_list_error = TRUE
+            cat ("\nERROR:  At edge_list row ", cur_row, 
+                 ", within group edge endpoints [", 
+                 from_node, ", ", to_node, 
+                 "] are both in the independent set.")
+            }
+        }
+    
+        #  Verify that intergroup links don't violate assumptions.
+    
+    for (cur_row in seq (first_row_of_intergroup_links, length (edge_list)))
+        {
+        from_node = edge_list [cur_row, 1]
+        to_node   = edge_list [cur_row, 2]
+        
+            #  Nodes in intergroup edges are not allowed to be in the 
+            #  independent set.
+        
+        if (! nodes$dependent_set_member [[from_node]])
+            {
+            edge_list_error = TRUE
+            cat ("\nERROR:  At edge_list row ", cur_row, 
+                 ", between group edge's FROM node [", 
+                 from_node, 
+                 "] is in the independent set.")
+            }
+        
+        if (! nodes$dependent_set_member [[to_node]])
+            {
+            edge_list_error = TRUE
+            cat ("\nERROR:  At edge_list row ", cur_row, 
+                 ", between group edge's TO node [", 
+                 to_node, 
+                 "] is in the independent set.")
+            }
+        }
+    
+    if (edge_list_error)
+        stop ("\n\nOne or more fatal errors in building edge_list.\n\n")
+    }
+
+#===============================================================================
+
 sort_within_rows = function (a_2_col_matrix, decreasing=FALSE)
     {
     for (row in 1:dim(a_2_col_matrix)[1])
         {
-cat ("\na_2_col_matrix [", row, ",] = ")
-print (a_2_col_matrix [row,])
-
         a_2_col_matrix [row,] = sort (a_2_col_matrix [row,], decreasing)
         }
     
@@ -110,6 +182,9 @@ create_Xu_graph = function (num_nodes_per_group,
                    "Starting link_nodes_between_groups")
 
 #    edge_list_and_cur_row = 
+
+    first_row_of_intergroup_links = edge_list_and_cur_row$cur_row
+
     edge_list = 
         link_nodes_between_groups (target_num_links_between_2_groups_per_round, 
                                    num_rounds_of_linking_between_groups, 
@@ -166,7 +241,14 @@ create_Xu_graph = function (num_nodes_per_group,
         print (edge_list)
         cat ("\n\n")
         }
-        
+
+        #  All edges added to the edge_list SHOULD be legal at this point 
+        #  if the code is working correctly.  Make sure that this is true 
+        #  and fail if it's not.
+
+    assert_edge_list_does_not_violate_assumptions (edge_list, 
+                                                   first_row_of_intergroup_links)
+
 #    return (edge_list_and_cur_row)
     return (edge_list)
     }
