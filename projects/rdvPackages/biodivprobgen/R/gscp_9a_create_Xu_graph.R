@@ -74,82 +74,111 @@ assert_edge_list_does_not_violate_assumptions =
         
     edge_list_error = FALSE    
     
-        #-------------------------------------------------------------
-        #  Verify that WITHIN group links don't violate assumptions.
-        #-------------------------------------------------------------
-
-    for (cur_row in seq (1, (first_row_of_intergroup_links - 1)))
-        {
-        from_node = edge_list [cur_row, 1]
-        to_node   = edge_list [cur_row, 2]
-        
-            #-----------------------------------------------
-            #  Nodes in an edge must be in the same group.
-            #-----------------------------------------------
-        
-        if (! (nodes$group_ID [[from_node]] == nodes$group_ID [[to_node]]))
-            {
-            edge_list_error = TRUE
-            cat ("\nERROR:  At edge_list row ", cur_row, 
-                 ", within group edge endpoints [", 
-                 from_node, ", ", to_node, 
-                 "] are in different groups [", 
-                 nodes$group_ID [[from_node]], ", ", 
-                 nodes$group_ID [[to_node]], 
-                 "].")
-            }
-        
-            #---------------------------------------------------------------
-            #  Independent set nodes really are independent, i.e., 
-            #  no edge connected to an independent set node can connect to 
-            #  another independent set node.
-            #---------------------------------------------------------------
-        
-        if ((! nodes$dependent_set_member [[from_node]]) & 
-            (! nodes$dependent_set_member [[to_node]]))
-            {
-            edge_list_error = TRUE
-            cat ("\nERROR:  At edge_list row ", cur_row, 
-                 ", within group edge endpoints [", 
-                 from_node, ", ", to_node, 
-                 "] are both in the independent set.")
-            }
-        }  #  end for - WITHIN group links
+        #---------------------------------------------------------------
+        #  First make sure that you don't have a completely degenerate 
+        #  edge_list, i.e., one where there are no within group links.
+        #  Since all within group links are expected to precede all 
+        #  between group links, the first row of intergroup links must 
+        #  be at least 2 if there are some within group links.
+        #---------------------------------------------------------------
     
-        #--------------------------------------------------------------
-        #  Verify that BETWEEN group links don't violate assumptions.
-        #--------------------------------------------------------------
-
-    num_rows_in_edge_list = dim (edge_list) [1]
-    for (cur_row in seq (first_row_of_intergroup_links, num_rows_in_edge_list))
+    if (first_row_of_intergroup_links < 2)
         {
-        from_node = edge_list [cur_row, 1]
-        to_node   = edge_list [cur_row, 2]
+        edge_list_error = TRUE
+        cat ("\nERROR:  Degenerate edge_list.  ", 
+             "first_row_of_intergroup_links = ", 
+             first_row_of_intergroup_links, 
+             ", i.e., < 2.")
         
-            #----------------------------------------------------------
-            #  Nodes in intergroup edges are not allowed to be in the 
-            #  independent set.
-            #----------------------------------------------------------
-        
-        if (! nodes$dependent_set_member [[from_node]])
-            {
-            edge_list_error = TRUE
-            cat ("\nERROR:  At edge_list row ", cur_row, 
-                 ", between group edge's FROM node [", 
-                 from_node, 
-                 "] is in the independent set.")
-            }
-        
-        if (! nodes$dependent_set_member [[to_node]])
-            {
-            edge_list_error = TRUE
-            cat ("\nERROR:  At edge_list row ", cur_row, 
-                 ", between group edge's TO node [", 
-                 to_node, 
-                 "] is in the independent set.")
-            }
-        }  #  end for - BETWEEN group links
+        } else  #  Not a degenerate edge_list.
+        {    
+            #-------------------------------------------------------------
+            #  Verify that WITHIN group links don't violate assumptions.
+            #-------------------------------------------------------------
     
+        for (cur_row in seq (1, (first_row_of_intergroup_links - 1)))
+            {
+            from_node = edge_list [cur_row, 1]
+            to_node   = edge_list [cur_row, 2]
+            
+                #-----------------------------------------------
+                #  Nodes in an edge must be in the same group.
+                #-----------------------------------------------
+            
+            if (! (nodes$group_ID [[from_node]] == nodes$group_ID [[to_node]]))
+                {
+                edge_list_error = TRUE
+                cat ("\nERROR:  At edge_list row ", cur_row, 
+                     ", within group edge endpoints [", 
+                     from_node, ", ", to_node, 
+                     "] are in different groups [", 
+                     nodes$group_ID [[from_node]], ", ", 
+                     nodes$group_ID [[to_node]], 
+                     "].")
+                }
+            
+                #---------------------------------------------------------------
+                #  Independent set nodes really are independent, i.e., 
+                #  no edge connected to an independent set node can connect to 
+                #  another independent set node.
+                #---------------------------------------------------------------
+            
+            if ((! nodes$dependent_set_member [[from_node]]) & 
+                (! nodes$dependent_set_member [[to_node]]))
+                {
+                edge_list_error = TRUE
+                cat ("\nERROR:  At edge_list row ", cur_row, 
+                     ", within group edge endpoints [", 
+                     from_node, ", ", to_node, 
+                     "] are both in the independent set.")
+                }
+            }  #  end for - WITHIN group links
+        
+        #-----------------------------------------------------------------------
+        
+            #------------------------------------------------------------------
+            #  Verify that BETWEEN group links don't violate assumptions.
+            #        
+            #  It's unusual but legally possible for no intergroup links to 
+            #  be generated, so only try to verify correctness of intergroup 
+            #  links if there are some.
+            #------------------------------------------------------------------
+        
+        num_rows_in_edge_list = dim (edge_list) [1]        
+        if (first_row_of_intergroup_links <= num_rows_in_edge_list)
+            {
+            for (cur_row in seq (first_row_of_intergroup_links, num_rows_in_edge_list))
+                {
+                from_node = edge_list [cur_row, 1]
+                to_node   = edge_list [cur_row, 2]
+                
+                    #----------------------------------------------------------
+                    #  Nodes in intergroup edges are not allowed to be in the 
+                    #  independent set.
+                    #----------------------------------------------------------
+                
+                if (! nodes$dependent_set_member [[from_node]])
+                    {
+                    edge_list_error = TRUE
+                    cat ("\nERROR:  At edge_list row ", cur_row, 
+                         ", between group edge's FROM node [", 
+                         from_node, 
+                         "] is in the independent set.")
+                    }
+                
+                if (! nodes$dependent_set_member [[to_node]])
+                    {
+                    edge_list_error = TRUE
+                    cat ("\nERROR:  At edge_list row ", cur_row, 
+                         ", between group edge's TO node [", 
+                         to_node, 
+                         "] is in the independent set.")
+                    }
+                
+                }  #  end for - BETWEEN group links
+            }  #  end if - (first_row_of_intergroup_links <= num_rows_in_edge_list)
+        }  #  end else - (first_row_of_intergroup_links >= 2)
+     
     if (edge_list_error)
         stop ("\n\nOne or more fatal errors in building edge_list.\n\n")
     }
