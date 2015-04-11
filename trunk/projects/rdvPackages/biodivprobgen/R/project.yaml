@@ -67,7 +67,7 @@ base_params:
         there as well.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg1kruns1sce7001ranSeed10to60ranPUs"
+    runset_abbrev: "bdpg100runs1sce8001ranSeed61to80ranPUs"
 
     run_id: $$run_id$$
 
@@ -256,13 +256,13 @@ base_params:
 
 scenarios:
             
-    - name: scen_rand_10_to_60_PUs_0.5_optFrac_random_r_and_p
+    - name: scen_rand_61_to_80_PUs_0.5_optFrac_random_r_and_p
       parameters:
             derive_alpha_from_n__num_groups_and_opt_frac_0.5: TRUE
             
             use_unif_rand_n__num_groups: TRUE
-            n__num_groups_lower_bound: 5
-            n__num_groups_upper_bound: 30
+            n__num_groups_lower_bound: 61
+            n__num_groups_upper_bound: 80
     
             use_unif_rand_r__density: TRUE
             r__density_lower_bound: 0.01
@@ -278,9 +278,10 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 7001
+          start: 8001
           step_size: 1
-          count: 1000
+#          count: 1000
+          count: 2
           
     #---------------------------------------------------------------------------
     
