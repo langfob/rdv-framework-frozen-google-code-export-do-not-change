@@ -280,8 +280,7 @@ repetitions:
           generator_type: linear_step
           start: 8001
           step_size: 1
-#          count: 1000
-          count: 2
+          count: 100
           
     #---------------------------------------------------------------------------
     
