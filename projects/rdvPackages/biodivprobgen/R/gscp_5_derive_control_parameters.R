@@ -305,8 +305,8 @@ if ((num_links_within_one_group < 1) | (tot_num_links_inside_groups < 1))
 #     quit (too_big_failure_msg, status=1)
 #     }
 
-if (FALSE)    #  Temporary, until I know the num_spp test works.  2015 03 13 - BTL
-{
+#if (FALSE)    #  Temporary, until I know the num_spp test works.  2015 03 13 - BTL
+#{
 if (max_possible_tot_num_links > parameters$max_allowed_possible_tot_num_links)
     {
     cat ("\n\nFailing:  max_possible_tot_num_links (", 
@@ -336,7 +336,7 @@ if (max_possible_tot_num_links > parameters$max_allowed_possible_tot_num_links)
     
     quit (status=20)
     }
-}
+#}
 
 #===============================================================================
 
