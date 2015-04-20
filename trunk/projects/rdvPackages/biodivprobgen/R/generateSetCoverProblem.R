@@ -325,6 +325,20 @@ edge_list =
 
 source (paste0 (sourceCodeLocationWithSlash, "gscp_9b_convert_Xu_graph_to_spp_PU_problem.R"))
 
+    #  Having problems with problem dimensions on some runs being too big and  
+    #  forcing problems that are much larger than are relevant for biodiversity 
+    #  or that just take too long to run in the current experimental setting.  
+    #  For example, things can run for 6 or more hours when I want them to 
+    #  be taking on the order of minutes instead of hours.  I may eventually 
+    #  want to go ahead with these kinds of big runs, but for now, I want to 
+    #  cut them down to be no larger than the biggest number of species 
+    #  that I'm aware of in biodiversity problems.  At the moment, the 
+    #  biggest ones that I know of have done around 2000 species but I'm 
+    #  going to make this threshold be an input variable.  
+    #  The number of planning units has not been a problem yet since they 
+    #  have been far less than the number of species.  They're also easier 
+    #  to control through the choice of the number of groups, etc.  
+
 if (num_spp > parameters$max_allowed_num_spp)
     {
     cat ("\n\nQuitting:  num_spp (", num_spp, ") > maximum allowed (", 
