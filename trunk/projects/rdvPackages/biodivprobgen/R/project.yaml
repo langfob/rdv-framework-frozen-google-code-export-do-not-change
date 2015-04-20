@@ -54,20 +54,11 @@ base_params:
             #  If you don't want the newlines (i.e., you want one long string), 
             #  then use a ">" in place of the "|".
     runset_description: |
-        This is a large runset that generates problems with even numbers of 
-        planning units randomly chosen to be between 10 and 60.  It forces 
-        the optimal solution fraction to be 0.5 for all generated problems.  
-        It derives the alpha value from the combination of the 0.5 solution 
-        fraction and the randomly chosen number of groups.  The r and p values 
-        are chosen randomly across a wide range rather than focusing on the 
-        areas where the Xu papers found errors.  The idea is to generate 
-        a broad variety of problems but make sure that it doesn't end up with 
-        just a few problems that generate errors.  It is also trying very 
-        small numbers of planning units to see whether hard problems can occur 
-        there as well.
+        This is a runset that generates problems focused on the 
+        parameterizations where the Xu simple model paper found hard cases.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg100runs1sce8001ranSeed61to80ranPUs"
+    runset_abbrev: "bdpg2runs3sce9001seed"
 
     run_id: $$run_id$$
 
@@ -90,7 +81,7 @@ base_params:
         #  instead of 701 if you want to induce a crash to test that error 
         #  trapping.
 
-    seed: 701
+#    seed: 701
 
     #--------------------
 
@@ -101,20 +92,20 @@ base_params:
             
     num_independent_nodes_per_group: 1
     
-    n__num_groups: 10
-    use_unif_rand_n__num_groups: FALSE
-    n__num_groups_lower_bound: 20
-    n__num_groups_upper_bound: 40
+#    n__num_groups: 10
+#    use_unif_rand_n__num_groups: FALSE
+#    n__num_groups_lower_bound: 20
+#    n__num_groups_upper_bound: 40
     
     #--------------------
 
             #  Drives the number of PUs per group and so, tot num PUs
             #  Increase alpha to increase num of PUs.
             #      tot_num_nodes = n__num_groups * num_nodes_per_group
-    alpha__: 0.25
-    use_unif_rand_alpha__: FALSE
-    alpha___lower_bound: 0
-    alpha___upper_bound: 1
+#    alpha__: 0.25
+#    use_unif_rand_alpha__: FALSE
+#    alpha___lower_bound: 0
+#    alpha___upper_bound: 1
 
     #--------------------
 
@@ -126,14 +117,14 @@ base_params:
             #         integerize (target_num_links_between_2_groups_per_round * num_rounds_of_linking_between_groups)
             #     max_possible_tot_num_links = integerize (tot_num_links_inside_groups + max_possible_num_links_between_groups)
 
-    use_unif_rand_p__prop_of_links_between_groups: TRUE
-    p__prop_of_links_between_groups_lower_bound: 0.20
-    p__prop_of_links_between_groups_upper_bound: 0.36
+#    use_unif_rand_p__prop_of_links_between_groups: TRUE
+#    p__prop_of_links_between_groups_lower_bound: 0.20
+#    p__prop_of_links_between_groups_upper_bound: 0.36
 
-    r__density: 0.8
-    use_unif_rand_r__density: FALSE
-    p__r__density_lower_bound: 2
-    p__r__density_upper_bound: 5
+#    r__density: 0.8
+#    use_unif_rand_r__density: FALSE
+#    p__r__density_lower_bound: 2
+#    p__r__density_upper_bound: 5
 
     #--------------------
 
@@ -210,25 +201,6 @@ base_params:
 
     #---------------------------------------------------------------------------
     
-        #  In "simple model ..." paper, they use:
-        #       n in [8..100] while alpha = 0.52, r = 1
-        #       r in [0.8..2.5] while n = 20, alpha = 0.77
-        #       alpha in [0.2..1] while n = 20, r = 2.5
-        #  In all 3 cases, best fit to the theory was when the parameter
-        #  was at the top of its range.  See figure 1 in the paper.
-        #
-        #  Values in the paper for propOfLinksBetweenGroups were more variable.
-        #  See figures 2 and 3 and text in column 2 of page 4.
-        #  In those examples, they had:
-        #       Figure 2:   k=2, alpha=0.8, r=3, n in {20,30,40}
-        #                   p in [0.14..0.36] w/ critical value Pcr ~ 0.23
-
-#    p: [0.14..0.36]    #  w/ critical value Pcr ~ 0.23
-    use_unif_rand_p__prop_of_links_between_groups: TRUE
-    p__prop_of_links_between_groups_lower_bound: 0.14    #  0
-    p__prop_of_links_between_groups_upper_bound: 0.36    #  1
-
-    
 #scenarios:
 #    - name: easy
 #        parameters: 
@@ -254,23 +226,119 @@ base_params:
 #                p__prop_of_links_between_cliques: 0.8
 #                r__density: 0.8
 
+#    - name: scen_rand_61_to_80_PUs_0.5_optFrac_random_r_and_p
+#      parameters:
+#            derive_alpha_from_n__num_groups_and_opt_frac_0.5: TRUE
+#            
+#            use_unif_rand_n__num_groups: TRUE
+#            n__num_groups_lower_bound: 61
+#            n__num_groups_upper_bound: 80
+#    
+#            use_unif_rand_r__density: TRUE
+#            r__density_lower_bound: 0.01
+#            r__density_upper_bound: 5.0
+#
+#            use_unif_rand_p__prop_of_links_between_groups: TRUE
+#            p__prop_of_links_between_groups_lower_bound: 0.01
+#            p__prop_of_links_between_groups_upper_bound: 0.99
+            
+#-------------------------------------------------------------------------------
+    
+    #  3 hard cases from Xu "simple model" paper.
+    #  Parameterize each case as a scenario, but use the same parameterization  
+    #  for p__prop_of_links_between_groups in all 3 scenarios, so set that 
+    #  first.
+    
+        #  In "simple model ..." paper, they use:
+        #       n in [8..100] while alpha = 0.52, r = 1
+        #       r in [0.8..2.5] while n = 20, alpha = 0.77
+        #       alpha in [0.2..1] while n = 20, r = 2.5
+        #  In all 3 cases, best fit to the theory was when the parameter
+        #  was at the top of its range.  See figure 1 in the paper.
+        #
+        #  Values in the paper for propOfLinksBetweenGroups were more variable.
+        #  See figures 2 and 3 and text in column 2 of page 4.
+        #  In those examples, they had:
+        #       Figure 2:   k=2, alpha=0.8, r=3, n in {20,30,40}
+        #                   p in [0.14..0.36] w/ critical value Pcr ~ 0.23
+
+    #---------------------------------------------------------------------------
+    
+            #--------------------------------------------------------            
+            #  Xu simple model - all 3 hard cases:  
+            #    p: [0.14..0.36]    #  w/ critical value Pcr ~ 0.23
+            #    alpha:  Don't derive from n__num_groups
+            #--------------------------------------------------------            
+            
+    use_unif_rand_p__prop_of_links_between_groups: TRUE
+    p__prop_of_links_between_groups_lower_bound: 0.14    #  0
+    p__prop_of_links_between_groups_upper_bound: 0.36    #  1
+
+            #------------------------------------------------------------------
+            #  Will set the alpha values explicitly in each scenario, 
+            #  so turn off the computing alpha to match n and opt frac = 0.5.
+            #------------------------------------------------------------------
+            
+    derive_alpha_from_n__num_groups_and_opt_frac_0.5: FALSE            
+    
+    #---------------------------------------------------------------------------
+    
 scenarios:
             
-    - name: scen_rand_61_to_80_PUs_0.5_optFrac_random_r_and_p
-      parameters:
-            derive_alpha_from_n__num_groups_and_opt_frac_0.5: TRUE
+            #-----------------------------------------------
+            #  Xu simple model hard case:  
+            #      n in [8..100] while alpha = 0.52, r = 1
+            #-----------------------------------------------
             
+    - name: scen_Xu_simple_model_hard_case_1__based_on_N
+      parameters:
+            use_unif_rand_alpha__: FALSE
+            alpha__: 0.52
+    
             use_unif_rand_n__num_groups: TRUE
-            n__num_groups_lower_bound: 61
-            n__num_groups_upper_bound: 80
+            n__num_groups_lower_bound: 8
+            n__num_groups_upper_bound: 100
+    
+            use_unif_rand_r__density: FALSE
+            r__density: 0.8
+
+    #---------------------------------------------------------------------------
+
+            #-------------------------------------------------
+            #  Xu simple model hard case:  
+            #      r in [0.8..2.5] while n = 20, alpha = 0.77
+            #--------------------------------------------------
+            
+    - name: scen_Xu_simple_model_hard_case_2__based_on_R
+      parameters:
+            use_unif_rand_alpha__: FALSE
+            alpha__: 0.77
+    
+            use_unif_rand_n__num_groups: FALSE
+            n__num_groups: 20
     
             use_unif_rand_r__density: TRUE
-            r__density_lower_bound: 0.01
-            r__density_upper_bound: 5.0
+            r__density_lower_bound: 0.8
+            r__density_upper_bound: 2.5
 
-            use_unif_rand_p__prop_of_links_between_groups: TRUE
-            p__prop_of_links_between_groups_lower_bound: 0.01
-            p__prop_of_links_between_groups_upper_bound: 0.99
+    #---------------------------------------------------------------------------
+
+            #----------------------------------------------
+            #  Xu simple model hard case:  
+            #     alpha in [0.2..1] while n = 20, r = 2.5
+            #----------------------------------------------
+
+    - name: scen_Xu_simple_model_hard_case_3__based_on_ALPHA
+      parameters:
+            use_unif_rand_alpha__: TRUE
+            alpha___lower_bound: 0.2
+            alpha___upper_bound: 1.0
+    
+            use_unif_rand_n__num_groups: FALSE
+            n__num_groups: 20
+    
+            use_unif_rand_r__density: FALSE
+            r__density: 2.5
 
     #---------------------------------------------------------------------------
     
@@ -278,9 +346,9 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 8001
+          start: 9001
           step_size: 1
-          count: 100
+          count: 2
           
     #---------------------------------------------------------------------------
     
