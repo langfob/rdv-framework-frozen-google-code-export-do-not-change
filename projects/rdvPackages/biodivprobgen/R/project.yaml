@@ -58,7 +58,7 @@ base_params:
         parameterizations where the Xu simple model paper found hard cases.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg2runs3sce9001seed"
+    runset_abbrev: "bdpg100runs3sce9001seed"
 
     run_id: $$run_id$$
 
@@ -348,7 +348,7 @@ repetitions:
           generator_type: linear_step
           start: 9001
           step_size: 1
-          count: 2
+          count: 100
           
     #---------------------------------------------------------------------------
     
