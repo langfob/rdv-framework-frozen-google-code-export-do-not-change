@@ -212,24 +212,6 @@ cat ("\n\n")
 
 #===============================================================================
 
-    #  BTL - 2015 01 08
-    #  
-    #  Having problems with problem dimensions on some runs being either 
-    #  too small and forcing array sizes of 0 or being too big and forcing 
-    #  problems that are much larger than are relevant for biodiversity or 
-    #  that just take too long to run in the current experimental setting.  
-    #  For example, things can run for 6 or more hours when I want them to 
-    #  be taking on the order of minutes instead of hours.  I may eventually 
-    #  want to go ahead with these kinds of big runs, but for now, I want to 
-    #  cut them down to be no larger than the biggest number of species 
-    #  that I'm aware of in biodiversity problems.  At the moment, the 
-    #  biggest ones that I know of have done around 2000 species.  
-    #  The number of planning units has not been a problem yet since they 
-    #  have been far less than the number of species.  They're also easier 
-    #  to control through the choice of the number of groups, etc.  
-
-#-------------------------------------------------------------------------------
-
     #  "Too small" problem
     #
     #  Running under tzar, this code crashes when it tries to allocate 
@@ -260,17 +242,6 @@ cat ("\n\n")
     #  small amount of added and seldom-used information about failures, so 
     #  I'm going with the simpler solution here for now.  
 
-# if ((num_links_within_one_group < 1) | (tot_num_links_inside_groups < 1))
-#     {
-#     too_small_failure_msg = 
-#         paste0 ("\n\nFailing:  num_links_within_one_group (", 
-#                 num_links_within_one_group, 
-#                 ") < 1  OR  tot_num_links_inside_groups (", 
-#                 tot_num_links_inside_groups, 
-#                 ") < 1.\n\n")
-#     quit (too_small_failure_msg, status=1)
-#     }
-
 if ((num_links_within_one_group < 1) | (tot_num_links_inside_groups < 1))
     {
     cat ("\n\nFailing:  num_links_within_one_group (", 
@@ -285,58 +256,8 @@ if ((num_links_within_one_group < 1) | (tot_num_links_inside_groups < 1))
 
     #  "Too big" problem
     #
-    #  I'm going to use the same reasoning about simplicity to decide here 
-    #  to just pick a "too big" level and fail any job that hits it.  
-    #  However, I'll make the "too big" threshold an input variable so that 
-    #  it's easy to change.  I will also choose to set the threshold on 
-    #  the maximum POSSIBLE number of links rather than the maximum realized 
-    #  unique links because the actual number of links (species) isn't known  
-    #  until the problem has been fully built and we can skip running that 
-    #  generative code this way.
-
-# if (max_possible_tot_num_links > parameters$max_allowed_possible_tot_num_links)
-#     {
-#     too_big_failure_msg = 
-#         paste0 ("\n\nFailing:  max_possible_tot_num_links (", 
-#                 max_possible_tot_num_links, 
-#                 ") > maximum allowed (", 
-#                 parameters$max_allowed_possible_tot_num_links, 
-#                 ").\n\n")
-#     quit (too_big_failure_msg, status=1)
-#     }
-
-#if (FALSE)    #  Temporary, until I know the num_spp test works.  2015 03 13 - BTL
-#{
-if (max_possible_tot_num_links > parameters$max_allowed_possible_tot_num_links)
-    {
-    cat ("\n\nFailing:  max_possible_tot_num_links (", 
-         max_possible_tot_num_links, ") > maximum allowed (", 
-         parameters$max_allowed_possible_tot_num_links, 
-         ").\n\n")
-    
-        #  Write a little file to the tzar output area flagging that the 
-        #  reason for this run failing is the link count threshold violation.
-        #  This is a quick and dirty way to make it easy to verify that a 
-        #  failed run is due to the threshold violation rather than 
-        #  a real error.  Need to make a better way of handling this as a  
-        #  line of NA values in the normal results output file, but 
-        #  the way that things are set up right now, that's a pain to do.
-        #  So, for now, this hack...
-        #  BTL - 2015 03 10.
-    
-    too_many_possible_links_error_flag_file_name = 
-        parameters$too_many_possible_links_error_flag_file_name
-
-    cat ("Failing:  max_possible_tot_num_links (", 
-        max_possible_tot_num_links, ") > maximum allowed (", 
-        parameters$max_allowed_possible_tot_num_links, 
-        ").\n\n", 
-        file=too_many_possible_links_error_flag_file_name
-        )    
-    
-    quit (status=20)
-    }
-#}
+    #  No longer handled here.
+    #  Now handled in generate_set_cover_problem.R
 
 #===============================================================================
 
