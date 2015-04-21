@@ -147,6 +147,10 @@
 
 #===============================================================================
 
+cat ("\n\nSTARTING at ", date(), "\n\n")
+
+#===============================================================================
+
     #  debugging level: 0 means don't output debugging write statements.
     #  Having this as an integer instead of binary so that I can have 
     #  multiple levels of detail if I want to.
@@ -394,6 +398,8 @@ write.csv (timepoints_df,
 #-------------------------------------------------------------------------------
 
 source (paste0 (sourceCodeLocationWithSlash, "gscp_17_clean_up_tzar_emulation.R"))
+
+cat ("\n\nALL DONE at ", date(), "\n\n")
 
 #===============================================================================
 
