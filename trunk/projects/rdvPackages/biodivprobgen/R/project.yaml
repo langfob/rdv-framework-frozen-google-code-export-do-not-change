@@ -348,18 +348,24 @@ scenarios:
 
 repetitions:
     static_repetitions:
-        - variables:
-            marxan_num_reps: 1
-            marxan_num_iterations: "100"
-        - variables:
-            marxan_num_reps: 1
-            marxan_num_iterations: "1000"
-        - variables:
-            marxan_num_reps: 1
-            marxan_num_iterations: "10000"
-        - variables:
-            marxan_num_reps: 1
-            marxan_num_iterations: "100000"
+      - marxan_num_reps: 1
+        marxan_num_iterations: "100"
+
+      - marxan_num_reps: 1
+        marxan_num_iterations: "1000"
+
+#        - variables:
+#            marxan_num_reps: 1
+#            marxan_num_iterations: "100"
+#        - variables:
+#            marxan_num_reps: 1
+#            marxan_num_iterations: "1000"
+#        - variables:
+#            marxan_num_reps: 1
+#            marxan_num_iterations: "10000"
+#        - variables:
+#            marxan_num_reps: 1
+#            marxan_num_iterations: "100000"
             
 #        - variables:
 #            marxan_num_reps: 10
