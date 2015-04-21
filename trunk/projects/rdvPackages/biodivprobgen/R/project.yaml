@@ -348,10 +348,10 @@ scenarios:
 
 repetitions:
     static_repetitions:
-      - marxan_num_reps: 1
+      - marxan_num_reps: 2
         marxan_num_iterations: "100"
 
-      - marxan_num_reps: 1
+      - marxan_num_reps: 2
         marxan_num_iterations: "1000"
 
 #        - variables:
