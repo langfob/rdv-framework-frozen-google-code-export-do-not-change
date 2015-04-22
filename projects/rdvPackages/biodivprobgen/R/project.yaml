@@ -348,11 +348,34 @@ scenarios:
 
 repetitions:
     static_repetitions:
-      - marxan_num_reps: 2
+      - marxan_num_reps: 10
         marxan_num_iterations: "100"
 
-      - marxan_num_reps: 2
+      - marxan_num_reps: 20
+        marxan_num_iterations: "100"
+
+      - marxan_num_reps: 50
+        marxan_num_iterations: "100"
+
+
+      - marxan_num_reps: 10
         marxan_num_iterations: "1000"
+
+      - marxan_num_reps: 20
+        marxan_num_iterations: "1000"
+
+      - marxan_num_reps: 50
+        marxan_num_iterations: "1000"
+
+
+      - marxan_num_reps: 10
+        marxan_num_iterations: "10000"
+
+      - marxan_num_reps: 20
+        marxan_num_iterations: "10000"
+
+      - marxan_num_reps: 50
+        marxan_num_iterations: "10000"
 
 #        - variables:
 #            marxan_num_reps: 1
@@ -396,9 +419,9 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 10007
+          start: 10100
           step_size: 1
-          count: 5
+          count: 1
           
     #---------------------------------------------------------------------------
     
