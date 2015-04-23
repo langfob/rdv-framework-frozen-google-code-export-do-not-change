@@ -56,13 +56,13 @@ base_params:
     runset_description: |
         This is a runset that generates problems focused on the 
         parameterizations where the Xu simple model paper found hard cases.
-        It also repeats these scenarios with 3 different levels of marxan 
-        number of repetitions and 4 different levels of marxan number of 
-        iterations.  The idea is to see if those marxan settings affect 
+        It also sets the number of marxan repetitions to just 1 and the 
+        number of marxan iterations to what appears to be its minimum allowed 
+        value, 10k.  The idea is to see if those marxan settings affect 
         how hard the problems are for marxan.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg10runs3sce12reps10001seed"
+    runset_abbrev: "bdpg100runs3sce1marxanRep10kmarxanIters10501seed"
 
     run_id: $$run_id$$
 
@@ -174,7 +174,10 @@ base_params:
 #    marxan_num_reps: 100
 #    marxan_num_iterations: "1000000"
 
-    #---------------------------------------------------------------------------
+    marxan_num_reps: 1
+    marxan_num_iterations: "10000"
+
+#---------------------------------------------------------------------------
         #  marxan spf value
         #
         #  Flag what rule to use for setting the spf value for all species.
@@ -347,81 +350,12 @@ scenarios:
     #---------------------------------------------------------------------------
 
 repetitions:
-    static_repetitions:
-      - marxan_num_reps: 10
-        marxan_num_iterations: "100"
-
-      - marxan_num_reps: 20
-        marxan_num_iterations: "100"
-
-      - marxan_num_reps: 50
-        marxan_num_iterations: "100"
-
-
-      - marxan_num_reps: 10
-        marxan_num_iterations: "1000"
-
-      - marxan_num_reps: 20
-        marxan_num_iterations: "1000"
-
-      - marxan_num_reps: 50
-        marxan_num_iterations: "1000"
-
-
-      - marxan_num_reps: 10
-        marxan_num_iterations: "10000"
-
-      - marxan_num_reps: 20
-        marxan_num_iterations: "10000"
-
-      - marxan_num_reps: 50
-        marxan_num_iterations: "10000"
-
-#        - variables:
-#            marxan_num_reps: 1
-#            marxan_num_iterations: "100"
-#        - variables:
-#            marxan_num_reps: 1
-#            marxan_num_iterations: "1000"
-#        - variables:
-#            marxan_num_reps: 1
-#            marxan_num_iterations: "10000"
-#        - variables:
-#            marxan_num_reps: 1
-#            marxan_num_iterations: "100000"
-            
-#        - variables:
-#            marxan_num_reps: 10
-#            marxan_num_iterations: "100"
-#        - variables:
-#            marxan_num_reps: 10
-#            marxan_num_iterations: "1000"
-#        - variables:
-#            marxan_num_reps: 10
-#            marxan_num_iterations: "10000"
-#        - variables:
-#            marxan_num_reps: 10
-#            marxan_num_iterations: "100000"
-
-#        - variables:
-#            marxan_num_reps: 50
-#            marxan_num_iterations: "100"
-#        - variables:
-#            marxan_num_reps: 50
-#            marxan_num_iterations: "1000"
-#        - variables:
-#            marxan_num_reps: 50
-#            marxan_num_iterations: "10000"
-#        - variables:
-#            marxan_num_reps: 50
-#            marxan_num_iterations: "100000"
-
     generators:
         - key: seed
           generator_type: linear_step
           start: 10100
           step_size: 1
-          count: 1
+          count: 100
           
     #---------------------------------------------------------------------------
     
