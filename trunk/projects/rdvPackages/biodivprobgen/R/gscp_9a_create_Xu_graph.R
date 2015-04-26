@@ -337,3 +337,14 @@ create_Xu_graph = function (num_nodes_per_group,
 
 #===============================================================================
 
+edge_list = 
+    create_Xu_graph (num_nodes_per_group, 
+                     n__num_groups, 
+                     nodes, 
+                     max_possible_tot_num_links, 
+                     target_num_links_between_2_groups_per_round, 
+                     num_rounds_of_linking_between_groups
+                     )
+
+#===============================================================================
+

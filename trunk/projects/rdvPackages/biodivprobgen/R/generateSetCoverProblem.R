@@ -145,25 +145,12 @@
 #         because I couldn't remember where it was happening when I wanted 
 #         to change it between runs.
 
+#  2015 04 27 - BTL
+#       - Extracted initialization code into biodivprobgen_initialization.R.
+#       - Extracted utility functions into biodivprobgen_utilities.R.
+
 #===============================================================================
-
-cat ("\n\nSTARTING at ", date(), "\n\n")
-
-#===============================================================================
-
-    #  debugging level: 0 means don't output debugging write statements.
-    #  Having this as an integer instead of binary so that I can have 
-    #  multiple levels of detail if I want to.
-DEBUG_LEVEL = 0
-
-    #  Turn all R warnings into errors.
-options (warn=2)
-
-    #  Values to return from the program when quit() is called on a serious
-    #  error.
-ERROR_STATUS_num_inside_or_within_group_links_less_than_one = 1001
-ERROR_STATUS_optimal_solution_is_not_optimal = 1002
-
+#           Specify the directory where code is to be sourced from.
 #===============================================================================
 
     #  Need to do this in a better way so that it is appropriate for  
@@ -173,160 +160,16 @@ if (!exists ("sourceCodeLocationWithSlash"))
         "/Users/bill/D/rdv-framework/projects/rdvPackages/biodivprobgen/R/"
 
 #===============================================================================
-
-    #  2014 12 29 - BTL
-    #  At this point, this flag will probably almost never change again 
-    #  because my code is relying on the parameters list that tzar builds 
-    #  and it would be too big of a pain in the ass to build the parameters 
-    #  structure myself, as would be required if NOT running under tzar or 
-    #  tzar emulation.  However, I have made it possible to do that using 
-    #  the function called local_build_parameters_list() in 
-    #  gscp_3_get_parameters.R.  That is mostly aimed at later use though, 
-    #  e.g., if the source code is distributed to someone else and they 
-    #  don't want to use tzar or tzar emulation.
-
-running_tzar_or_tzar_emulator = TRUE
-
-    #  Need to set emulation flag every time you swap between emulating 
-    #  and not emulating.  
-    #  This is the only variable you should need to set for that.
-    #  Make the change in the file called emulatingTzarFlag.R so that 
-    #  every file that needs to know the value of this flag is using 
-    #  the synchronized to the same value.
-
-        #  2014 12 29 - BTL 
-        #  Moving this to the top level code so that it's easier to see and 
-        #  control.
-
-source (paste0 (sourceCodeLocationWithSlash, "emulatingTzarFlag.R"))
-source (paste0 (sourceCodeLocationWithSlash, "gscp_2_tzar_emulation.R"))
-
+#                   Set up variables, etc. for this run.
 #===============================================================================
 
-    #  2015 04 08 - BTL
-    #  I just got bitten very badly by the incredibly annoying behavior of R's 
-    #  sample() function, so here is a replacement function that I need to 
-    #  use everywhere now.
-    #  When I called sample with a vector that sometimes had length n=1, 
-    #  it sampled from 1:n instead of returning the single value.  
-    #  This majorly screwed all kinds of things in a very subtle, very hard 
-    #  to find way.
-
-safe_sample = function (x,...) { if (length (x) == 1) x else sample (x,...) } 
+source (paste0 (sourceCodeLocationWithSlash, "biodivprobgen_initialization.R"))
 
 #===============================================================================
-
-source (paste0 (sourceCodeLocationWithSlash, "gscp_3_get_parameters.R"))
-
-#===============================================================================
-
-library (plyr)    #  For count() and arrange()
-library (marxan)
-
-#===============================================================================
-
-    #  The rest of this code has to come after tzar or someone else has 
-    #  created the "parameters" object.
-
-#===============================================================================
-
-seed = parameters$seed
-set.seed (seed)
-
-#---------------------------------------------------------------    
-    #  Determine the OS so you can assign the correct name for 
-    #  the marxan executable, etc.
-    #   - for linux this returns linux-gnu
-    #   - for mac this currently returns os = 'darwin13.4.0'
-    #   - for windows this returns mingw32
-
-current_os <- sessionInfo()$R.version$os
-cat ("\n\nos = '", current_os, "'\n", sep='')
-
-#---------------------------------------------------------------    
-
-cat ("\n\n", parameters$runset_description, "\n\n")
-
-#---------------------------------------------------------------    
-
-plot_output_dir = paste0 (parameters$fullOutputDirWithSlash, "Plots")
-dir.create (plot_output_dir, 
-            showWarnings = TRUE, 
-            recursive = FALSE)
-
-network_output_dir = paste0 (parameters$fullOutputDirWithSlash, "Networks")
-dir.create (network_output_dir, 
-            showWarnings = TRUE, 
-            recursive = FALSE)
-
-# result_tables_output_dir = paste0 (parameters$fullOutputDirWithSlash, "Results")
-# dir.create (result_tables_output_dir, 
-#             showWarnings = TRUE, 
-#             recursive = FALSE)
-
-marxan_IO_dir = paste0 (parameters$fullOutputDirWithSlash, "Marxan_IO")
-dir.create (marxan_IO_dir, 
-            showWarnings = TRUE, 
-            recursive = FALSE)
-
-marxan_input_dir = paste0 (marxan_IO_dir, .Platform$file.sep, "input")
-dir.create (marxan_input_dir, 
-            showWarnings = TRUE, 
-            recursive = FALSE)
-
-marxan_output_dir = paste0 (marxan_IO_dir, .Platform$file.sep, "output")
-dir.create (marxan_output_dir, 
-            showWarnings = TRUE, 
-            recursive = FALSE)
-
-#---------------------------------------------------------------    
-
-source (paste0 (sourceCodeLocationWithSlash, "timepoints.R"))
-
-#===============================================================================
-
-    #  This function is used two different ways.
-    #  It's called when the program quits because there are too many species 
-    #  or it's called when the program runs successfully.  
-    #  It's declared here because you don't know which path the program 
-    #  will take.
-    #  It should go in a file of misc utilities, but it might be the only 
-    #  thing in that file at the moment.
-
-write_results_to_files = function (results_df, parameters)
-    {    
-        #  Write the results out to 2 separate and nearly identical files.
-        #  The only difference between the two files is that the run ID in 
-        #  one of them is always set to 0 and in the other, it's the correct 
-        #  current run ID.  This is done to make it easier to automatically 
-        #  compare the output csv files of different runs when the only thing 
-        #  that should be different between the two runs is the run ID.  
-        #  Having different run IDs causes diff or any similar comparison to 
-        #  think that the run outputs don't match.  If they both have 0 run ID, 
-        #  then diff's output will correctly flag whether there are differences 
-        #  in the outputs.
-    
-    results_df$run_ID [cur_result_row] = 0
-    write.csv (results_df, file = parameters$summary_without_run_id_filename, row.names = FALSE)
-    
-    results_df$run_ID [cur_result_row] = parameters$run_id
-    write.csv (results_df, file = parameters$summary_filename, row.names = FALSE)
-    }
-
-#===============================================================================
-#                   Generate a problem, i.e, create the Xu graph.
+#       Generate a problem, i.e, create the Xu graph nodes and edge_list.
 #===============================================================================
 
 source (paste0 (sourceCodeLocationWithSlash, "gscp_9a_create_Xu_graph.R"))
-
-edge_list = 
-    create_Xu_graph (num_nodes_per_group, 
-                     n__num_groups, 
-                     nodes, 
-                     max_possible_tot_num_links, 
-                     target_num_links_between_2_groups_per_round, 
-                     num_rounds_of_linking_between_groups
-                     )
 
 #===============================================================================
 #                       Clean up after graph creation.
