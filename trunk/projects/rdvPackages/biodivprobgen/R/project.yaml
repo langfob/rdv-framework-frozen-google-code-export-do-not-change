@@ -54,15 +54,11 @@ base_params:
             #  If you don't want the newlines (i.e., you want one long string), 
             #  then use a ">" in place of the "|".
     runset_description: |
-        This is a runset that generates problems focused on the 
-        parameterizations where the Xu simple model paper found hard cases.
-        It also sets the number of marxan repetitions to just 1 and the 
-        number of marxan iterations to what appears to be its minimum allowed 
-        value, 10k.  The idea is to see if those marxan settings affect 
-        how hard the problems are for marxan.
+        Single run runset to test and debug while refactoring to allow 
+        reading a Xu set cover problem from a file instead of generating it.
         
     runset_name: $$runset$$
-    runset_abbrev: "bdpg100runs3sce1marxanRep10kmarxanIters10501seed"
+    runset_abbrev: "bdpgSingleRunForTestAndDebug"
 
     run_id: $$run_id$$
 
@@ -195,6 +191,11 @@ base_params:
 #    marxan_spf_rule: "CONSTANT"
 #    marxan_spf_const: 10
 
+
+    #---------------------------------------------------------------------------
+    
+    compute_network_metrics: FALSE
+    
     #---------------------------------------------------------------------------
     
         # Outputs
@@ -292,23 +293,6 @@ base_params:
     
 scenarios:
             
-            #-----------------------------------------------
-            #  Xu simple model hard case:  
-            #      n in [8..100] while alpha = 0.52, r = 1
-            #-----------------------------------------------
-            
-    - name: scen_Xu_simple_model_hard_case_1__based_on_N
-      parameters:
-            use_unif_rand_alpha__: FALSE
-            alpha__: 0.52
-    
-            use_unif_rand_n__num_groups: TRUE
-            n__num_groups_lower_bound: 8
-            n__num_groups_upper_bound: 100
-    
-            use_unif_rand_r__density: FALSE
-            r__density: 0.8
-
     #---------------------------------------------------------------------------
 
             #-------------------------------------------------
@@ -319,7 +303,8 @@ scenarios:
     - name: scen_Xu_simple_model_hard_case_2__based_on_R
       parameters:
             use_unif_rand_alpha__: FALSE
-            alpha__: 0.77
+#            alpha__: 0.77
+            alpha__: 0.3  # to make fewer links
     
             use_unif_rand_n__num_groups: FALSE
             n__num_groups: 20
@@ -330,32 +315,13 @@ scenarios:
 
     #---------------------------------------------------------------------------
 
-            #----------------------------------------------
-            #  Xu simple model hard case:  
-            #     alpha in [0.2..1] while n = 20, r = 2.5
-            #----------------------------------------------
-
-    - name: scen_Xu_simple_model_hard_case_3__based_on_ALPHA
-      parameters:
-            use_unif_rand_alpha__: TRUE
-            alpha___lower_bound: 0.2
-            alpha___upper_bound: 1.0
-    
-            use_unif_rand_n__num_groups: FALSE
-            n__num_groups: 20
-    
-            use_unif_rand_r__density: FALSE
-            r__density: 2.5
-
-    #---------------------------------------------------------------------------
-
 repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 10100
+          start: 10101
           step_size: 1
-          count: 100
+          count: 1
           
     #---------------------------------------------------------------------------
     

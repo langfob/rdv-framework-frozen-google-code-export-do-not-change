@@ -358,8 +358,11 @@ if (num_spp > parameters$max_allowed_num_spp)
     #                       Compute network metrics.
     #===============================================================================
     
-    source (paste0 (sourceCodeLocationWithSlash, "gscp_11a_network_measures_using_bipartite_package.R"))
-    source (paste0 (sourceCodeLocationWithSlash, "gscp_11b_network_measures_using_igraph_package.R"))
+    if (parameters$compute_network_metrics)
+        {
+        source (paste0 (sourceCodeLocationWithSlash, "gscp_11a_network_measures_using_bipartite_package.R"))
+        source (paste0 (sourceCodeLocationWithSlash, "gscp_11b_network_measures_using_igraph_package.R"))
+        }
     
     #===============================================================================
     #                                   Run marxan.

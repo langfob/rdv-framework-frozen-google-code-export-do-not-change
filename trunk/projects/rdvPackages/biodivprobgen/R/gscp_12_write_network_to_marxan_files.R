@@ -1,3 +1,15 @@
+#             #--------------------------------
+#             #  temporary...  BTL - 2015 04 26
+#             library (plyr)  # for arrange
+#             PU_col_name = names (PU_spp_pair_indices)[1]
+#             spp_col_name = names (PU_spp_pair_indices)[2]
+#             parameters = list()
+#             parameters$marxan_spf_rule = "POWER_OF_10"
+#             #parameters$marxan_spf_rule = "CONSTANT"
+#             #--------------------------------
+
+
+
 #===============================================================================
 
                 #  gscp_12_write_network_to_marxan_files.R
