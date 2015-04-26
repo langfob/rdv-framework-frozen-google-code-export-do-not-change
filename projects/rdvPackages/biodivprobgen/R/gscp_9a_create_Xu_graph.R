@@ -47,7 +47,19 @@ integerize = switch (integerize_string,
 #===============================================================================
 
 source (paste0 (sourceCodeLocationWithSlash, "gscp_5_derive_control_parameters.R"))
+
+#-------------------------------------------------------------------------------
+
+    #  Create and load nodes data structure.
 source (paste0 (sourceCodeLocationWithSlash, "gscp_6_create_data_structures.R"))
+nodes = create_nodes_data_structure (tot_num_nodes, 
+                                      num_nodes_per_group, 
+                                      n__num_groups, 
+                                      num_independent_nodes_per_group 
+                                     )
+
+#-------------------------------------------------------------------------------
+
 source (paste0 (sourceCodeLocationWithSlash, "gscp_8_link_nodes_within_groups.R"))
 source (paste0 (sourceCodeLocationWithSlash, "gscp_9_link_nodes_between_groups.R"))
 
@@ -215,6 +227,10 @@ create_Xu_graph = function (num_nodes_per_group,
 
     #---------------------------------------------------------------------------
     
+        #-----------------------------
+        #  Link nodes WITHIN groups.
+        #-----------------------------
+    
     timepoints_df = 
         timepoint (timepoints_df, "gscp_9a_create_Xu_graph", 
                    "Starting link_nodes_within_groups.R")
@@ -227,6 +243,10 @@ create_Xu_graph = function (num_nodes_per_group,
                                   edge_list)
 
     #---------------------------------------------------------------------------
+    
+        #------------------------------
+        #  Link nodes BETWEEN groups.
+        #------------------------------
     
     timepoints_df = 
         timepoint (timepoints_df, "gscp_9a_create_Xu_graph", 
@@ -245,6 +265,10 @@ create_Xu_graph = function (num_nodes_per_group,
                                    edge_list_and_cur_row$cur_row)
     
     #---------------------------------------------------------------------------
+
+        #---------------------------------------------
+        #  Remove duplicate links, if there are any.
+        #---------------------------------------------
 
         #  All node pairs should be loaded into the edge_list table now 
         #  and there should be no NA lines left in the table.
@@ -293,6 +317,12 @@ create_Xu_graph = function (num_nodes_per_group,
         cat ("\n\n")
         }
 
+    #---------------------------------------------------------------------------
+
+        #------------------------------------
+        #  Verify that all edges are legal.
+        #------------------------------------
+
         #  All edges added to the edge_list SHOULD be legal at this point 
         #  if the code is working correctly.  Make sure that this is true 
         #  and fail if it's not.
@@ -300,7 +330,8 @@ create_Xu_graph = function (num_nodes_per_group,
     assert_edge_list_does_not_violate_assumptions (edge_list, 
                                                    first_row_of_intergroup_links)
 
-#    return (edge_list_and_cur_row)
+    #---------------------------------------------------------------------------
+
     return (edge_list)
     }
 

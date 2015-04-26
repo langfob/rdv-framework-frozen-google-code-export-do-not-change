@@ -75,6 +75,8 @@ create_adj_matrix_with_spp_rows_vs_PU_cols =
     return (bpm)
     }
 
+#===============================================================================
+
 bpm = 
     create_adj_matrix_with_spp_rows_vs_PU_cols (num_spp,                                                 
                                                   num_PUs, 
@@ -95,6 +97,8 @@ bpm =
     #  fraction of their target of at least 1 (where 1 means exactly meeting 
     #  their target).
 
+dependent_node_IDs = get_dependent_node_IDs (nodes) 
+
 spp_rep_targets = rep (1, num_spp)
 spp_rep_fracs = compute_rep_fraction (bpm, 
                                       dependent_node_IDs, 
@@ -113,9 +117,8 @@ if (length (unmet_spp_rep_frac_indices) > 0)
     print (dependent_node_IDs)
     cat ("\n\nbpm = \n")
     print (bpm)
-    
-    
-    stop()
+
+    quit (save="yes", status=ERROR_STATUS_optimal_solution_is_not_optimal)
     }
 
 solution_cost = compute_solution_cost (dependent_node_IDs, rep (1, num_PUs))
