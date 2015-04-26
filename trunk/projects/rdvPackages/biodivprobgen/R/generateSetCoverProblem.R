@@ -159,6 +159,11 @@ DEBUG_LEVEL = 0
     #  Turn all R warnings into errors.
 options (warn=2)
 
+    #  Values to return from the program when quit() is called on a serious
+    #  error.
+ERROR_STATUS_num_inside_or_within_group_links_less_than_one = 1001
+ERROR_STATUS_optimal_solution_is_not_optimal = 1002
+
 #===============================================================================
 
     #  Need to do this in a better way so that it is appropriate for  

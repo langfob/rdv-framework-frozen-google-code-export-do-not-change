@@ -2,90 +2,134 @@
 
                         #  gscp_6_create_data_structures.R
 
+#  The "nodes" data structure is the main store for data about each node in 
+#  the problem (where nodes correspond to "planning units" in the reserve 
+#  selection phrasing of the problem and "sets" in the minimum set cover 
+#  phrasing of the problem).
+
+#  For each node, the structure contains its:
+#       - node_ID
+#           - an integer
+#       - group_ID
+#           - integer identifying what clique it belongs to
+#       - dependent_set_member 
+#           - boolean flag indicating whether it's in the independent set or not
+#           - FALSE means it IS in the independent set
+#           - TRUE means it is NOT in the independent set and therefore, 
+#             it IS in the optimal solution
+
 #===============================================================================
 
-        #--------------------------------------------------
-        #  Create structures to hold the nodes and links.
-#  NEED TO DESCRIBE ALL OF THE MAJOR DATA STRUCTURES USED IN HERE 
-#  AND WHAT (IF ANYTHING), THEY ASSUME.
-        #--------------------------------------------------    
-
-    cat ("\n\n--------------------  Creating structures to hold the nodes and links.\n")
-
-    node_IDs = 1:tot_num_nodes
+create_nodes_data_structure = 
+        function (tot_num_nodes, 
+                  num_nodes_per_group, 
+                  n__num_groups, 
+                  num_independent_nodes_per_group)
+    {
+    cat ("\n\n--------------------  Creating and populating nodes structure.\n")
+  
+        #--------------------------------------------------------------
+        #  For each group ID, assign a consecutive set of node IDs.
+        #  For example, if there are 8 nodes total and 2 node groups, 
+        #  assign nodes 1:4 to group 1 and nodes 5:8 to group 2.
+        #--------------------------------------------------------------
     
-#--------------------
-
-            #  For each node ID, what group does it belong to?
+    node_IDs = 1:tot_num_nodes
     group_IDs = 1 + (0:(tot_num_nodes - 1) %/% num_nodes_per_group)
-
-            #  Assign lowest node IDs in each group to be the independent nodes 
-            #  in that group.
-#     independent_node_IDs = seq (from=1, 
-#                                 by=num_nodes_per_group, 
-#                                 length.out=n__num_groups)
-
+  
+        #--------------------------------------------------------------------
+        #  Assign lowest node IDs in each group to be the independent nodes 
+        #  in that group.
+        #--------------------------------------------------------------------
+    
     independent_node_ID_starts = seq (from=1, 
-                                      by=num_nodes_per_group, 
-                                      length.out=n__num_groups)
+                                        by=num_nodes_per_group, 
+                                        length.out=n__num_groups)
     independent_node_IDs = c()
     for (idx in 0:(num_independent_nodes_per_group-1))
         {
-        independent_node_IDs = 
-                c(independent_node_IDs, (idx + independent_node_ID_starts))
+        independent_node_IDs = c(independent_node_IDs, 
+                                 (idx + independent_node_ID_starts))
         }            
     independent_node_IDs = sort (independent_node_IDs)
-
-#--------------------
-
-            #  For each node ID, flag whether it is in the dependent set or not.
+    
+    #--------------------
+    
+        #  For each node ID, flag whether it is in the dependent set or not.
+    
     dependent_set_members = rep (TRUE, tot_num_nodes)
     dependent_set_members [independent_node_IDs] = FALSE
     
-            #  Collect the IDs of just the dependent nodes.
+        #  Collect the IDs of just the dependent nodes.
+    
     dependent_node_IDs = node_IDs [-independent_node_IDs]
     
-            #  Build an overall data frame that shows for each node, 
-            #  its node ID and group ID, plus a flag indicating whether 
-            #  it's in the dependent set or not.  For example, if there 
-            #  are 3 nodes per group:
-            #
-            #       node_ID     group_ID       dependent_set_member
-            #         1            1                 TRUE
-            #         2            1                 TRUE
-            #         3            1                 FALSE
-            #         4            2                 TRUE
-            #         5            2                 TRUE
-            #         6            2                 FALSE
-            #        ...          ...                 ...
-
-
-#    nodes = cbind (node_IDs, group_IDs, dependent_set_member)
+    
+        #------------------------------------------------------------
+        #  Build an overall data frame that shows for each node, 
+        #  its node ID and group ID, plus a flag indicating whether 
+        #  it's in the dependent set or not.  For example, if there 
+        #  are 3 nodes per group:
+        #
+        #       node_ID     group_ID       dependent_set_member
+        #         1            1                 TRUE
+        #         2            1                 TRUE
+        #         3            1                 FALSE
+        #         4            2                 TRUE
+        #         5            2                 TRUE
+        #         6            2                 FALSE
+        #        ...          ...                 ...
+        #------------------------------------------------------------
+    
     nodes = data.frame (node_ID = node_IDs,
                         group_ID = group_IDs, 
                         dependent_set_member = dependent_set_members)
+    
+    #-------------------------------------------------------------------------------
+  
+    return (nodes)
+    }
+    
+#===============================================================================
 
-#     cat ("\n\nnodes and their group IDs:")
-#     for (cur_node_ID in 1:tot_num_nodes)
-#         {
-#         cat ("\n\t", cur_node_ID, "\t", group_IDs [cur_node_ID])    
-#         }
-#     cat ("\n")
+get_dependent_node_IDs = function (nodes) 
+    { 
+    return (which (! nodes [,"dependent_set_member"]))
+    }
 
-if (DEBUG_LEVEL > 0)
+#===============================================================================
+
+get_independent_node_IDs = function (nodes) 
+    { 
+    return (which (nodes [,"dependent_set_member"]))
+    }
+
+#===============================================================================
+
+TESTING = FALSE
+if (TESTING)
     {
-    cat ("\n\t\t independent_node_IDs = ", independent_node_IDs)
-    cat ("\n\t\t dependent_node_IDs = ", dependent_node_IDs)
+    tot_num_nodes = 8 
+    num_nodes_per_group = 4
+    n__num_groups = 2
+    num_independent_nodes_per_group = 1
+
+    nodes = create_nodes_data_structure (tot_num_nodes, 
+                                          num_nodes_per_group, 
+                                          n__num_groups, 
+                                          num_independent_nodes_per_group 
+                                         )
     
     cat ("\n\nnodes = \n")
     print (nodes)
-    cat ("\n\n")    
-    }
     
-#     edge_list = matrix (NA, 
-#                                 nrow = max_possible_tot_num_links, 
-#                                 ncol = 2, 
-#                                 byrow = TRUE)
+    dependent_node_IDs = get_dependent_node_IDs (nodes) 
+    cat ("\ndependent_node_IDs = [", dependent_node_IDs, "]\n", sep=' ')
+    
+    independent_node_IDs = get_independent_node_IDs (nodes) 
+    cat ("\nindependent_node_IDs = [", independent_node_IDs, "]\n\n", sep=' ')
+
+    }
 
 #===============================================================================
 
