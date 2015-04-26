@@ -289,12 +289,14 @@ results_df$runset_name [cur_result_row]                                      = p
 #  Execution halted 
 
 
-    #  Need to bind the network measures to the data frame too.
-
-results_df = cbind (results_df, 
-                    bipartite_metrics_from_bipartite_package, 
-                    bipartite_metrics_from_igraph_package_df
-                    )
+if (parameters$compute_network_metrics)
+    {
+        #  Need to bind the network measures to the data frame too.
+    results_df = cbind (results_df, 
+                        bipartite_metrics_from_bipartite_package, 
+                        bipartite_metrics_from_igraph_package_df
+                        )
+    }
 
 write_results_to_files (results_df, parameters)
 
