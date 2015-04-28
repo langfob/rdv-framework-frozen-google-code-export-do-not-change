@@ -4,47 +4,33 @@
 
 #===============================================================================
 
-VERBOSE = FALSE
-TESTING = FALSE
-
-#===============================================================================
-
-if (!TESTING)
-{
-timepoints_df = 
-    timepoint (timepoints_df, "gscp_10b", 
-               "Starting gscp_10b_compute_solution_rep_levels_and_costs.R")
-}
-
-#===============================================================================
-
 #  History:
 
 #  2015 02 18 - BTL - Created.
 
 #===============================================================================
 
-###  Compute representation match (shortfall or overrep) given a spp rows by 
-###  PU columns adjacency matrix.
+    #  Compute representation match (shortfall or overrep) given a spp rows by 
+    #  PU columns adjacency matrix.
 
 compute_rep_fraction = 
     function (spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU, 
               PU_set_to_test,
-              spp_rep_targets = 1  #  replace with vector if not all 1s
+              spp_rep_targets = 1,   #  replace with vector if not all 1s
+              DEBUG_LEVEL
               )
     {
         #  Reduce the spp/PU adjacency matrix to only include PUs that 
         #  are in the set to test (e.g., in the proposed reserve set).
         #  Once that's done, summing each spp row will tell you how much 
         #  representation each spp achieves in the proposed solution.
-#browser()
+        
     selected_PUs_matrix_of_spp_cts_per_PU = 
-#        spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU [ , which (PU_set_to_test)]
         spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU [ , PU_set_to_test, drop=FALSE]
     spp_rep_cts = apply (selected_PUs_matrix_of_spp_cts_per_PU, 1, sum)
     spp_rep_fracs = 1 + ((spp_rep_cts - spp_rep_targets) / spp_rep_targets)
     
-    if (VERBOSE)
+    if (DEBUG_LEVEL)
         {
         if (length (spp_rep_targets) == 1)
             spp_rep_targets = rep (spp_rep_targets, 
@@ -54,27 +40,24 @@ compute_rep_fraction =
         cat ("\nIn compute_rep_fraction():\nselected_PUs_matrix_of_spp_cts_per_PU with cts, targets, and fracs appended = \n")
         print (display_matrix)
         }
-    
+
     return (spp_rep_fracs)
     }
 
 #===============================================================================
 
-###  Compute cost of given solution vector of PUs to include.
+    #  Compute cost of given solution vector of PUs to include.
 
 compute_solution_cost = 
     function (PU_set_to_test, PU_costs)
     {
-    solution_cost = sum (PU_costs [PU_set_to_test])
-#browser()
-    return (solution_cost)
+    return (sum (PU_costs [PU_set_to_test]))
     }
 
 #===============================================================================
 #===============================================================================
 
-test_compute_rep_fraction = 
-    function ()
+test_compute_rep_fraction = function (DEBUG_LEVEL)
     {
     
         #  Create a solution set to test that includes 2 PUs out of 4.
@@ -96,33 +79,42 @@ test_compute_rep_fraction =
                 )
     
         #  Test with default targets of all 1s.
-    if (VERBOSE)  cat ("\n\nCASE:  default targets all 1s.")
+    if (DEBUG_LEVEL)  cat ("\n\nCASE:  default targets all 1s.")
     correct_answer = c (4, 12, 20, 28, 36)
-    answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, solution_set, 1)
+    answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, 
+                                   solution_set, 
+                                   1, 
+                                   DEBUG_LEVEL)
     if (isTRUE (all.equal (correct_answer, answer))) cat (".") else cat ("F")
-    if (VERBOSE)
+    if (DEBUG_LEVEL)
         {
         cat ("\ncorrect answer = ", correct_answer)
         cat ("\nanswer         = ", answer, "\n")
         }
     
         #  Test with targets of all 20s.
-    if (VERBOSE)  cat ("\n\nCASE:  default targets all 20s.")
+    if (DEBUG_LEVEL)  cat ("\n\nCASE:  default targets all 20s.")
     correct_answer = c (0.2, 0.6, 1.0, 1.4, 1.8)
-    answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, solution_set, 20)
+    answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, 
+                                   solution_set, 
+                                   20, 
+                                   DEBUG_LEVEL)
     if (isTRUE (all.equal (correct_answer, answer))) cat (".") else cat ("F")
-    if (VERBOSE)
+    if (DEBUG_LEVEL)
         {
         cat ("\ncorrect answer = ", correct_answer)
         cat ("\nanswer         = ", answer, "\n")
         }
     
         #  Test with spp_target_levels = c (20, 10, 30, 10, 0)
-    if (VERBOSE)  cat ("\n\nCASE:  spp_target_levels = c (20, 10, 30, 10, 0).")
+    if (DEBUG_LEVEL)  cat ("\n\nCASE:  spp_target_levels = c (20, 10, 30, 10, 0).")
     correct_answer = c (0.2, 1.2, 0.6666667, 2.8, Inf)
-    answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, solution_set, spp_target_levels)
+    answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, 
+                                   solution_set, 
+                                   spp_target_levels, 
+                                   DEBUG_LEVEL)
     if (isTRUE (all.equal (correct_answer, answer, tolerance = 1e-6))) cat (".") else cat ("F")
-    if (VERBOSE)
+    if (DEBUG_LEVEL)
         {
         cat ("\ncorrect answer = ", correct_answer)
         cat ("\nanswer         = ", answer, "\n")
@@ -203,7 +195,8 @@ test_compute_solution_cost = function ()
 
 #-------------------------------------------------------------------------------
 
-if (TESTING) test_compute_rep_fraction()
+TESTING = FALSE
+if (TESTING) test_compute_rep_fraction (DEBUG_LEVEL)
 if (TESTING) test_compute_solution_cost()
 
 #===============================================================================

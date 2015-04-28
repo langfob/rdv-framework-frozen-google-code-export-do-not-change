@@ -4,14 +4,6 @@
 
 #===============================================================================
 
-timepoints_df = 
-    timepoint (timepoints_df, "gscp_11", 
-               "Starting gscp_11_summarize_and_plot_graph_structure_information.R")
-
-#===============================================================================
-
-cat ("\n\n--------------------  Computing and plotting degree distribution of node graph.\n")
-
 #  Compute and plot the degree distribution of the node graph.
 #  It may be that we can use metrics over this graph as features of the 
 #  problem that give information about its difficulty.
@@ -47,55 +39,68 @@ cat ("\n\n--------------------  Computing and plotting degree distribution of no
 #  or visual display over those (e.g., something about their degree 
 #  distribution) that can be used as a predictive feature?
 
-final_link_counts_for_each_node = count (PU_spp_pair_indices, vars=PU_col_name)
-#final_link_counts_for_each_node = count (PU_spp_pair_names, vars=PU_col_name)
+#-------------------------------------------------------------------------------
 
-if (DEBUG_LEVEL > 0)
+plot_final_degree_dist_for_node_graph = 
+        function (final_link_counts_for_each_node, 
+                  PU_col_name, 
+                  plot_output_dir
+                  ) 
     {
-    cat ("\n\nNumber of links per node AFTER intergroup linking:\n")
-    print (final_link_counts_for_each_node)
+    cat ("\n\n--------------------  Computing and plotting degree distribution of node graph.\n")
+
+    final_degree_dist = arrange (final_link_counts_for_each_node, -freq)
+    final_degree_dist[,PU_col_name] = 1:dim(final_degree_dist)[1]
+    
+    pdf (file.path (plot_output_dir, "final_degree_dist.pdf"), width=6, height=6)
+    plot (final_degree_dist, 
+            main="Richness", 
+            #sub="subtitle",
+            xlab="PU ID", 
+            ylab="num spp on PU")
+    dev.off()
     }
-
-final_degree_dist = arrange (final_link_counts_for_each_node, -freq)
-final_degree_dist[,PU_col_name] = 1:dim(final_degree_dist)[1]
-
-#pdf (paste0 (plot_output_dir, "final_degree_dist.pdf"), width=6, height=6)
-pdf (file.path (plot_output_dir, "final_degree_dist.pdf"), width=6, height=6)
-plot (final_degree_dist, 
-      main="Richness", 
-      #sub="subtitle",
-      xlab="PU ID", 
-      ylab="num spp on PU")
-dev.off()
 
 #-------------------------------------------------------------------------------
 
-# if (DEBUG_LEVEL > 0)
-#     {
-#     cat ("\n\nNumber of nodes per link BEFORE intergroup linking:\n")
-#     print (initial_node_counts_for_each_link)
-#     }
-
-final_node_counts_for_each_link = count (PU_spp_pair_indices, vars=spp_col_name)
-#final_node_counts_for_each_link = count (PU_spp_pair_names, vars=spp_col_name)
-
-if (DEBUG_LEVEL > 0)
+plot_rank_abundance_dist_for_node_graph = 
+        function (final_node_counts_for_each_link, 
+                  spp_col_name, 
+                  plot_output_dir
+                  ) 
     {
-    cat ("\n\nNumber of nodes per link AFTER intergroup linking:\n")
-    print (final_node_counts_for_each_link)
+    final_rank_abundance_dist = arrange (final_node_counts_for_each_link, -freq)
+    final_rank_abundance_dist[,spp_col_name] = 1:dim(final_rank_abundance_dist)[1]
+    
+    pdf (file.path (plot_output_dir, "final_rank_abundance_dist.pdf"))
+    plot (final_rank_abundance_dist,
+            main="Rank abundance curve", 
+            # sub="subtitle",
+            xlab="spp ID", 
+            ylab="abundance:  num PUs occupied by spp")
+    dev.off()
     }
 
-final_rank_abundance_dist = arrange (final_node_counts_for_each_link, -freq)
-final_rank_abundance_dist[,spp_col_name] = 1:dim(final_rank_abundance_dist)[1]
+#===============================================================================
 
-#pdf (paste0 (plot_output_dir, "final_rank_abundance_dist.pdf"))
-pdf (file.path (plot_output_dir, "final_rank_abundance_dist.pdf"))
-plot (final_rank_abundance_dist,
-      main="Rank abundance curve", 
-      # sub="subtitle",
-      xlab="spp ID", 
-      ylab="abundance:  num PUs occupied by spp")
-dev.off()
+plot_degree_and_abundance_dists_for_node_graph = 
+        function (final_link_counts_for_each_node, 
+                  final_rank_abundance_dist, 
+                  PU_col_name, 
+                  plot_output_dir, 
+                  spp_col_name
+                  ) 
+    {
+    plot_final_degree_dist_for_node_graph (final_link_counts_for_each_node, 
+                                            PU_col_name, 
+                                            plot_output_dir
+                                            ) 
+    
+    plot_rank_abundance_dist_for_node_graph (final_rank_abundance_dist, 
+                                            spp_col_name, 
+                                            plot_output_dir
+                                            ) 
+    }
 
 #===============================================================================
 

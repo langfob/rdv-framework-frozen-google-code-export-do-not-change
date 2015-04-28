@@ -191,9 +191,10 @@ source (paste0 (sourceCodeLocationWithSlash, "gscp_9b_convert_Xu_graph_to_spp_PU
     #  have been far less than the number of species.  They're also easier 
     #  to control through the choice of the number of groups, etc.  
 
-if (num_spp > parameters$max_allowed_num_spp)
+#num_spp = get_num_spp (edge_list)
+if (get_num_spp (edge_list) > parameters$max_allowed_num_spp)
     {
-    cat ("\n\nQuitting:  num_spp (", num_spp, ") > maximum allowed (", 
+    cat ("\n\nQuitting:  num_spp (", get_num_spp (edge_list), ") > maximum allowed (", 
          parameters$max_allowed_num_spp, ").\n\n")
 
     cur_result_row = 1

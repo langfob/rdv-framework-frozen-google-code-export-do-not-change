@@ -4,28 +4,25 @@
 
 #===============================================================================
 
-timepoints_df = 
-    timepoint (timepoints_df, "gscp_8", 
-               "Starting gscp_8_link_nodes_within_groups.R.")
-
-#===============================================================================
-
 link_nodes_within_groups = 
     function (num_nodes_per_group, 
               n__num_groups, 
               nodes, 
-#              cur_group_ID, 
-#              cur_idx, 
-              edge_list
-#               , 
-#              other_node_idx
+              edge_list, 
+              DEBUG_LEVEL
               ) 
     {
     cat ("\n\n--------------------  Linking nodes WITHIN each group.\n")
     
     if (num_nodes_per_group < 2)
-        quit ("\n\n***  num_nodes_per_group (", num_nodes_per_group, 
-              ") must be at least 2.\n\n")
+        {
+        cat ("\n\n***  num_nodes_per_group (", num_nodes_per_group, 
+             ") must be at least 2.\n\n")
+        
+        if (emulatingTzar)  browser ()
+        
+        quit (save="yes", status=ERROR_STATUS_num_nodes_per_group_must_be_at_least_2)
+        }
     
     num_nodes_per_group_minus_1 = num_nodes_per_group - 1
     cur_row = 1
