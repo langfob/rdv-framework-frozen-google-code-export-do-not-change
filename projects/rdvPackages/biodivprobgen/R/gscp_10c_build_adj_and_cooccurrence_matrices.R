@@ -11,8 +11,9 @@
 #       gscp_11a_network_measures_using_bipartite_package.R.
 
 #===============================================================================
+#       Verify that the generated optimal solution really is a solution.
+#===============================================================================
 
-    #  Verify that the generated optimal solution really is a solution.
     #  Theoretically, this should not be necessary, but checking it here to 
     #  make sure that the implementation is working correctly.
     #  Correct solutions will have every species attaining a representation 
@@ -69,10 +70,64 @@ verify_that_generated_solution_really_is_a_solution =
     }
 
 #===============================================================================
+#  Create a data frame using NAMES of the elements rather than their INDICES.  
+#===============================================================================
 
-###  Build input matrix for bipartite package...
+    #  Though the two data frames carry identical information, it looks 
+    #  like both of them are necessary because different network packages 
+    #  expect different inputs.  The bipartite package creates an 
+    #  adjacency matrix based on the indices, but the igraph package 
+    #  creates a bipartite graph using either the indices or the vertex names.  
 
-cat ("\n\nAbout to create bpm matrix.")
+    #  However, if I later decide to use the vertex indices, I need to go 
+    #  back and renumber either the spp vertices or the PU vertices so 
+    #  that they don't overlap the other set.  That may end up being the 
+    #  better strategy when graphs get big, but at the moment, giving them 
+    #  names seems less likely to introduce some kind of indexing bug.
+        
+    #  Will create names for PU vertices by prepending the vertex ID with a "p".
+    #  Similarly, spp vertices will be named by prepending with an "s".
+    #  Note that we have to either uniquely name the vertices or we have to  
+    #  renumber either the spp or the PUs.  This is because the numbering of 
+    #  both sets of vertices starts at 1 and that means the vertex IDs are 
+    #  not unique when the two sets are combined.  
+
+create_PU_spp_pair_names = 
+        function (num_PUs, 
+                  num_spp, 
+                  PU_spp_pair_indices, 
+                  PU_col_name, 
+                  spp_col_name
+                  ) 
+    {
+    cat ("\n\nAbout to create PU_spp_pair_names...")
+    
+        #  First, create vectors of just then PU names and spp names alone.
+        #  These are used later to build tables.
+    
+    PU_vertex_indices = 1:num_PUs
+    PU_vertex_names = str_c ("p", PU_vertex_indices)
+    
+    spp_vertex_indices = 1:num_spp
+    spp_vertex_names = str_c ("s", spp_vertex_indices)
+    
+        #  Now, create a near copy of the PU_spp_pair_indices table 
+        #  but using the names of the PUs and species instead of their 
+        #  indices.
+    
+    PU_spp_pair_names = 
+        data.frame (PU_ID = str_c ("p", PU_spp_pair_indices [,PU_col_name]),
+                    spp_ID = str_c ("s", PU_spp_pair_indices [,spp_col_name]), 
+                    stringsAsFactors = FALSE)
+    
+    return (list (PU_spp_pair_names=PU_spp_pair_names, 
+                  PU_vertex_names=PU_vertex_names, 
+                  spp_vertex_names=spp_vertex_names))
+    }
+
+#===============================================================================
+#               Build input matrix for bipartite package...
+#===============================================================================
 
 create_adj_matrix_with_spp_rows_vs_PU_cols = 
     function (num_spp, 
@@ -89,6 +144,8 @@ create_adj_matrix_with_spp_rows_vs_PU_cols =
               ) 
 
     {
+    cat ("\n\nAbout to create bpm matrix.")
+    
         #  Create the adjacency matrix that will be viewed as a 
         #  bipartite matrix (bpm) by the bipartite network routines 
         #  with species as rows and planning units as columns.
