@@ -53,7 +53,7 @@ library (stringr)
     #  description of a bipartite network, so I may need to modify or use 
     #  it in doing the bipartite network analyses too.
 
-create_PU_spp_pair_indices = function (edge_list) 
+create_PU_spp_pair_indices = function (edge_list, nodes) 
     {
     num_edge_list = get_num_edge_list (edge_list)
 
@@ -81,13 +81,15 @@ create_PU_spp_pair_indices = function (edge_list)
     
     return (list (PU_spp_pair_indices=PU_spp_pair_indices, 
                   PU_col_name=PU_col_name,
-                  spp_col_name=spp_col_name))
+                  spp_col_name=spp_col_name, 
+                  num_PUs=get_num_nodes (nodes),
+                  num_spp=get_num_edge_list (edge_list)))
     }
 
 #===============================================================================
 
-get_num_PUs = function (nodes) { get_num_nodes (nodes) }    #  = tot_num_nodes
-get_num_spp = function (edge_list) { get_num_edge_list (edge_list) }
+# get_num_PUs = function (nodes) { get_num_nodes (nodes) }    #  = tot_num_nodes
+# get_num_spp = function (edge_list) { get_num_edge_list (edge_list) }
 
 #===============================================================================
 
