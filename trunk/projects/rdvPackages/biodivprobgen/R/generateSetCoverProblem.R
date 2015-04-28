@@ -169,6 +169,35 @@ source (paste0 (sourceCodeLocationWithSlash, "biodivprobgen_initialization.R"))
 #       Generate a problem, i.e, create the Xu graph nodes and edge_list.
 #===============================================================================
 
+PU_costs = rep (1, num_PUs)
+
+PU_spp_pair_indices_sextet = NULL
+correct_solution_vector_is_known = FALSE
+read_Xu_problem_from_file = parameters$read_Xu_problem_from_file
+
+if (read_Xu_problem_from_file)
+{
+    #  
+    infile_name = parameters$Xu_problem_input_file_name
+
+    PU_spp_pair_indices_sextet = 
+        load_Xu_problem_from_file_into_PU_spp_pair_indices_sextet (infile_name, 
+                                        parameters$given_correct_solution_cost) 
+
+    dependent_node_IDs = NULL
+    
+} else
+
+#     PU_spp_pair_indices = PU_spp_pair_indices_sextet$PU_spp_pair_indices 
+#     PU_col_name = PU_spp_pair_indices_sextet$PU_col_name
+#     spp_col_name = PU_spp_pair_indices_sextet$spp_col_name
+#     num_PUs = PU_spp_pair_indices_sextet$num_PUs
+#     num_spp = PU_spp_pair_indices_sextet$num_spp
+#     correct_solution_cost = PU_spp_pair_indices_sextet$correct_solution_cost
+
+#-------------------------------------------------------------------------------
+
+{
 #  Not a function.  Not sure how to make this a function yet...
 source (paste0 (sourceCodeLocationWithSlash, "gscp_5_derive_control_parameters.R"))
 
@@ -180,6 +209,9 @@ nodes = create_nodes_data_structure (tot_num_nodes,
                                       n__num_groups, 
                                       num_independent_nodes_per_group 
                                      )
+
+correct_solution_vector_is_known = TRUE
+dependent_node_IDs = get_dependent_node_IDs (nodes)
 
 #-------------------------------------------------------------------------------
 
@@ -205,14 +237,21 @@ timepoints_df =
     timepoint (timepoints_df, "gscp_10", 
                "Starting gscp_10_clean_up_completed_graph_structures.R")
 
-PU_spp_pair_indices_quintet = create_PU_spp_pair_indices (edge_list, nodes) 
+PU_spp_pair_indices_sextet = create_PU_spp_pair_indices (edge_list, 
+                                                          nodes, 
+                                                          dependent_node_IDs, 
+                                                          PU_costs) 
+}
 
-PU_spp_pair_indices = PU_spp_pair_indices_quintet$PU_spp_pair_indices 
-PU_col_name = PU_spp_pair_indices_quintet$PU_col_name
-spp_col_name = PU_spp_pair_indices_quintet$spp_col_name
-num_PUs = PU_spp_pair_indices_quintet$num_PUs
-num_spp = PU_spp_pair_indices_quintet$num_spp
+#-------------------------------------------------------------------------------
 
+PU_spp_pair_indices = PU_spp_pair_indices_sextet$PU_spp_pair_indices 
+PU_col_name = PU_spp_pair_indices_sextet$PU_col_name
+spp_col_name = PU_spp_pair_indices_sextet$spp_col_name
+num_PUs = PU_spp_pair_indices_sextet$num_PUs
+num_spp = PU_spp_pair_indices_sextet$num_spp
+correct_optimum_cost = PU_spp_pair_indices_sextet$correct_solution_cost
+    
 #===============================================================================
 
     #  Having problems with problem dimensions on some runs being too big and  
@@ -229,7 +268,11 @@ num_spp = PU_spp_pair_indices_quintet$num_spp
     #  have been far less than the number of species.  They're also easier 
     #  to control through the choice of the number of groups, etc.  
 
-if (num_spp > parameters$max_allowed_num_spp)
+max_allowed_num_spp = parameters$max_allowed_num_spp
+if (read_Xu_problem_from_file)
+    max_allowed_num_spp = num_spp
+
+if (num_spp > max_allowed_num_spp)
     {
     cat ("\n\nQuitting:  num_spp (", num_spp, ") > maximum allowed (", 
          parameters$max_allowed_num_spp, ").\n\n")
@@ -289,7 +332,8 @@ if (num_spp > parameters$max_allowed_num_spp)
                                                     edge_idx, 
                                                     spp_col_name, 
                                                     PU_col_name, 
-                                                    get_dependent_node_IDs (nodes), 
+                                                    dependent_node_IDs, 
+                                                    correct_solution_vector_is_known, 
                             ERROR_STATUS_optimal_solution_is_not_optimal, 
                                                     emulatingTzar) 
     
@@ -351,6 +395,9 @@ if (num_spp > parameters$max_allowed_num_spp)
     #---------------------------------------------------------------------------
     
     source (paste0 (sourceCodeLocationWithSlash, "gscp_13_write_marxan_control_file_and_run_marxan.R"))
+    
+    #---------------------------------------------------------------------------
+
     source (paste0 (sourceCodeLocationWithSlash, "gscp_14_read_marxan_output_files.R"))
     
     #===============================================================================

@@ -132,9 +132,7 @@ marxan_ssoln_PUs_ranked_by_votes_df = arrange (marxan_ssoln_df, desc (number))
 #  when all PUs with the same number of votes or more are included in the 
 #  solution.
 
-PU_costs = rep (1, num_PUs)
 total_landscape_cost = sum (PU_costs)
-correct_optimum_cost = num_dependent_set_nodes    #  TEMPORARY - only works for all costs = 1
 correct_optimum_landscape_frac_cost = correct_optimum_cost / total_landscape_cost
 
 rle_lengths_and_values = rle (marxan_ssoln_PUs_ranked_by_votes_df [, "number"])

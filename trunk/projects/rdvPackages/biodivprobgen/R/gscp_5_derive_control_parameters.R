@@ -252,7 +252,7 @@ if ((num_links_within_one_group < 1) | (tot_num_links_inside_groups < 1))
 
     if (emulatingTzar)  browser ()
     quit (status=ERROR_STATUS_num_inside_or_within_group_links_less_than_one, 
-          save="yes")
+          save="no")
     }
 
 #-------------------------------------------------------------------------------

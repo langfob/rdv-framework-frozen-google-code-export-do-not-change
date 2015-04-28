@@ -42,11 +42,42 @@ timepoints_df =
     #  the assignments for inclusion or exclusion of patches in the solutions.
 
     #  Create table holding all the information to compare solutions.
-signed_difference = marxan_best_df$SOLUTION - nodes$dependent_set_member
-abs_val_signed_difference = abs (signed_difference)
+
+if (read_Xu_problem_from_file)
+    {
+    correct_solution_vector = rep (NA, num_PUs)
+    signed_difference = rep (NA, num_PUs)
+    abs_val_signed_difference = rep (NA, num_PUs)
+
+            #  Xu options
+    n__num_groups = NA
+    alpha__ = NA
+    p__prop_of_links_between_groups = NA
+    r__density = NA
+    
+        #  Derived Xu options
+    num_nodes_per_group = NA
+    tot_num_nodes = num_PUs
+    num_independent_set_nodes = tot_num_nodes - correct_optimum_cost
+    num_dependent_set_nodes = correct_optimum_cost
+    num_rounds_of_linking_between_groups = NA
+    target_num_links_between_2_groups_per_round = NA
+    num_links_within_one_group = NA
+    tot_num_links_inside_groups = NA
+    max_possible_num_links_between_groups = NA
+    max_possible_tot_num_links = NA
+    
+    opt_solution_as_frac_of_tot_num_nodes = correct_optimum_cost / tot_num_nodes
+    
+    } else
+    {
+    correct_solution_vector = nodes$dependent_set_member
+    signed_difference = marxan_best_df$SOLUTION - nodes$dependent_set_member
+    abs_val_signed_difference = abs (signed_difference)
+    }
 
 solutions_df = data.frame (puid = marxan_best_df$PUID,
-                           optimal_solution = nodes$dependent_set_member, 
+                           optimal_solution = correct_solution_vector, 
                            marxan_best_solution = marxan_best_df$SOLUTION, 
                            marxan_votes = marxan_ssoln_df$number, 
                            signed_diff = signed_difference, 
@@ -83,7 +114,8 @@ solutions_df = data.frame (puid = marxan_best_df$PUID,
 #                 Although, this is more directly available as the size of 
 #                 the dependent set.  Still, it's more reusable to compute it 
 #                 rather than assume the existance of a dependent set. 
-cor_num_patches = sum (solutions_df$optimal_solution)
+#cor_num_patches = sum (solutions_df$optimal_solution)
+cor_num_patches = correct_optimum_cost    #  assuming cost = number of patches
 cat ("\n\ncor_num_patches =", cor_num_patches)
 
     #  marxan best solution number of patches (cost)
