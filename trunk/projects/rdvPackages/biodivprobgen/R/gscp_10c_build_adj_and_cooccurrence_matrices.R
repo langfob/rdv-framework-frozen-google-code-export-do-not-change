@@ -31,8 +31,8 @@ verify_that_generated_solution_really_is_a_solution =
     spp_rep_targets = rep (1, num_spp)
     spp_rep_fracs = compute_rep_fraction (bpm, 
                                             dependent_node_IDs, 
-                                            spp_rep_targets, 
-                                            DEBUG_LEVEL)
+                                            DEBUG_LEVEL, 
+                                            spp_rep_targets)
     
     unmet_spp_rep_frac_indices = which (spp_rep_fracs < 1)
     if (length (unmet_spp_rep_frac_indices) > 0)

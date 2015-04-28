@@ -302,38 +302,3 @@ get_num_edge_list = function (edge_list)
 
 #===============================================================================
 
-source (paste0 (sourceCodeLocationWithSlash, "gscp_6_create_data_structures.R"))
-
-
-#===============================================================================
-
-#  Not a function.  Not sure how to make this a function yet...
-source (paste0 (sourceCodeLocationWithSlash, "gscp_5_derive_control_parameters.R"))
-
-#-------------------------------------------------------------------------------
-
-    #  Create and load nodes data structure.
-nodes = create_nodes_data_structure (tot_num_nodes, 
-                                      num_nodes_per_group, 
-                                      n__num_groups, 
-                                      num_independent_nodes_per_group 
-                                     )
-
-#-------------------------------------------------------------------------------
-
-    #  Create and load edge_list data structure.
-source (paste0 (sourceCodeLocationWithSlash, "gscp_8_link_nodes_within_groups.R"))
-source (paste0 (sourceCodeLocationWithSlash, "gscp_9_link_nodes_between_groups.R"))
-
-edge_list = 
-    create_Xu_graph (num_nodes_per_group, 
-                     n__num_groups, 
-                     nodes, 
-                     max_possible_tot_num_links, 
-                     target_num_links_between_2_groups_per_round, 
-                     num_rounds_of_linking_between_groups, 
-                     DEBUG_LEVEL
-                     )
-
-#===============================================================================
-

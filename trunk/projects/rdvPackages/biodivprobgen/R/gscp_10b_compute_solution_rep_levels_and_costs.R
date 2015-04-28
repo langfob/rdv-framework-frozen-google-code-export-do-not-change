@@ -16,8 +16,8 @@
 compute_rep_fraction = 
     function (spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU, 
               PU_set_to_test,
-              spp_rep_targets = 1,   #  replace with vector if not all 1s
-              DEBUG_LEVEL
+              DEBUG_LEVEL, 
+              spp_rep_targets = 1   #  replace with vector if not all 1s
               )
     {
         #  Reduce the spp/PU adjacency matrix to only include PUs that 
@@ -28,6 +28,21 @@ compute_rep_fraction =
     selected_PUs_matrix_of_spp_cts_per_PU = 
         spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU [ , PU_set_to_test, drop=FALSE]
     spp_rep_cts = apply (selected_PUs_matrix_of_spp_cts_per_PU, 1, sum)
+    
+            #  2015 04 28 - BTL
+            #  Moved this statement out of the debug if statement below.  
+            #  It looks like it was a bug to have it in there instead of 
+            #  here before the spp_rep_fracs computation.  
+            #  I only noticed this today when I started getting the 
+            #  following warning/error message:
+            #       Error in spp_rep_cts - spp_rep_targets : 
+            #       (converted from warning) longer object length is not 
+            #       a multiple of shorter object length
+
+#     if (length (spp_rep_targets) == 1)
+#         spp_rep_targets = rep (spp_rep_targets, 
+#                                dim (selected_PUs_matrix_of_spp_cts_per_PU) [1])
+
     spp_rep_fracs = 1 + ((spp_rep_cts - spp_rep_targets) / spp_rep_targets)
     
     if (DEBUG_LEVEL)
@@ -83,8 +98,8 @@ test_compute_rep_fraction = function (DEBUG_LEVEL)
     correct_answer = c (4, 12, 20, 28, 36)
     answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, 
                                    solution_set, 
-                                   1, 
-                                   DEBUG_LEVEL)
+                                   DEBUG_LEVEL, 
+                                   1)
     if (isTRUE (all.equal (correct_answer, answer))) cat (".") else cat ("F")
     if (DEBUG_LEVEL)
         {
@@ -97,8 +112,8 @@ test_compute_rep_fraction = function (DEBUG_LEVEL)
     correct_answer = c (0.2, 0.6, 1.0, 1.4, 1.8)
     answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, 
                                    solution_set, 
-                                   20, 
-                                   DEBUG_LEVEL)
+                                   DEBUG_LEVEL, 
+                                   20)
     if (isTRUE (all.equal (correct_answer, answer))) cat (".") else cat ("F")
     if (DEBUG_LEVEL)
         {
@@ -111,8 +126,8 @@ test_compute_rep_fraction = function (DEBUG_LEVEL)
     correct_answer = c (0.2, 1.2, 0.6666667, 2.8, Inf)
     answer = compute_rep_fraction (matrix_of_spp_cts_per_PU, 
                                    solution_set, 
-                                   spp_target_levels, 
-                                   DEBUG_LEVEL)
+                                   DEBUG_LEVEL, 
+                                   spp_target_levels)
     if (isTRUE (all.equal (correct_answer, answer, tolerance = 1e-6))) cat (".") else cat ("F")
     if (DEBUG_LEVEL)
         {

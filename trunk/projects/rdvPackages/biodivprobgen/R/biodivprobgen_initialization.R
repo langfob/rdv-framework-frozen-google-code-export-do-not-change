@@ -155,3 +155,10 @@ source (paste0 (sourceCodeLocationWithSlash, "timepoints.R"))
 
 #===============================================================================
 
+source (paste0 (sourceCodeLocationWithSlash, "gscp_11aa_write_abbreviated_results_to_files.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_11a_network_measures_using_bipartite_package.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_12_write_network_to_marxan_files.R"))
+
+#===============================================================================
+
+

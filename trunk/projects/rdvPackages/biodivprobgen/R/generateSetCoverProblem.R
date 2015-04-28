@@ -169,13 +169,113 @@ source (paste0 (sourceCodeLocationWithSlash, "biodivprobgen_initialization.R"))
 #       Generate a problem, i.e, create the Xu graph nodes and edge_list.
 #===============================================================================
 
+source (paste0 (sourceCodeLocationWithSlash, "gscp_6_create_data_structures.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_8_link_nodes_within_groups.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_9_link_nodes_between_groups.R"))
 source (paste0 (sourceCodeLocationWithSlash, "gscp_9a_create_Xu_graph.R"))
+
+#-------------------------------------------------------------------------------
+
+#  Not a function.  Not sure how to make this a function yet...
+source (paste0 (sourceCodeLocationWithSlash, "gscp_5_derive_control_parameters.R"))
+
+#-------------------------------------------------------------------------------
+
+    #  Create and load nodes data structure.
+nodes = create_nodes_data_structure (tot_num_nodes, 
+                                      num_nodes_per_group, 
+                                      n__num_groups, 
+                                      num_independent_nodes_per_group 
+                                     )
+
+#-------------------------------------------------------------------------------
+
+    #  Create and load edge_list data structure.
+
+edge_list = 
+    create_Xu_graph (num_nodes_per_group, 
+                     n__num_groups, 
+                     nodes, 
+                     max_possible_tot_num_links, 
+                     target_num_links_between_2_groups_per_round, 
+                     num_rounds_of_linking_between_groups, 
+                     DEBUG_LEVEL
+                     )
+
 
 #===============================================================================
 #                       Clean up after graph creation.
 #===============================================================================
 
-source (paste0 (sourceCodeLocationWithSlash, "gscp_9b_convert_Xu_graph_to_spp_PU_problem.R"))
+#  Replaced 9b with the code below.
+#source (paste0 (sourceCodeLocationWithSlash, "gscp_9b_convert_Xu_graph_to_spp_PU_problem.R"))
+
+source (paste0 (sourceCodeLocationWithSlash, "gscp_10a_clean_up_completed_graph_structures.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_10b_compute_solution_rep_levels_and_costs.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_10c_build_adj_and_cooccurrence_matrices.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_11_summarize_and_plot_graph_structure_information.R"))
+
+#-------------------------------------------------------------------------------
+
+timepoints_df = 
+    timepoint (timepoints_df, "gscp_10", 
+               "Starting gscp_10_clean_up_completed_graph_structures.R")
+
+PU_spp_pair_indices_triple = create_PU_spp_pair_indices (edge_list) 
+
+PU_spp_pair_indices = PU_spp_pair_indices_triple$PU_spp_pair_indices 
+PU_col_name = PU_spp_pair_indices_triple$PU_col_name
+spp_col_name = PU_spp_pair_indices_triple$spp_col_name
+
+#-------------------------------------------------------------------------------
+
+PU_spp_pair_names_triple = create_PU_spp_pair_names (get_num_PUs (nodes), 
+                                                      get_num_spp (edge_list), 
+                                                      PU_spp_pair_indices, 
+                                                      PU_col_name, 
+                                                      spp_col_name
+                                                      ) 
+
+PU_spp_pair_names = PU_spp_pair_names_triple$PU_spp_pair_names
+PU_vertex_names = PU_spp_pair_names_triple$PU_vertex_names
+spp_vertex_names = PU_spp_pair_names_triple$spp_vertex_names
+
+#-------------------------------------------------------------------------------
+
+timepoints_df = 
+    timepoint (timepoints_df, "gscp_10c", 
+               "Starting gscp_10c_build_adj_and_cooccurrence_matrices.R")
+
+bpm = 
+    create_adj_matrix_with_spp_rows_vs_PU_cols (get_num_spp (edge_list),                                                 
+                                                get_num_PUs (nodes), 
+                                                spp_vertex_names, 
+                                                PU_vertex_names, 
+                                                PU_spp_pair_indices, 
+                                                edge_idx, 
+                                                spp_col_name, 
+                                                PU_col_name, 
+                                                get_dependent_node_IDs (nodes), 
+                        ERROR_STATUS_optimal_solution_is_not_optimal, 
+                                                emulatingTzar) 
+
+#-------------------------------------------------------------------------------
+
+timepoints_df = 
+    timepoint (timepoints_df, "gscp_11", 
+               "Starting gscp_11_summarize_and_plot_graph_structure_information.R")
+
+final_link_counts_for_each_node = count (PU_spp_pair_indices, vars=PU_col_name)
+final_node_counts_for_each_link = count (PU_spp_pair_indices, vars=spp_col_name)
+
+plot_degree_and_abundance_dists_for_node_graph (final_link_counts_for_each_node, 
+                                                final_node_counts_for_each_link,  
+                                                PU_col_name, 
+                                                plot_output_dir, 
+                                                spp_col_name
+                                                ) 
+
+#===============================================================================
 
     #  Having problems with problem dimensions on some runs being too big and  
     #  forcing problems that are much larger than are relevant for biodiversity 
@@ -191,7 +291,6 @@ source (paste0 (sourceCodeLocationWithSlash, "gscp_9b_convert_Xu_graph_to_spp_PU
     #  have been far less than the number of species.  They're also easier 
     #  to control through the choice of the number of groups, etc.  
 
-#num_spp = get_num_spp (edge_list)
 if (get_num_spp (edge_list) > parameters$max_allowed_num_spp)
     {
     cat ("\n\nQuitting:  num_spp (", get_num_spp (edge_list), ") > maximum allowed (", 
@@ -199,7 +298,26 @@ if (get_num_spp (edge_list) > parameters$max_allowed_num_spp)
 
     cur_result_row = 1
     
-    source (paste0 (sourceCodeLocationWithSlash, "gscp_11aa_write_abbreviated_results_to_files.R"))
+    write_abbreviated_results_to_files (cur_result_row,                                         
+                                          parameters, 
+                                          num_PUs, 
+                                          num_spp, 
+                                          seed, 
+                                          n__num_groups, 
+                                          alpha__, 
+                                          p__prop_of_links_between_groups, 
+                                          r__density, 
+                                          num_nodes_per_group, 
+                                          tot_num_nodes, 
+                                          num_independent_set_nodes, 
+                                          num_dependent_set_nodes, 
+                                          num_rounds_of_linking_between_groups, 
+                                          target_num_links_between_2_groups_per_round, 
+                                          num_links_within_one_group, 
+                                          tot_num_links_inside_groups, 
+                                          max_possible_num_links_between_groups, 
+                                          max_possible_tot_num_links
+                                          ) 
     
     } else
     {
@@ -209,15 +327,41 @@ if (get_num_spp (edge_list) > parameters$max_allowed_num_spp)
     
     if (parameters$compute_network_metrics)
         {
-        source (paste0 (sourceCodeLocationWithSlash, "gscp_11a_network_measures_using_bipartite_package.R"))
+        timepoints_df = 
+            timepoint (timepoints_df, "gscp_11a", 
+                       "Starting gscp_11a_network_measures_using_bipartite_package.R")
+
+        bipartite_metrics_from_bipartite_package = 
+            compute_network_measures_using_bipartite_package (bpm) 
+
+        timepoints_df = 
+            timepoint (timepoints_df, "gscp_11b", 
+                       "Starting gscp_11b_network_measures_using_igraph_package.R")
+
         source (paste0 (sourceCodeLocationWithSlash, "gscp_11b_network_measures_using_igraph_package.R"))
         }
     
     #===============================================================================
     #                                   Run marxan.
     #===============================================================================
+
+    timepoints_df = 
+        timepoint (timepoints_df, "gscp_12", 
+                   "Starting gscp_12_write_network_to_marxan_files.R")
     
-    source (paste0 (sourceCodeLocationWithSlash, "gscp_12_write_network_to_marxan_files.R"))
+    spf_const = write_network_to_marxan_files (PU_spp_pair_indices,
+                                                  PU_col_name, 
+                                                  spp_col_name, 
+                                                  parameters, 
+                                                  num_spp, 
+                                                  PU_IDs, 
+                                                  spp_IDs, 
+                                                  marxan_input_dir, 
+                                                  marxan_output_dir
+                                                  ) 
+
+    #---------------------------------------------------------------------------
+    
     source (paste0 (sourceCodeLocationWithSlash, "gscp_13_write_marxan_control_file_and_run_marxan.R"))
     source (paste0 (sourceCodeLocationWithSlash, "gscp_14_read_marxan_output_files.R"))
     
