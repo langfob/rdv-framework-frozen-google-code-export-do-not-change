@@ -13,8 +13,8 @@ library (igraph)
 #===============================================================================
 
 vertices = data.frame (name=c(spp_vertex_names, PU_vertex_names), 
-                       type=c(rep(FALSE, num_spp),
-                              rep(TRUE, num_PUs)))
+                       type=c(rep(FALSE, get_num_spp (edge_list)),
+                              rep(TRUE, get_num_PUs (nodes))))
 
     #  Does igraph require me to rename the columns to say 
     #  "from" and "to instead of "PU_ID" and "spp_ID"?
