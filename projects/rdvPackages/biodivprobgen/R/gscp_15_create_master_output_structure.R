@@ -76,6 +76,9 @@ solutions_df = data.frame (puid = marxan_best_df$PUID,
 #  Aggregate measures not in binding (may be computed From the bound data)
 #---------------------------------------------------------------------------
 
+num_PUs = get_num_PUs (nodes)
+num_spp = get_num_spp (edge_list)
+
     #  correct/optimal number of patches (cost)
     #  This is also just the size of the dependent set...
 #       - correct/optimal number of patches (cost)
