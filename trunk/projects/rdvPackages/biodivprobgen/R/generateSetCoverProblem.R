@@ -205,11 +205,13 @@ timepoints_df =
     timepoint (timepoints_df, "gscp_10", 
                "Starting gscp_10_clean_up_completed_graph_structures.R")
 
-PU_spp_pair_indices_triple = create_PU_spp_pair_indices (edge_list) 
+PU_spp_pair_indices_quintet = create_PU_spp_pair_indices (edge_list, nodes) 
 
-PU_spp_pair_indices = PU_spp_pair_indices_triple$PU_spp_pair_indices 
-PU_col_name = PU_spp_pair_indices_triple$PU_col_name
-spp_col_name = PU_spp_pair_indices_triple$spp_col_name
+PU_spp_pair_indices = PU_spp_pair_indices_quintet$PU_spp_pair_indices 
+PU_col_name = PU_spp_pair_indices_quintet$PU_col_name
+spp_col_name = PU_spp_pair_indices_quintet$spp_col_name
+num_PUs = PU_spp_pair_indices_quintet$num_PUs
+num_spp = PU_spp_pair_indices_quintet$num_spp
 
 #===============================================================================
 
