@@ -132,7 +132,7 @@ marxan_ssoln_PUs_ranked_by_votes_df = arrange (marxan_ssoln_df, desc (number))
 #  when all PUs with the same number of votes or more are included in the 
 #  solution.
 
-PU_costs = rep (1, get_num_PUs (nodes))
+PU_costs = rep (1, num_PUs)
 total_landscape_cost = sum (PU_costs)
 correct_optimum_cost = num_dependent_set_nodes    #  TEMPORARY - only works for all costs = 1
 correct_optimum_landscape_frac_cost = correct_optimum_cost / total_landscape_cost
@@ -163,11 +163,11 @@ for (cur_run_length in rle_lengths_and_values$lengths)
     cur_solution_PUs = 
         c(cur_solution_PUs, 
           marxan_ssoln_PUs_ranked_by_votes_df [cur_run_indices, "planning_unit"])
-#browser()    
-    cur_rep_fractions = compute_rep_fraction (bpm, cur_solution_PUs, DEBUG_LEVEL, rep (1, get_num_spp (edge_list)))
+
+    cur_rep_fractions = compute_rep_fraction (bpm, cur_solution_PUs, DEBUG_LEVEL, rep (1, num_spp))
     cur_num_spp_meeting_their_target = sum (cur_rep_fractions >= 1.0)  #  How best to give a tolerance here?
     cur_frac_of_all_spp_meeting_their_target = 
-        cur_num_spp_meeting_their_target / get_num_spp (edge_list)
+        cur_num_spp_meeting_their_target / num_spp
     frac_of_all_spp_meeting_their_target [cur_run_index] = 
         cur_frac_of_all_spp_meeting_their_target
 
