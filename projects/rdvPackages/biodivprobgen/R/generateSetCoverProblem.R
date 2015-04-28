@@ -229,17 +229,17 @@ num_spp = PU_spp_pair_indices_quintet$num_spp
     #  have been far less than the number of species.  They're also easier 
     #  to control through the choice of the number of groups, etc.  
 
-if (get_num_spp (edge_list) > parameters$max_allowed_num_spp)
+if (num_spp > parameters$max_allowed_num_spp)
     {
-    cat ("\n\nQuitting:  num_spp (", get_num_spp (edge_list), ") > maximum allowed (", 
+    cat ("\n\nQuitting:  num_spp (", num_spp, ") > maximum allowed (", 
          parameters$max_allowed_num_spp, ").\n\n")
 
     cur_result_row = 1
     
     write_abbreviated_results_to_files (cur_result_row,                                         
                                           parameters, 
-                                          get_num_PUs (nodes), 
-                                          get_num_spp (edge_list), 
+                                          num_PUs, 
+                                          num_spp, 
                                           seed, 
                                           n__num_groups, 
                                           alpha__, 
@@ -263,8 +263,8 @@ if (get_num_spp (edge_list) > parameters$max_allowed_num_spp)
     #   Convert PU/spp data structure into other formats needed downstream.
     #===============================================================================
     
-    PU_spp_pair_names_triple = create_PU_spp_pair_names (get_num_PUs (nodes), 
-                                                          get_num_spp (edge_list), 
+    PU_spp_pair_names_triple = create_PU_spp_pair_names (num_PUs, 
+                                                          num_spp, 
                                                           PU_spp_pair_indices, 
                                                           PU_col_name, 
                                                           spp_col_name
@@ -281,8 +281,8 @@ if (get_num_spp (edge_list) > parameters$max_allowed_num_spp)
                    "Starting gscp_10c_build_adj_and_cooccurrence_matrices.R")
     
     bpm = 
-        create_adj_matrix_with_spp_rows_vs_PU_cols (get_num_spp (edge_list),                                                 
-                                                    get_num_PUs (nodes), 
+        create_adj_matrix_with_spp_rows_vs_PU_cols (num_spp,                                                 
+                                                    num_PUs, 
                                                     spp_vertex_names, 
                                                     PU_vertex_names, 
                                                     PU_spp_pair_indices, 

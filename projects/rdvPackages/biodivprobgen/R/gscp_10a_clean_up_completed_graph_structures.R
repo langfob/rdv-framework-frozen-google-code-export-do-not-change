@@ -88,8 +88,3 @@ create_PU_spp_pair_indices = function (edge_list, nodes)
 
 #===============================================================================
 
-# get_num_PUs = function (nodes) { get_num_nodes (nodes) }    #  = tot_num_nodes
-# get_num_spp = function (edge_list) { get_num_edge_list (edge_list) }
-
-#===============================================================================
-
