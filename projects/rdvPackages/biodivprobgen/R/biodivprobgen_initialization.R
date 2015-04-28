@@ -25,6 +25,7 @@ options (warn=2)
     #  error.
 ERROR_STATUS_num_inside_or_within_group_links_less_than_one = 1001
 ERROR_STATUS_optimal_solution_is_not_optimal = 1002
+ERROR_STATUS_num_nodes_per_group_must_be_at_least_2 = 1003
 
 #===============================================================================
 
@@ -123,6 +124,34 @@ marxan_output_dir = paste0 (marxan_IO_dir, .Platform$file.sep, "output")
 dir.create (marxan_output_dir, 
             showWarnings = TRUE, 
             recursive = FALSE)
+
+#===============================================================================
+
+default_integerize_string = "round"
+integerize_string = default_integerize_string
+
+integerize_string = parameters$integerize_string
+
+#integerize_string = "round"
+#integerize_string = "ceiling"
+#integerize_string = "floor"
+
+integerize = switch (integerize_string, 
+                     round=round, 
+                     ceiling=ceiling, 
+                     floor=floor, 
+                     round)    #  default to round()
+
+# integerize = function (x) 
+#     { 
+#     round (x) 
+# #    ceiling (x)
+# #    floor (x)
+#     }
+
+#===============================================================================
+
+source (paste0 (sourceCodeLocationWithSlash, "timepoints.R"))
 
 #===============================================================================
 

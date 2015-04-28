@@ -164,7 +164,7 @@ for (cur_run_length in rle_lengths_and_values$lengths)
         c(cur_solution_PUs, 
           marxan_ssoln_PUs_ranked_by_votes_df [cur_run_indices, "planning_unit"])
 #browser()    
-    cur_rep_fractions = compute_rep_fraction (bpm, cur_solution_PUs, rep (1, num_spp))
+    cur_rep_fractions = compute_rep_fraction (bpm, cur_solution_PUs, rep (1, num_spp), DEBUG_LEVEL)
     cur_num_spp_meeting_their_target = sum (cur_rep_fractions >= 1.0)  #  How best to give a tolerance here?
     cur_frac_of_all_spp_meeting_their_target = 
         cur_num_spp_meeting_their_target / num_spp

@@ -92,14 +92,18 @@ create_nodes_data_structure =
     
 #===============================================================================
 
-get_dependent_node_IDs = function (nodes) 
+get_num_nodes = function (nodes) { dim (nodes)[1] }
+
+#===============================================================================
+
+get_independent_node_IDs = function (nodes) 
     { 
     return (which (! nodes [,"dependent_set_member"]))
     }
 
 #===============================================================================
 
-get_independent_node_IDs = function (nodes) 
+get_dependent_node_IDs = function (nodes) 
     { 
     return (which (nodes [,"dependent_set_member"]))
     }
@@ -128,7 +132,6 @@ if (TESTING)
     
     independent_node_IDs = get_independent_node_IDs (nodes) 
     cat ("\nindependent_node_IDs = [", independent_node_IDs, "]\n\n", sep=' ')
-
     }
 
 #===============================================================================

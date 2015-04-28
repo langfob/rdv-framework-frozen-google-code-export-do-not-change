@@ -4,25 +4,17 @@
 
 #===============================================================================
 
-timepoints_df = 
-    timepoint (timepoints_df, "gscp_9", 
-               "Starting gscp_9_link_nodes_between_groups.R")
-
-#===============================================================================
-
     #  Now all groups and their within group links have been built.  
     #  Ready to start doing rounds of intergroup linking.
 
 link_nodes_between_groups = 
     function (target_num_links_between_2_groups_per_round, 
               num_rounds_of_linking_between_groups, 
-#              cur_round, 
               n__num_groups, 
               nodes, 
               edge_list, 
-              cur_row
-#               , 
-#               cur_node_pair_idx
+              cur_row, 
+              DEBUG_LEVEL
               ) 
     {
     cat ("\n\n--------------------  Doing rounds of intergroup linking.\n")
