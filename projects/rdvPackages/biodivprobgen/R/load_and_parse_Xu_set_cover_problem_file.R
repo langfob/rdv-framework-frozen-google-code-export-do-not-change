@@ -176,11 +176,15 @@ load_Xu_problem_from_file_into_PU_spp_pair_indices =
 
 #==============================================================================
 
-load_Xu_problem_from_file_into_PU_spp_pair_indices_quintet = function (input_file_name)
+load_Xu_problem_from_file_into_PU_spp_pair_indices_sextet = 
+        function (input_file_name, 
+                  correct_solution_cost)
     {
-    parsed_Xu_file_triple = load_and_parse_Xu_set_cover_problem_file (infile_name)
+    parsed_Xu_file_triple = 
+        load_and_parse_Xu_set_cover_problem_file (infile_name)
     
-    xu_list_of_vectors_of_edge_IDs = parsed_Xu_file_triple$xu_list_of_vectors_of_edge_IDs
+    xu_list_of_vectors_of_edge_IDs = 
+        parsed_Xu_file_triple$xu_list_of_vectors_of_edge_IDs
     num_PUs = parsed_Xu_file_triple$num_PUs
     num_spp = parsed_Xu_file_triple$num_spp
     
@@ -202,17 +206,25 @@ load_Xu_problem_from_file_into_PU_spp_pair_indices_quintet = function (input_fil
                   PU_col_name=PU_col_name,
                   spp_col_name=spp_col_name, 
                   num_PUs=num_PUs,
-                  num_spp=num_spp))
+                  num_spp=num_spp, 
+                  correct_solution_cost = correct_solution_cost
+                  ))
     }
 
 #==============================================================================
 
 test_load_and_parse_Xu_set_cover_problem_file = function (infile_name)
     {
-    xu_list_of_vectors_of_edge_IDs = load_and_parse_Xu_set_cover_problem_file (infile_name)
-    
+    xu_triple = load_and_parse_Xu_set_cover_problem_file (infile_name)
+
+    xu_list_of_vectors_of_edge_IDs = xu_triple$xu_list_of_vectors_of_edge_IDs 
+    num_PUs = xu_triplenum_vertices
+    num_spp = xu_triplemax_edge_ID
+
     cat ("\n\nXu file values = \n")
     print (xu_list_of_vectors_of_edge_IDs)
+    cat ("\nnum_PUs = ", num_PUs, sep='')
+    cat ("\nnum_spp = ", num_spp, sep='')
     }
 
 TESTING = TRUE
@@ -220,16 +232,30 @@ if (TESTING)
     {
 #    infile_name = "/Users/bill/D/rdv-framework/projects/rdvPackages/biodivprobgen/R/test_xu_input.msc"
     infile_name = "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-1.msc"
+    given_correct_solution_cost = 420
+    
+    PU_spp_pair_indices_sextet = 
+        load_Xu_problem_from_file_into_PU_spp_pair_indices_sextet (infile_name,
+                                                                   given_correct_solution_cost)
 
-#    PU_spp_pair_indices = convert_Xu_set_cover_input_file_to_marxan_input (infile_name)
     
-    PU_spp_pair_indices_quintet = load_Xu_problem_from_file_into_PU_spp_pair_indices_quintet (infile_name) 
+    PU_spp_pair_indices = PU_spp_pair_indices_sextet$PU_spp_pair_indices 
+    cat ("\n")
     
-    PU_spp_pair_indices = PU_spp_pair_indices_quintet$PU_spp_pair_indices 
-    PU_col_name = PU_spp_pair_indices_quintet$PU_col_name
-    spp_col_name = PU_spp_pair_indices_quintet$spp_col_name
-    num_PUs = PU_spp_pair_indices_quintet$num_PUs
-    num_spp = PU_spp_pair_indices_quintet$num_spp
+    PU_col_name = PU_spp_pair_indices_sextet$PU_col_name
+    cat ("\nPU_col_name = '", PU_col_name, "'", sep='')
+    
+    spp_col_name = PU_spp_pair_indices_sextet$spp_col_name
+    cat ("\nspp_col_name = '", spp_col_name, "'", sep='')
+    
+    num_PUs = PU_spp_pair_indices_sextet$num_PUs
+    cat ("\nnum_PUs = '", num_PUs, "'", sep='')
+    
+    num_spp = PU_spp_pair_indices_sextet$num_spp
+    cat ("\nnum_spp = '", num_spp, "'", sep='')
+    
+    correct_solution_cost = PU_spp_pair_indices_sextet$correct_solution_cost
+    cat ("\ncorrect_solution_cost = '", correct_solution_cost, "'", sep='')    
     }
 
 #==============================================================================

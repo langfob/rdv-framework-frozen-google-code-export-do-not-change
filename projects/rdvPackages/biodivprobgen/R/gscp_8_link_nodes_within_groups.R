@@ -21,7 +21,7 @@ link_nodes_within_groups =
         
         if (emulatingTzar)  browser ()
         
-        quit (save="yes", status=ERROR_STATUS_num_nodes_per_group_must_be_at_least_2)
+        quit (save="no", status=ERROR_STATUS_num_nodes_per_group_must_be_at_least_2)
         }
     
     num_nodes_per_group_minus_1 = num_nodes_per_group - 1

@@ -50,7 +50,7 @@ verify_that_generated_solution_really_is_a_solution =
         print (bpm)
         
         if (emulatingTzar)  browser ()
-        quit (save="yes", status=ERROR_STATUS_optimal_solution_is_not_optimal)
+        quit (save="no", status=ERROR_STATUS_optimal_solution_is_not_optimal)
         }
     
     solution_cost = compute_solution_cost (dependent_node_IDs, rep (1, num_PUs))
@@ -139,6 +139,7 @@ create_adj_matrix_with_spp_rows_vs_PU_cols =
               spp_col_name, 
               PU_col_name, 
               dependent_node_IDs, 
+              correct_solution_vector_is_known, 
               ERROR_STATUS_optimal_solution_is_not_optimal, 
               emulatingTzar = FALSE
               ) 
@@ -177,12 +178,22 @@ create_adj_matrix_with_spp_rows_vs_PU_cols =
         bpm [cur_row, cur_col] = 1 + bpm [cur_row, cur_col]
         }
     
-    verify_that_generated_solution_really_is_a_solution (bpm, 
-                                                    dependent_node_IDs, 
-                                                    num_spp, 
-                                                    num_PUs, 
-                ERROR_STATUS_optimal_solution_is_not_optimal, 
-                                                    emulatingTzar)
+        #  If you've generated the problem, then you know the correct 
+        #  solution vector and can verify that it does get the representation 
+        #  that is required.
+        #  However, if you've just read the Xu problem in from a file, 
+        #  you probably don't know what is the correct solution, so 
+        #  you can't verify it.
+    
+    if (correct_solution_vector_is_known)
+        {
+        verify_that_generated_solution_really_is_a_solution (bpm, 
+                                                        dependent_node_IDs, 
+                                                        num_spp, 
+                                                        num_PUs, 
+                    ERROR_STATUS_optimal_solution_is_not_optimal, 
+                                                        emulatingTzar)
+        }
 
 
     return (bpm)
