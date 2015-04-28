@@ -169,13 +169,6 @@ source (paste0 (sourceCodeLocationWithSlash, "biodivprobgen_initialization.R"))
 #       Generate a problem, i.e, create the Xu graph nodes and edge_list.
 #===============================================================================
 
-source (paste0 (sourceCodeLocationWithSlash, "gscp_6_create_data_structures.R"))
-source (paste0 (sourceCodeLocationWithSlash, "gscp_8_link_nodes_within_groups.R"))
-source (paste0 (sourceCodeLocationWithSlash, "gscp_9_link_nodes_between_groups.R"))
-source (paste0 (sourceCodeLocationWithSlash, "gscp_9a_create_Xu_graph.R"))
-
-#-------------------------------------------------------------------------------
-
 #  Not a function.  Not sure how to make this a function yet...
 source (paste0 (sourceCodeLocationWithSlash, "gscp_5_derive_control_parameters.R"))
 
@@ -206,16 +199,6 @@ edge_list =
 #===============================================================================
 #                       Clean up after graph creation.
 #===============================================================================
-
-#  Replaced 9b with the code below.
-#source (paste0 (sourceCodeLocationWithSlash, "gscp_9b_convert_Xu_graph_to_spp_PU_problem.R"))
-
-source (paste0 (sourceCodeLocationWithSlash, "gscp_10a_clean_up_completed_graph_structures.R"))
-source (paste0 (sourceCodeLocationWithSlash, "gscp_10b_compute_solution_rep_levels_and_costs.R"))
-source (paste0 (sourceCodeLocationWithSlash, "gscp_10c_build_adj_and_cooccurrence_matrices.R"))
-source (paste0 (sourceCodeLocationWithSlash, "gscp_11_summarize_and_plot_graph_structure_information.R"))
-
-#-------------------------------------------------------------------------------
 
 timepoints_df = 
     timepoint (timepoints_df, "gscp_10", 

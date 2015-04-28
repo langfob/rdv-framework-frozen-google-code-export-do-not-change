@@ -155,6 +155,23 @@ source (paste0 (sourceCodeLocationWithSlash, "timepoints.R"))
 
 #===============================================================================
 
+#  Replaced 9b with the code below.
+#source (paste0 (sourceCodeLocationWithSlash, "gscp_9b_convert_Xu_graph_to_spp_PU_problem.R"))
+
+source (paste0 (sourceCodeLocationWithSlash, "gscp_6_create_data_structures.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_8_link_nodes_within_groups.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_9_link_nodes_between_groups.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_9a_create_Xu_graph.R"))
+
+#-------------------------------------------------------------------------------
+
+source (paste0 (sourceCodeLocationWithSlash, "gscp_10a_clean_up_completed_graph_structures.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_10b_compute_solution_rep_levels_and_costs.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_10c_build_adj_and_cooccurrence_matrices.R"))
+source (paste0 (sourceCodeLocationWithSlash, "gscp_11_summarize_and_plot_graph_structure_information.R"))
+
+#-------------------------------------------------------------------------------
+
 source (paste0 (sourceCodeLocationWithSlash, "gscp_11aa_write_abbreviated_results_to_files.R"))
 source (paste0 (sourceCodeLocationWithSlash, "gscp_11a_network_measures_using_bipartite_package.R"))
 source (paste0 (sourceCodeLocationWithSlash, "gscp_12_write_network_to_marxan_files.R"))
