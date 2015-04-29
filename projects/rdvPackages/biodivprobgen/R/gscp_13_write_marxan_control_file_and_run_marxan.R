@@ -115,8 +115,13 @@ run_marxan = function (marxan_dir, marxan_executable_name)
     }
 
 #===============================================================================
+#                       General Marxan Parameters
+#===============================================================================
 
-    #  General Parameters
+    #  Set default marxan values here, but allow for overrides below if  
+    #  the marxan_use_default_input_parameters flag is turned off in the 
+    #  parameters set.
+
 marxan_BLM = 1
 marxan_PROP  = 0.5
 
@@ -166,10 +171,57 @@ marxan_SAVELOG  = 2
 marxan_OUTPUTDIR  = marxan_output_dir    #  "output"
 
     #  Program control
+
+    #  From Marxan user's manual v. 1.8.10, pp. 25-6
+    #  3.2.1.2.1 Run Options
+    #  Variable – ‘RUNMODE’ Required: Yes
+    #  Description: This is an essential variable that defines the method Marxan
+    #  will use to locate good reserve solutions . As discussed in the introduction,
+    #  the real strength of Marxan lies in its use of Simulated Annealing to find
+    #  solutions to the reserve selection problem. Marxan, however, is also capable
+    #  of using simpler, but more rapid, methods to locate potential solutions ,
+    #  such as heuristic rules and iterative improvement (see Appendix B -2.2 for
+    #  more details on these methods). Because heuristic rules can be applied
+    #  extremely quickly and produce reasonable results they are included for use on
+    #  extremely large data sets. Modern computers are now so powerful that
+    #  heuristics are less necessary as a time saving device, a lthough they are
+    #  still useful as research tools. Running Iterative Improvement on itsown gives
+    #  very poor solutions. As well as using any of these three methods on their
+    #  own, Marxan can also use them in concert with each. If more than one are
+    #  selected they will be applied in the following order: Simulated Annealing,
+    #  Heuristic, Iterative Improvement. This means that there are seven different
+    #  run options:    
+    #     0  Apply Simulated Annealing followed by a Heuristic
+    #     1  Apply Simulated Annealing followed by Iterative Improvement
+    #     2  Apply Simulated Annealing followed by a Heuristic, followed by
+    #        Iterative Improvement
+    #     3  Use only a Heuristic
+    #     4  Use only Iterative Improvement
+    #     5  Use a Heuristic followed by Iterative Improvement
+    #     6  Use only Simulated Annealing
+    #  ... each of the above running combinations can be set with a single
+    #  number in the ‘input.dat’ file ...
 marxan_RUNMODE  = 1
+
+    #  From Marxan user's manual v. 1.8.10, p. 27
+    #  3.2.1.2.3 Heuristic
+    #  Variable – ‘HEURTYPE’ Required: No
+    #  Description: If you are using a n optional heuristic to find reserve
+    #  solutions, this variable defines what type of heuristic algorithm will be
+    #  applied. Details of the different Heuristics listed below are given in
+    #  Appendix B-2 .3.
+    #   0  Richness
+    #   1  Greedy
+    #   2  Max Rarity
+    #   3  Best Rarity
+    #   4  Average Rarity
+    #   5  Sum Rarity
+    #   6  Product Irreplaceability
+    #   7  Summation Irreplaceability
+marxan_HEURTYPE  = -1
+
 marxan_MISSLEVEL  = 1
 marxan_ITIMPTYPE  = 0
-marxan_HEURTYPE  = -1
 marxan_CLUMPTYPE  = 0
 marxan_VERBOSITY  = 3
 
@@ -201,7 +253,15 @@ if (! parameters$marxan_use_default_input_parameters)
     
     if (! is.null (parameters$marxan_num_iterations))  
         { marxan_NUMITNS  = parameters$marxan_num_iterations } 
+    
+    if (! is.null (parameters$marxan_runmode))  
+        { marxan_RUNMODE  = parameters$marxan_runmode } 
+
+    if (! is.null (parameters$marxan_heurtype))  
+        { marxan_HEURTYPE  = parameters$marxan_heurtype } 
     }
+
+#browser()
 
 #-------------------
 
@@ -279,6 +339,8 @@ cat ("\nSAVESOLUTIONSMATRIX", marxan_SAVESOLUTIONSMATRIX, file=marxan_input_file
 input_dat_cp_cmd = paste0 ("cp ", marxan_input_parameters_file_name, " ", marxan_IO_dir)
 cat ("\n\ninput_dat_cp_cmd = ", input_dat_cp_cmd, "\n")
 system (input_dat_cp_cmd)
+
+#browser()
 
 #===============================================================================
 

@@ -64,6 +64,17 @@ base_params:
 
     #--------------------
 
+        #  If you're reading the Xu problem from a file instead of 
+        #  generating it, you need to give the input file name and the 
+        #  cost of the correct solution (since it's not specified in the file).
+        
+    read_Xu_problem_from_file: TRUE
+    
+    Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-1.msc"
+    given_correct_solution_cost: 420
+
+    #--------------------
+
     max_allowed_possible_tot_num_links: 1500
     max_allowed_num_spp: 1500
 
@@ -167,11 +178,11 @@ base_params:
         #  converted to scientific notation, so I'm putting them in 
         #  quotes so that they are written out to marxan's liking.
 
-#    marxan_num_reps: 100
-#    marxan_num_iterations: "1000000"
+    marxan_num_reps: 100
+    marxan_num_iterations: "1000000"
 
-    marxan_num_reps: 1
-    marxan_num_iterations: "10000"
+#    marxan_num_reps: 1
+#    marxan_num_iterations: "10000"
 
 #---------------------------------------------------------------------------
         #  marxan spf value
@@ -191,6 +202,37 @@ base_params:
 #    marxan_spf_rule: "CONSTANT"
 #    marxan_spf_const: 10
 
+    #---------------------------------------------------------------------------
+    
+        #  Specify which algorithm for marxan to use.
+        
+        #  Default runmode is 1, which specifies simulated annealing 
+        #  followed by iterative improvement.
+        #  There are 7 different runmode options:
+            #  0  Apply Simulated Annealing followed by a Heuristic
+            #  1  Apply Simulated Annealing followed by Iterative Improvement
+            #  2  Apply Simulated Annealing followed by a Heuristic, followed 
+            #     by Iterative Improvement
+            #  3  Use only a Heuristic
+            #  4  Use only Iterative Improvement
+            #  5  Use a Heuristic followed by Iterative Improvement
+            #  6  Use only Simulated Annealing
+    marxan_runmode: 1 
+    
+        #  If the runmode specifies to use a heuristic, then this specifies 
+        #  which of the 8 heuristics to use.
+        #  Default is to set it to -1, meaning no heuristic.
+        #  Details of the different Heuristics listed below are given 
+        #  in Marxan manual v. 1.8.10 Appendix B-2 .3.
+            #  0  Richness
+            #  1  Greedy
+            #  2  Max Rarity
+            #  3  Best Rarity
+            #  4  Average Rarity
+            #  5  Sum Rarity
+            #  6  Product Irreplaceability
+            #  7  Summation Irreplaceability            
+    marxan_heurtype: -1 
 
     #---------------------------------------------------------------------------
     
@@ -293,42 +335,76 @@ base_params:
     
 scenarios:
             
-    #---------------------------------------------------------------------------
-
-            #-------------------------------------------------
-            #  Xu simple model hard case:  
-            #      r in [0.8..2.5] while n = 20, alpha = 0.77
-            #--------------------------------------------------
-            
-    - name: scen_Xu_simple_model_hard_case_2__based_on_R
+    - name: marxan_simulated_annealing
       parameters:
-            use_unif_rand_alpha__: FALSE
-#            alpha__: 0.77
-            alpha__: 0.3  # to make fewer links
-    
-            use_unif_rand_n__num_groups: FALSE
-            n__num_groups: 20
-    
-            use_unif_rand_r__density: TRUE
-            r__density_lower_bound: 0.8
-            r__density_upper_bound: 2.5
+            marxan_runmode: 1 
+            marxan_heurtype: -1 
+            marxan_num_reps: 100
 
+    - name: marxan_heuristic_richness
+      parameters:
+            marxan_runmode: 3 
+            marxan_heurtype: 0 
+            marxan_num_reps: 100
+    
+    - name: marxan_heuristic_greedy
+      parameters:
+            marxan_runmode: 3 
+            marxan_heurtype: 1 
+            marxan_num_reps: 100
+    
+    - name: marxan_heuristic_maxRarity
+      parameters:
+            marxan_runmode: 3 
+            marxan_heurtype: 2 
+            marxan_num_reps: 100
+    
+    - name: marxan_heuristic_bestRarity
+      parameters:
+            marxan_runmode: 3 
+            marxan_heurtype: 3 
+            marxan_num_reps: 100
+    
+    - name: marxan_heuristic_averageRarity
+      parameters:
+            marxan_runmode: 3 
+            marxan_heurtype: 4 
+            marxan_num_reps: 100
+    
+    - name: marxan_heuristic_sumRarity
+      parameters:
+            marxan_runmode: 3 
+            marxan_heurtype: 5 
+            marxan_num_reps: 100
+    
+    - name: marxan_heuristic_productIrreplaceability
+      parameters:
+            marxan_runmode: 3 
+            marxan_heurtype: 6 
+            marxan_num_reps: 100
+    
+    - name: marxan_heuristic_summationIrreplaceability
+      parameters:
+            marxan_runmode: 3 
+            marxan_heurtype: 7 
+            marxan_num_reps: 100
+    
     #---------------------------------------------------------------------------
 
 repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 10101
+          start: 10105
           step_size: 1
           count: 1
           
     #---------------------------------------------------------------------------
     
-#concatenate:
-#    heading_row: true
-#    input_filename: prob_diff_results.csv
-#    output_filename: all_results_prob_diff.csv
+concatenate:
+    heading_row: true
+    input_filename: prob_diff_results.csv
+    output_filename: all_results_prob_diff.csv
 
     #---------------------------------------------------------------------------
     
