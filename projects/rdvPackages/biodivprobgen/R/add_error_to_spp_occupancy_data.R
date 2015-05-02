@@ -10,369 +10,242 @@
 
 #===============================================================================
 
-#TESTING = FALSE
+TESTING = FALSE
 
 #===============================================================================
 
-    #  Add a new PU/spp pair to the list of new False Positives to be added 
-    #  to the PU_spp_pair_indices once all FPs have been identified.
-    #  I'm making this a function because I will probably need to make it 
-    #  more efficient but don't want to mess with it right now.
-
-add_FP_at = function (a_PU_ID, a_spp_ID, new_FP_list)
+build_PU_spp_pair_indices_from_occ_matrix = function (occ_matrix, 
+                                                      num_PUs, num_spp)
     {
-    if (is.null (new_FP_list))
-        new_FP_list = list()
+    num_PU_spp_pairs = sum (occ_matrix)
     
-    new_FP_list [[length (new_FP_list) + 1]] = c(a_PU_ID, a_spp_ID)
-        
-    return (new_FP_list)
-    }
+        #****************************************************************
+        #  Why is PU_spp_pair_indices a data frame instead of a matrix?
+        #****************************************************************
+    
+    PU_spp_pair_indices = data.frame (PU_ID = rep (NA, num_PU_spp_pairs),
+                                      spp_ID = rep (NA, num_PU_spp_pairs))
 
-#------------------------------------------
+    cur_PU_spp_row_idx = 0
 
-test_add_FP_at = function (new_FP_list = NULL)
-    {
-    for (cur_PU in 1:3)
+    for (cur_spp_row in 1:num_spp)
         {
-        for (cur_spp in 11:13)
+        for (cur_PU_col in 1:num_PUs)
             {
-            new_FP_list = add_FP_at (cur_PU, cur_spp, new_FP_list)
-            }
-        }
-
-    cat ("\n\nAt end of test_add_FP_at(), new_FP_list = \n")
-    print (new_FP_list)
-    cat ("\n")
-    }
-
-#------------------------------------------
-
-if (TESTING) test_add_FP_at ()
-
-#===============================================================================
-
-possibly_replace_TN_with_FP = function (cur_FP_rate, 
-                                          bpm, 
-                                          cur_PU_row, cur_spp_col, 
-                                          new_FPs_list = NULL
-                                          )
-    {                    
-        #       Randomly choose whether to replace a given TN  
-        #       with a false positive (FP).
-    
-    if (runif (1) < cur_FP_rate)
-        {
-        bpm [cur_PU_row, cur_spp_col] = 1
-        
-        new_FPs_list = add_FP_at (cur_PU_row, cur_spp_col, new_FPs_list)
-        
-        }  #  end if - set FP    
-    
-    return (list (bpm=bpm, new_FPs_list=new_FPs_list))
-    }
-
-#------------------------------------------
-
-test_possibly_replace_TN_with_FP = function ()
-    {
-    bpm = matrix (c(0,1,1,0,1,0), nrow=2, ncol=3, byrow=2)
-    new_FPs_list = NULL
-    
-        #  bpm should look like this:
-        #            [,1] [,2] [,3]
-        #       [1,]    0    1    1
-        #       [2,]    0    1    0
-
-    cat ("\n\nIn test_possibly_replace_TN_with_FP() before start of test.")
-    cat ("\nbpm = \n")
-    print (bpm)
-    cat ("\nand new_FPs_list = \n")
-    print (new_FPs_list)
-    
-    #--------------------
-    
-        #  This test should reset the value of element [2,1] from 0 to 1.
-    
-    cur_FP_rate = 1.0
-    cur_PU_row = 2
-    cur_spp_col = 1
-    bpm_FPs_double = possibly_replace_TN_with_FP (cur_FP_rate, bpm, 
-                                                  cur_PU_row, cur_spp_col, 
-                                                  new_FPs_list)
-    bpm          = bpm_FPs_double$bpm
-    new_FPs_list = bpm_FPs_double$new_FPs_list
-    
-    
-    cat ("\n\nAfter should have set element [", cur_PU_row, ", ", 
-         cur_spp_col, "] to 1:", sep='')
-    cat ("\nbpm = \n")
-    print (bpm)
-    cat ("\nand new_FPs_list = \n")
-    print (new_FPs_list)
-    assert_that (bpm [cur_PU_row, cur_spp_col] == 1)
-    
-     #--------------------
-    
-        #  This test should NOT reset the value of element [1,1] from 0 to 1.
-    
-    cur_FP_rate = 0.0
-    cur_PU_row = 1
-    cur_spp_col = 1
-    bpm_FPs_double = possibly_replace_TN_with_FP (cur_FP_rate, bpm, 
-                                                  cur_PU_row, cur_spp_col, 
-                                                  new_FPs_list)
-    bpm          = bpm_FPs_double$bpm
-    new_FPs_list = bpm_FPs_double$new_FPs_list
-    
-    cat ("\n\nAfter should NOT have set element [", cur_PU_row, ", ", 
-         cur_spp_col, "] to 1:", sep='')
-    cat ("\nbpm = \n")
-    print (bpm)
-    cat ("\nand new_FPs_list = \n")
-    print (new_FPs_list)
-    assert_that (bpm [cur_PU_row, cur_spp_col] == 0)   
-    }
-
-#------------------------------------------
-
-TESTING = TRUE
-if (TESTING) test_possibly_replace_TN_with_FP ()
-    
-#===============================================================================
-#===============================================================================
-
-    #  Add a new PU/spp pair row number to the list of False Negatives whose  
-    #  rows are to be deleted from the PU_spp_pair_indices once all FNs have 
-    #  been identified.
-    #  I'm making this a function because I will probably need to make it 
-    #  more efficient but don't want to mess with it right now.
-
-add_FN_at = function (PU_spp_pair_row_num, FN_vector)
-    {
-    if (is.null (FN_vector))
-        FN_vector = vector (mode="integer", length=0)
-        
-    FN_vector [length (FN_vector) + 1] = PU_spp_pair_row_num
-    
-    return (FN_vector)
-    }
-
-#------------------------------------------
-
-test_add_FN_at = function (FN_vector = NULL)
-    {
-    for (cur_row_num in 1:5)
-        {
-        FN_vector = add_FN_at (cur_row_num, FN_vector)
-        }
-
-    cat ("\n\nAt end of test_add_FN_vector (), FN_vector = \n")
-    print (FN_vector)
-    cat ("\n")
-    }
-
-#------------------------------------------
-
-TESTING = TRUE
-if (TESTING) test_add_FN_at ()
-
-#===============================================================================
-
-possibly_replace_TP_with_FN = function (cur_FN_rate, 
-                                         bpm, 
-                                         cur_PU_row, cur_spp_col, 
-                                         PU_spp_pair_indices, 
-                                         FN_vector = NULL
-                                         )
-    {
-        #       Randomly choose whether to replace a given TP  
-        #       with a false negative (FN)
-        #       i.e., simulate not detecting that spp on that PU.    
-    
-    if (runif (1) < cur_FN_rate)
-        {
-        bpm [cur_PU_row, cur_spp_col] = 0
-    
-            #  Save the row number so that you can remove it 
-            #  from the pairs list after you know all that 
-            #  need to be removed.
-            #  Could do it now, but it would cause the PU_spp_pair_indices 
-            #  to be resized each time.  Seems likely to be more efficiently  
-            #  done by R's vectorized operator that removes a set of indices 
-            #  from an array (ie., the [-x] operator).
-        
-        PU_spp_pair_row = 
-            which ((PU_spp_pair_indices$PU_ID == cur_PU_row) &
-                   (PU_spp_pair_indices$spp_ID == cur_spp_col))
-        
-        FN_vector = add_FN_at (PU_spp_pair_row, FN_vector)
-
-        }  #  end if - TP so set FN
-    
-    return (list (bpm=bpm, FN_vector=FN_vector))
-    }
-
-#===============================================================================
-#===============================================================================
-
-add_FPs_to_PU_spp_pair_indices = 
-        function (new_FPs_list, 
-                  PU_spp_pair_indices, 
-                  PU_col_name, 
-                  spp_col_name
-                  ) 
-    {
-    num_FPs_to_add = length (new_FPs_list)
-    if (num_FPs_to_add > 0)
-        {
-            #  Find end of current index list.  
-            #  Need to do this now, before its size changes when you add 
-            #  empty space for the new FPs in the next step.
-        new_FP_start_index = (dim(PU_spp_pair_indices)[1]) + 1        
-
-            #  Create space for the new FPs and tack it onto the end of 
-            #  the current list of indices.
-        empty_matrix_of_FPs_to_add = matrix (NA, nrow=num_FPs_to_add, ncol=2, 
-                                             byrow=TRUE)  
-        PU_spp_pair_indices = rbind (PU_spp_pair_indices, 
-                                     empty_matrix_of_FPs_to_add)
-        
-            #  Copy the new FPs into the added space.
-        for (cur_PU_spp_row in seq (new_FP_start_index, 
-                                    length (PU_spp_pair_indices)))
-            {
-            cur_PU_spp_pair = new_FPs_list [[cur_PU_spp_row]]
-            
-            PU_spp_pair_indices [cur_PU_spp_row, PU_col_name] = cur_PU_spp_pair [1]            
-            PU_spp_pair_indices [cur_PU_spp_row, spp_col_name] = cur_PU_spp_pair [2]
-            
-            }  #  end for - added rows
-        }  #  end if  there are FPs to add
-    
-    return (PU_spp_pair_indices)
-    }
-
-#===============================================================================
-
-possibly_replace_TP_or_TN = function (bpm, 
-                                      cur_PU_row, cur_spp_col, 
-                                      FN_rates, FP_rates, 
-                                      new_FPs_list = NULL, 
-                                      FN_vector = NULL) 
-    {
-    if (bpm [cur_PU_row, cur_spp_col])
-        {
-            #  TP:  This species DOES exist on this planning unit.
-        
-        cur_FN_rate = FN_rates [cur_PU_row, cur_spp_col]
-        bpm_FNs_double = possibly_replace_TP_with_FN (cur_FN_rate, bpm, 
-                                                      cur_PU_row, cur_spp_col, 
-                                                      PU_spp_pair_indices, 
-                                                      FN_vector)
-                        
-        bpm = bpm_FNs_double$bpm
-        FN_vector = bpm_FNs_double$FN_vector
-        
-        }  else
-        {
-           #  TN:  This species does NOT exist on this planning unit.
-        
-        cur_FP_rate    = FP_rates [cur_PU_row, cur_spp_col]
-        bpm_FPs_double = possibly_replace_TN_with_FP (cur_FP_rate, bpm, 
-                                                      cur_PU_row, cur_spp_col, 
-                                                      new_FPs_list)
-        
-        bpm          = bpm_FPs_double$bpm
-        new_FPs_list = bpm_FPs_double$new_FPs_list
-        
-        }  #  end else - TN so set FP
-    
-    return (list (bpm, new_FPs_list, FN_vector))
-    }
-
-#===============================================================================
-#===============================================================================
-
-add_error_to_spp_occupancy_data = 
-    function (PU_spp_pair_indices,  #  
-              bpm,  #  0-1 integer matrix with dim num_PU rows by num_spp cols
-              errors_to_add,  #  2 element list: FP_rates matrix and FN_rates matrix
-                              #  where the matrices are floating points in 0-1
-                              #  and dim num_PU rows by num_spp cols
-              num_PUs,  #  
-              num_spp,  #  
-              PU_col_name,  #  
-              spp_col_name  #
-              ) 
-    {
-    FP_rates = errors_to_add$FP_rates,
-    FN_rates = errors_to_add$FN_rates)    
-    new_FPs_list = NULL
-
-        #  Walk through the occupancy matrix (PU vs spp) and randomly 
-        #  choose to flip some of the TPs to FNs and TNs to FPs based on the 
-        #  given FP and FN error rates.
-        #  Update the occupancy matrix (bpm) as you go along, but don't update 
-        #  the PU_spp_pair_indices until you know all locations that have 
-        #  flipped.  Update PU_spp_pair_indices at the end so that you don't 
-        #  have to constantly resize this big array as you go along.
-
-    for (cur_PU_row in 1:num_PUs)
-        {
-        for (cur_spp_col in 1:num_spp)
-            {
-                #  Flip the occupancy of this spp on this PU 
-                #  if it's called for.
-            replacement_triple = 
-                possibly_replace_TP_or_TN (bpm, 
-                                           cur_PU_row, cur_spp_col, 
-                                           FN_rates, FP_rates, 
-                                           new_FPs_list, FN_vector)
-            
-                #  Extract the data structures that may have changed.
-            bpm          = replacement_triple$bpm
-            new_FPs_list = replacement_triple$new_FPs_list
-            FN_vector    = replacement_triple$FN_vector
+            if (occ_matrix [cur_spp_row, cur_PU_col])
+                {
+                cur_PU_spp_row_idx = cur_PU_spp_row_idx + 1
                 
+                PU_spp_pair_indices [cur_PU_spp_row_idx, "PU_ID"] = cur_PU_col
+                PU_spp_pair_indices [cur_PU_spp_row_idx, "spp_ID"] = cur_spp_row
+                
+                }  #  end if - cur spp occupies cur PU
             }  #  end for - all spp cols
         }  #  end for - all PU rows
 
-        #  Remove the FNs from PU_spp_pair_indices.
-    PU_spp_pair_indices = PU_spp_pair_indices [- FN_vector]
-
-        #  Add the FPs to PU_spp_pair_indices.
-    add_FPs_to_PU_spp_pair_indices (new_FPs_list, PU_spp_pair_indices, 
-                                    PU_col_name, spp_col_name)   
-        
-    #--------------------
-    
-    return (list (app_PU_spp_pair_indices = PU_spp_pair_indices,
-                  app_bpm = bpm))
+    return (PU_spp_pair_indices)
     }
 
 #-------------------------------------------------------------------------------
 
-test_add_error_to_spp_occupancy_data ()
+test_build_PU_spp_pair_indices_from_occ_matrix = function ()
     {
-    PU_spp_pair_indices = NULL
-    bpm = NULL
-    errors_to_add = NULL
-    num_PUs = 0
-    num_spp = 0
+    num_PUs = 3
+    num_spp = 2
 
-    add_error_to_spp_occupancy_data (PU_spp_pair_indices,  
-                                     bpm, 
-                                     errors_to_add, 
-                                     num_PUs, 
-                                     num_spp,
-                                     PU_col_name,  
-                                     spp_col_name
-                                     )     
+    #--------------------
+        
+    bpm = matrix (c(0,1,1,0,1,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    cat ("\n\nIn test_add_const_error_to_spp_occupancy_data() before start of test.")
+    cat ("\nbpm = \n")
+    print (bpm)
+    
+    #--------------------
+    
+    PU_spp_pair_indices = 
+            build_PU_spp_pair_indices_from_occ_matrix (bpm, num_PUs, num_spp)
+    
+    cat ("\n\nPU_spp_pair_indices from bpm = \n")
+    print (PU_spp_pair_indices)
+    cat ("\n\nShould look like:\n\t1      2\n\t1      3\n\t2      2\n")
     }
 
-TESTING = FALSE
-if (TESTING) test_add_error_to_spp_occupancy_data ()
+if (TESTING) test_build_PU_spp_pair_indices_from_occ_matrix ()
+
+#===============================================================================
+
+    #  Walk through the occupancy matrix (PU vs spp) and randomly 
+    #  choose to flip some of the TPs to FNs and TNs to FPs based on the 
+    #  given FP and FN error rates.
+    #  Update the occupancy matrix (bpm) as you go along, but don't update 
+    #  the PU_spp_pair_indices until you know all locations that have 
+    #  flipped.  Update PU_spp_pair_indices at the end so that you don't 
+    #  have to constantly resize this big array as you go along.
+
+add_const_error_to_spp_occupancy_data = 
+        function (bpm, FP_rates, FN_rates, num_PUs, num_spp, 
+                  random_values  #  passing these in to make it easier to test
+                                 #  in a reproducible way
+                  ) 
+    {
+    cat ("\nStarting add_const_error_to_spp_occupancy_data loop.\n\n")
+    
+    for (cur_spp_row in 1:num_spp)
+        {
+        for (cur_PU_col in 1:num_PUs)
+            {
+#             cat ("\n[", cur_spp_row, ",", 
+#                  cur_PU_col, 
+#                  "]", sep='')
+            if (bpm [cur_spp_row, cur_PU_col])
+                {
+                    #  TP:  This species DOES exist on this planning unit.
+                    #       Randomly choose whether to replace a given TP  
+                    #       with a false negative (FN)
+                    #       i.e., simulate not detecting that spp on that PU.                    
+                if (random_values [cur_spp_row, cur_PU_col] < FN_rates [cur_spp_row, cur_PU_col])
+                    bpm [cur_spp_row, cur_PU_col] = 0
+                
+                }  else 
+                {
+                    #  TN:  This species does NOT exist on this planning unit.
+                    #       Randomly choose whether to replace a given TN  
+                    #       with a false positive (FP).                
+                if (random_values [cur_spp_row, cur_PU_col] < FP_rates [cur_spp_row, cur_PU_col])
+                    bpm [cur_spp_row, cur_PU_col] = 1
+                
+               }  #  end else - TN so set FP                
+            }  #  end for - all spp cols
+        }  #  end for - all PU rows
+
+    return (bpm)
+    }
+
+#-------------------------------------------------------------------------------
+
+test_add_const_error_to_spp_occupancy_data = function ()
+    {
+    num_PUs = 2
+    num_spp = 3
+
+    #--------------------
+        
+    bpm = matrix (c(0,1,1,0,1,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    cat ("\n\nIn test_add_const_error_to_spp_occupancy_data() before start of test.")
+    cat ("\nbpm = \n")
+    print (bpm)
+    
+    #--------------------
+    
+    set.seed (17)
+    random_values = matrix (runif (num_PUs*num_spp), 
+                            nrow=num_PUs, ncol=num_spp, byrow=TRUE)
+    cat ("\nrandom_values = \n")
+    print (random_values)
+    
+    #--------------------
+    
+    FP_rates = matrix (c(1,1,1,0,0,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    FN_rates = matrix (c(0,0,0,1,1,1), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    
+    app_bpm = add_const_error_to_spp_occupancy_data (bpm, FP_rates, FN_rates, 
+                                               num_PUs, num_spp, random_values) 
+
+    cat ("\n\nApparent bpm = \n")
+    print (app_bpm)
+
+    cat ("\n\nShould look like = \n\t1    1    1\n\t0    0    0")
+
+        #--------------------
+    
+    FP_rates = matrix (c(0,0,0,1,1,1), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    FN_rates = matrix (c(1,1,1,0,0,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    
+    app_bpm = add_const_error_to_spp_occupancy_data (bpm, FP_rates, FN_rates, 
+                                               num_PUs, num_spp, random_values) 
+
+    cat ("\n\nApparent bpm after reversing FP and FN = \n")
+    print (app_bpm)    
+
+    cat ("\n\nShould look like = \n\t0    0    0\n\t1    1    1")
+    }
+
+if (TESTING) test_add_const_error_to_spp_occupancy_data ()
+
+#===============================================================================
+
+add_error_to_spp_occupancy_data = 
+        function (parameters, bpm, num_PU_spp_pairs, num_PUs, num_spp) 
+    {
+    FP_const_rate = parameters$FP_const_rate
+    FN_const_rate = parameters$FN_const_rate
+    
+    if (parameters$match_FP_and_FN_frequency_of_opportunity)
+        {
+            #  Usually, TNs will far outnumber TPs.
+            #  Therefore, there will be far more opportunities to inject 
+            #  FPs than FNs.  
+            #  Consequently, even if the FP and FN rates are set to the  
+            #  same value, there are likely to be far more FPs than FNs  
+            #  in the apparent matrix.
+            #  If you want to keep the opportunities for each of them 
+            #  to be more balanced, then you can multiply the dominant 
+            #  one by the lesser one's fraction of occurrence.
+            #
+            #  Example: if there are 
+            #       - 100 entries total 
+            #       - 70 TNs
+            #       - 30 TPs 
+            #  and you want 0.1 probability of FN, then you should get 
+            #  approximately 3 FNs.  If you want the FPs to be balanced 
+            #  by their opporunity but to have the same probability, 
+            #  then x * 70 FPs must equal 3 FPs too.  
+            #  So, the multiplier x = 3 / 70 = 3 / 0.7 ~ 0.0429
+            #  i.e.,
+            #  the adjusted_P(FP) = num_FNs / num_TNs
+            
+        num_TPs = sum (bpm)
+        approx_num_FNs = round (FN_const_rate * num_TPs)
+        
+        num_TNs = length (bpm) - num_TPs
+        FP_const_rate = approx_num_FNs / num_TNs
+        
+        cat ("\n\nComputing stratified version of FP_const_rate:"
+             "\n\tnum_TPs = ", num_TPs, 
+             "\n\tapprox_num_FNs = ", approx_num_FNs, 
+             "\n\tnum_TNs = ", num_TNs, 
+             "\n\tFP_const_rate = ", FP_const_rate,
+             "\n")             
+        }
+    
+    FP_rates = matrix (rep (FP_const_rate, (num_PUs * num_spp)), 
+                        nrow=num_spp,
+                        ncol=num_PUs,
+                        byrow=TRUE)
+    
+    FN_rates = matrix (rep (FN_const_rate, (num_PUs * num_spp)), 
+                        nrow=num_spp,
+                        ncol=num_PUs,
+                        byrow=TRUE)
+    
+    random_values = matrix (runif (num_PUs * num_spp), 
+                            nrow=num_spp,
+                            ncol=num_PUs,
+                            byrow=TRUE)
+    
+    app_spp_occupancy_data = 
+        add_const_error_to_spp_occupancy_data (bpm, 
+                                                FP_rates, FN_rates, 
+                                                num_PUs, num_spp, 
+                                                random_values)
+    
+    app_PU_spp_pair_indices = 
+        build_PU_spp_pair_indices_from_occ_matrix (app_spp_occupancy_data, 
+                                                    num_PUs, num_spp)
+    
+    return (list (app_PU_spp_pair_indices = app_PU_spp_pair_indices, 
+                  app_spp_occupancy_data = app_spp_occupancy_data))
+    }
 
 #===============================================================================
 
