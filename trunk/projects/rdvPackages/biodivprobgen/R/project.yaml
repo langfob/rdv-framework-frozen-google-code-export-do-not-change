@@ -237,7 +237,16 @@ base_params:
     #---------------------------------------------------------------------------
     
     compute_network_metrics: FALSE
+
+    #---------------------------------------------------------------------------
     
+        #  Error model.
+        
+    add_error_to_spp_occupancy_data: TRUE
+    match_FP_and_FN_frequency_of_opportunity: TRUE
+    FP_const_rate: 0.1
+    FN_const_rate: 0.1        
+
     #---------------------------------------------------------------------------
     
         # Outputs
@@ -339,54 +348,6 @@ scenarios:
       parameters:
             marxan_runmode: 1 
             marxan_heurtype: -1 
-            marxan_num_reps: 100
-
-    - name: marxan_heuristic_richness
-      parameters:
-            marxan_runmode: 3 
-            marxan_heurtype: 0 
-            marxan_num_reps: 100
-    
-    - name: marxan_heuristic_greedy
-      parameters:
-            marxan_runmode: 3 
-            marxan_heurtype: 1 
-            marxan_num_reps: 100
-    
-    - name: marxan_heuristic_maxRarity
-      parameters:
-            marxan_runmode: 3 
-            marxan_heurtype: 2 
-            marxan_num_reps: 100
-    
-    - name: marxan_heuristic_bestRarity
-      parameters:
-            marxan_runmode: 3 
-            marxan_heurtype: 3 
-            marxan_num_reps: 100
-    
-    - name: marxan_heuristic_averageRarity
-      parameters:
-            marxan_runmode: 3 
-            marxan_heurtype: 4 
-            marxan_num_reps: 100
-    
-    - name: marxan_heuristic_sumRarity
-      parameters:
-            marxan_runmode: 3 
-            marxan_heurtype: 5 
-            marxan_num_reps: 100
-    
-    - name: marxan_heuristic_productIrreplaceability
-      parameters:
-            marxan_runmode: 3 
-            marxan_heurtype: 6 
-            marxan_num_reps: 100
-    
-    - name: marxan_heuristic_summationIrreplaceability
-      parameters:
-            marxan_runmode: 3 
-            marxan_heurtype: 7 
             marxan_num_reps: 100
     
     #---------------------------------------------------------------------------

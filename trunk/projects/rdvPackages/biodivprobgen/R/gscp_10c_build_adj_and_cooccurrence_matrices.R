@@ -132,8 +132,8 @@ create_PU_spp_pair_names =
 create_adj_matrix_with_spp_rows_vs_PU_cols = 
     function (num_spp, 
               num_PUs, 
-              spp_vertex_names, 
-              PU_vertex_names, 
+## 2015 05 01 ##               spp_vertex_names, 
+## 2015 05 01 ##               PU_vertex_names, 
               PU_spp_pair_indices, 
               edge_idx, 
               spp_col_name, 
@@ -157,9 +157,9 @@ create_adj_matrix_with_spp_rows_vs_PU_cols =
                   
                       #  Not sure whether to have dimnames or not.  
                       #  Doesn't seem to hurt anything at the moment...
-                  , 
-                  dimnames=list (spp_vertex_names, 
-                                 PU_vertex_names)
+## 2015 05 01 ##                   , 
+## 2015 05 01 ##                   dimnames=list (spp_vertex_names, 
+## 2015 05 01 ##                                  PU_vertex_names)
                   )
     
     cat ("\n\nAbout to fill in bpm matrix.")

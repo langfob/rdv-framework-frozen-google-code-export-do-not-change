@@ -323,8 +323,8 @@ if (num_spp > max_allowed_num_spp)
     bpm = 
         create_adj_matrix_with_spp_rows_vs_PU_cols (num_spp,                                                 
                                                     num_PUs, 
-                                                    spp_vertex_names, 
-                                                    PU_vertex_names, 
+## 2015 05 01 ##                                                    spp_vertex_names, 
+## 2015 05 01 ##                                                    PU_vertex_names, 
                                                     PU_spp_pair_indices, 
                                                     edge_idx, 
                                                     spp_col_name, 
@@ -338,39 +338,14 @@ if (num_spp > max_allowed_num_spp)
     #                   Add error to the species occupancy data.
     #===============================================================================
     
-    add_error_to_spp_occupancy_data = TRUE    #  TEMPORARY
-#    add_error_to_spp_occupancy_data = parameters$add_error_to_spp_occupancy_data
-    
-    FP_const_rate = 0.1
-    FN_const_rate = 0.1
-
-    FP_rates = matrix (rep (errors_to_add$FP_const_rate, num_PU_spp_pairs), 
-                       nrow=num_PUs,
-                       ncol=num_spp,
-                       byrow=TRUE)
-    
-    FN_rates = matrix (rep (errors_to_add$FN_const_rate, num_PU_spp_pairs), 
-                       nrow=num_PUs,
-                       ncol=num_spp,
-                       byrow=TRUE)
-    
-    errors_to_add = list (FP_rates = FP_const_rates,
-                          FN_rates = FN_const_rates)
-    
-    if (add_error_to_spp_occupancy_data)
+    if (parameters$add_error_to_spp_occupancy_data)
         {
-        app_spp_occupancy_data = 
-            add_error_to_spp_occupancy_data (PU_spp_pair_indices_sextet, 
-                                             bpm, 
-                                             errors_to_add) 
-   
-            #-------------------------------------------------------------
-            #  Reset the species occupancy data to be the apparent data, 
-            #  i.e., the data containing errors.
-            #-------------------------------------------------------------
+        double_return = add_error_to_spp_occupancy_data (parameters, 
+                                                         bpm, num_PU_spp_pairs, 
+                                                         num_PUs, num_spp)
         
-        PU_spp_pair_indices = app_spp_occupancy_data$app_PU_spp_pair_indices
-        bpm                 = app_spp_occupancy_data$bpm
+        PU_spp_pair_indices = double_return$app_PU_spp_pair_indices
+        bpm                 = double_return$app_spp_occupancy_data
         }
 
     #===============================================================================
