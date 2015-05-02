@@ -245,11 +245,11 @@ PU_spp_pair_indices_sextet = create_PU_spp_pair_indices (edge_list,
 
 #-------------------------------------------------------------------------------
 
-PU_spp_pair_indices = PU_spp_pair_indices_sextet$PU_spp_pair_indices 
-PU_col_name = PU_spp_pair_indices_sextet$PU_col_name
-spp_col_name = PU_spp_pair_indices_sextet$spp_col_name
-num_PUs = PU_spp_pair_indices_sextet$num_PUs
-num_spp = PU_spp_pair_indices_sextet$num_spp
+PU_spp_pair_indices  = PU_spp_pair_indices_sextet$PU_spp_pair_indices 
+PU_col_name          = PU_spp_pair_indices_sextet$PU_col_name
+spp_col_name         = PU_spp_pair_indices_sextet$spp_col_name
+num_PUs              = PU_spp_pair_indices_sextet$num_PUs
+num_spp              = PU_spp_pair_indices_sextet$num_spp
 correct_optimum_cost = PU_spp_pair_indices_sextet$correct_solution_cost
     
 #===============================================================================
@@ -267,10 +267,20 @@ correct_optimum_cost = PU_spp_pair_indices_sextet$correct_solution_cost
     #  The number of planning units has not been a problem yet since they 
     #  have been far less than the number of species.  They're also easier 
     #  to control through the choice of the number of groups, etc.  
+        #  The Xu benchmark problems are much bigger than typical reserve 
+        #  selection problems, so limiting the number of species would not 
+        #  allow any of them to run.
+        #  I'm going to override the whatever max has been set in the 
+        #  yaml file or elsewhere so that I can be sure that the Xu 
+        #  benchmarks will be run when requested.
 
-max_allowed_num_spp = parameters$max_allowed_num_spp
 if (read_Xu_problem_from_file)
+    {
     max_allowed_num_spp = num_spp
+    } else
+    {
+    max_allowed_num_spp = parameters$max_allowed_num_spp
+    }
 
 if (num_spp > max_allowed_num_spp)
     {
@@ -306,19 +316,6 @@ if (num_spp > max_allowed_num_spp)
     #   Convert PU/spp data structure into other formats needed downstream.
     #===============================================================================
     
-    PU_spp_pair_names_triple = create_PU_spp_pair_names (num_PUs, 
-                                                          num_spp, 
-                                                          PU_spp_pair_indices, 
-                                                          PU_col_name, 
-                                                          spp_col_name
-                                                          ) 
-    
-    PU_spp_pair_names = PU_spp_pair_names_triple$PU_spp_pair_names
-    PU_vertex_names = PU_spp_pair_names_triple$PU_vertex_names
-    spp_vertex_names = PU_spp_pair_names_triple$spp_vertex_names
-    
-    #-------------------------------------------------------------------------------
-    
     timepoints_df = 
         timepoint (timepoints_df, "gscp_10c", 
                    "Starting gscp_10c_build_adj_and_cooccurrence_matrices.R")
@@ -337,7 +334,48 @@ if (num_spp > max_allowed_num_spp)
                             ERROR_STATUS_optimal_solution_is_not_optimal, 
                                                     emulatingTzar) 
     
-    #-------------------------------------------------------------------------------
+    #===============================================================================
+    #                   Add error to the species occupancy data.
+    #===============================================================================
+    
+    add_error_to_spp_occupancy_data = TRUE    #  TEMPORARY
+#    add_error_to_spp_occupancy_data = parameters$add_error_to_spp_occupancy_data
+    
+    FP_const_rate = 0.1
+    FN_const_rate = 0.1
+
+    FP_rates = matrix (rep (errors_to_add$FP_const_rate, num_PU_spp_pairs), 
+                       nrow=num_PUs,
+                       ncol=num_spp,
+                       byrow=TRUE)
+    
+    FN_rates = matrix (rep (errors_to_add$FN_const_rate, num_PU_spp_pairs), 
+                       nrow=num_PUs,
+                       ncol=num_spp,
+                       byrow=TRUE)
+    
+    errors_to_add = list (FP_rates = FP_const_rates,
+                          FN_rates = FN_const_rates)
+    
+    if (add_error_to_spp_occupancy_data)
+        {
+        app_spp_occupancy_data = 
+            add_error_to_spp_occupancy_data (PU_spp_pair_indices_sextet, 
+                                             bpm, 
+                                             errors_to_add) 
+   
+            #-------------------------------------------------------------
+            #  Reset the species occupancy data to be the apparent data, 
+            #  i.e., the data containing errors.
+            #-------------------------------------------------------------
+        
+        PU_spp_pair_indices = app_spp_occupancy_data$app_PU_spp_pair_indices
+        bpm                 = app_spp_occupancy_data$bpm
+        }
+
+    #===============================================================================
+    #                   Summarize and plot graph structure information.
+    #===============================================================================
     
     timepoints_df = 
         timepoint (timepoints_df, "gscp_11", 
@@ -352,6 +390,21 @@ if (num_spp > max_allowed_num_spp)
                                                     plot_output_dir, 
                                                     spp_col_name
                                                     ) 
+    
+    #===============================================================================
+    #           Generate the data structure with names instead of indices.
+    #===============================================================================
+    
+    PU_spp_pair_names_triple = create_PU_spp_pair_names (num_PUs, 
+                                                          num_spp, 
+                                                          PU_spp_pair_indices, 
+                                                          PU_col_name, 
+                                                          spp_col_name
+                                                          ) 
+    
+    PU_spp_pair_names = PU_spp_pair_names_triple$PU_spp_pair_names
+    PU_vertex_names = PU_spp_pair_names_triple$PU_vertex_names
+    spp_vertex_names = PU_spp_pair_names_triple$spp_vertex_names
     
     #===============================================================================
     #                       Compute network metrics.
