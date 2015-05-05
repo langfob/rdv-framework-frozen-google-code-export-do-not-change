@@ -54,8 +54,8 @@ base_params:
             #  If you don't want the newlines (i.e., you want one long string), 
             #  then use a ">" in place of the "|".
     runset_description: |
-        Single run runset to test and debug while refactoring to allow 
-        reading a Xu set cover problem from a file instead of generating it.
+        Small set of runs of a Xu hard scenario with error generation both 
+        on and off plus running simulated annealing and richness heuristic.
         
     runset_name: $$runset$$
     runset_abbrev: "bdpgSingleRunForTestAndDebug"
@@ -76,7 +76,7 @@ base_params:
     #--------------------
 
     max_allowed_possible_tot_num_links: 1500
-    max_allowed_num_spp: 1500
+    max_allowed_num_spp: 2000
 
     #--------------------
 
@@ -240,12 +240,48 @@ base_params:
 
     #---------------------------------------------------------------------------
     
-        #  Error model.
+        #  Error models.
         
-    add_error_to_spp_occupancy_data: TRUE
-    match_FP_and_FN_frequency_of_opportunity: TRUE
-    FP_const_rate: 0.1
-    FN_const_rate: 0.1        
+    add_error_to_spp_occupancy_data: FALSE
+    stratify_error_probabilities: TRUE
+    
+    #--------------------
+
+        #  Constant errors
+        
+    spp_occ_FP_error_type: "CONSTANT"
+    spp_occ_FP_const_rate: 0.1
+    
+    spp_occ_FN_error_type: "CONSTANT"
+    spp_occ_FN_const_rate: 0.1        
+
+    #--------------------
+
+        #  Uniform random errors.
+        
+#    spp_occ_FP_error_type: "RANDOM_UNIFORM_CONSTANT"
+#    spp_occ_FP_rate_lower_bound: 0
+#    spp_occ_FP_rate_upper_bound: 0.1
+    
+#    spp_occ_FN_error_type: "RANDOM_UNIFORM_CONSTANT"
+#    spp_occ_FN_rate_lower_bound: 0       
+#    spp_occ_FN_rate_upper_bound: 0.1
+
+    #--------------------
+
+        #  Truncated normal errors.
+        
+#    spp_occ_FP_error_type: "RANDOM_TRUNCATED_NORMAL"
+#    spp_occ_FP_rate_lower_bound: 0
+#    spp_occ_FP_rate_upper_bound: 1.0
+#    spp_occ_FP_rate_mean: 0.1
+#    spp_occ_FP_rate_sd: 1.0
+
+#    spp_occ_FN_error_type: "RANDOM_TRUNCATED_NORMAL"
+#    spp_occ_FN_rate_lower_bound: 0       
+#    spp_occ_FN_rate_upper_bound: 0.1
+#    spp_occ_FN_rate_mean: 0.1
+#    spp_occ_FN_rate_sd: 1.0
 
     #---------------------------------------------------------------------------
     
@@ -344,28 +380,71 @@ base_params:
     
 scenarios:
             
+            #-----------------------------------------------
+            #  Xu simple model hard case:  
+            #      n in [8..100] while alpha = 0.52, r = 1
+            #-----------------------------------------------
+            
+        #  Taken from v700 project.yaml scenario:
+        #  scen_Xu_simple_model_hard_case_1__based_on_N
+        
     - name: marxan_simulated_annealing
       parameters:
+            read_Xu_problem_from_file: TRUE
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-1.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-2.msc"
+            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-3.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-4.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-5.msc"
+            given_correct_solution_cost: 420
+            
             marxan_runmode: 1 
             marxan_heurtype: -1 
             marxan_num_reps: 100
+
+
+#    - name: marxan_heuristic_richness
+#      parameters:
+#            marxan_runmode: 3 
+#            marxan_heurtype: 0 
+#            marxan_num_reps: 100
+
+#            use_unif_rand_alpha__: FALSE
+#            alpha__: 0.52
     
+#            use_unif_rand_n__num_groups: TRUE
+#            n__num_groups_lower_bound: 8
+#            n__num_groups_upper_bound: 100
+    
+#            use_unif_rand_r__density: FALSE
+#            r__density: 0.8
+
     #---------------------------------------------------------------------------
 
 repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 10105
+          start: 10001    #  10105
           step_size: 1
           count: 1
           
     #---------------------------------------------------------------------------
+
+#repetitions:
+#    generators:
+#        - key: add_error_to_spp_occupancy_data
+#          generator_type: linear_step
+#          start: 0
+#          step_size: 1
+#          count: 2
+          
+    #---------------------------------------------------------------------------
     
-concatenate:
-    heading_row: true
-    input_filename: prob_diff_results.csv
-    output_filename: all_results_prob_diff.csv
+#concatenate:
+#    heading_row: true
+#    input_filename: prob_diff_results.csv
+#    output_filename: all_results_prob_diff.csv
 
     #---------------------------------------------------------------------------
     

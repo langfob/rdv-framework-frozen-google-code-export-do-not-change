@@ -137,7 +137,7 @@ see_if_there_are_any_duplicate_links = function (occ_matrix, num_spp)
         cat ("\n\nERROR: ", num_duplicates, 
              " duplicate species in the Xu benchmark file.\n\n")
         
-        quit (save="no", ERROR_STATUS_duplicate_spp_in_Xu_input_file))
+        quit (save="no", ERROR_STATUS_duplicate_spp_in_Xu_input_file)
         }
     
     return (edge_list)
