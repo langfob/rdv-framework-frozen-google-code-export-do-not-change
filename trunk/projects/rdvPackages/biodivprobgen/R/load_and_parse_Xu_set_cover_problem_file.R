@@ -227,7 +227,6 @@ test_load_and_parse_Xu_set_cover_problem_file = function (infile_name)
     cat ("\nnum_spp = ", num_spp, sep='')
     }
 
-TESTING = TRUE
 if (TESTING) 
     {
 #    infile_name = "/Users/bill/D/rdv-framework/projects/rdvPackages/biodivprobgen/R/test_xu_input.msc"

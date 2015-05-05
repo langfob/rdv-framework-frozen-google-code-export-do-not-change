@@ -10,67 +10,7 @@
 
 #===============================================================================
 
-TESTING = FALSE
-
-#===============================================================================
-
-build_PU_spp_pair_indices_from_occ_matrix = function (occ_matrix, 
-                                                      num_PUs, num_spp)
-    {
-    num_PU_spp_pairs = sum (occ_matrix)
-    
-        #****************************************************************
-        #  Why is PU_spp_pair_indices a data frame instead of a matrix?
-        #****************************************************************
-    
-    PU_spp_pair_indices = data.frame (PU_ID = rep (NA, num_PU_spp_pairs),
-                                      spp_ID = rep (NA, num_PU_spp_pairs))
-
-    cur_PU_spp_row_idx = 0
-
-    for (cur_spp_row in 1:num_spp)
-        {
-        for (cur_PU_col in 1:num_PUs)
-            {
-            if (occ_matrix [cur_spp_row, cur_PU_col])
-                {
-                cur_PU_spp_row_idx = cur_PU_spp_row_idx + 1
-                
-                PU_spp_pair_indices [cur_PU_spp_row_idx, "PU_ID"] = cur_PU_col
-                PU_spp_pair_indices [cur_PU_spp_row_idx, "spp_ID"] = cur_spp_row
-                
-                }  #  end if - cur spp occupies cur PU
-            }  #  end for - all spp cols
-        }  #  end for - all PU rows
-
-    return (PU_spp_pair_indices)
-    }
-
-#-------------------------------------------------------------------------------
-
-test_build_PU_spp_pair_indices_from_occ_matrix = function ()
-    {
-    num_PUs = 3
-    num_spp = 2
-
-    #--------------------
-        
-    bpm = matrix (c(0,1,1,0,1,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
-    cat ("\n\nIn test_add_const_error_to_spp_occupancy_data() before start of test.")
-    cat ("\nbpm = \n")
-    print (bpm)
-    
-    #--------------------
-    
-    PU_spp_pair_indices = 
-            build_PU_spp_pair_indices_from_occ_matrix (bpm, num_PUs, num_spp)
-    
-    cat ("\n\nPU_spp_pair_indices from bpm = \n")
-    print (PU_spp_pair_indices)
-    cat ("\n\nShould look like:\n\t1      2\n\t1      3\n\t2      2\n")
-    }
-
-if (TESTING) test_build_PU_spp_pair_indices_from_occ_matrix ()
+TESTING=FALSE
 
 #===============================================================================
 
@@ -115,8 +55,8 @@ add_const_error_to_spp_occupancy_data =
                     bpm [cur_spp_row, cur_PU_col] = 1
                 
                }  #  end else - TN so set FP                
-            }  #  end for - all spp cols
-        }  #  end for - all PU rows
+            }  #  end for - all PU cols
+        }  #  end for - all spp rows
 
     return (bpm)
     }
@@ -145,8 +85,10 @@ test_add_const_error_to_spp_occupancy_data = function ()
     
     #--------------------
     
-    FP_rates = matrix (c(1,1,1,0,0,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
-    FN_rates = matrix (c(0,0,0,1,1,1), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    FP_rates = matrix (c(1,1,1,
+                         0,0,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    FN_rates = matrix (c(0,0,0,
+                         1,1,1), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
     
     app_bpm = add_const_error_to_spp_occupancy_data (bpm, FP_rates, FN_rates, 
                                                num_PUs, num_spp, random_values) 
@@ -158,8 +100,10 @@ test_add_const_error_to_spp_occupancy_data = function ()
 
         #--------------------
     
-    FP_rates = matrix (c(0,0,0,1,1,1), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
-    FN_rates = matrix (c(1,1,1,0,0,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    FP_rates = matrix (c(0,0,0,
+                         1,1,1), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
+    FN_rates = matrix (c(1,1,1,
+                         0,0,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
     
     app_bpm = add_const_error_to_spp_occupancy_data (bpm, FP_rates, FN_rates, 
                                                num_PUs, num_spp, random_values) 
@@ -177,10 +121,14 @@ if (TESTING) test_add_const_error_to_spp_occupancy_data ()
 add_error_to_spp_occupancy_data = 
         function (parameters, bpm, num_PU_spp_pairs, num_PUs, num_spp) 
     {
-    FP_const_rate = parameters$FP_const_rate
-    FN_const_rate = parameters$FN_const_rate
+    FP_const_rate = parameters$spp_occ_FP_const_rate
+    FN_const_rate = parameters$spp_occ_FN_const_rate
     
-    if (parameters$match_FP_and_FN_frequency_of_opportunity)
+    stratify_error_probabilities = FALSE
+    if (! is.null (parameters$stratify_error_probabilities))
+        stratify_error_probabilities = parameters$stratify_error_probabilities
+        
+    if (stratify_error_probabilities)
         {
             #  Usually, TNs will far outnumber TPs.
             #  Therefore, there will be far more opportunities to inject 
@@ -210,7 +158,7 @@ add_error_to_spp_occupancy_data =
         num_TNs = length (bpm) - num_TPs
         FP_const_rate = approx_num_FNs / num_TNs
         
-        cat ("\n\nComputing stratified version of FP_const_rate:"
+        cat ("\n\nComputing stratified version of FP_const_rate:", 
              "\n\tnum_TPs = ", num_TPs, 
              "\n\tapprox_num_FNs = ", approx_num_FNs, 
              "\n\tnum_TNs = ", num_TNs, 
