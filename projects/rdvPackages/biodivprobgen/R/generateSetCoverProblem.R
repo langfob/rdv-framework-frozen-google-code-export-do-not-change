@@ -169,8 +169,6 @@ source (paste0 (sourceCodeLocationWithSlash, "biodivprobgen_initialization.R"))
 #       Generate a problem, i.e, create the Xu graph nodes and edge_list.
 #===============================================================================
 
-PU_costs = rep (1, num_PUs)
-
 PU_spp_pair_indices_sextet = NULL
 correct_solution_vector_is_known = FALSE
 read_Xu_problem_from_file = parameters$read_Xu_problem_from_file
@@ -212,6 +210,8 @@ nodes = create_nodes_data_structure (tot_num_nodes,
 
 correct_solution_vector_is_known = TRUE
 dependent_node_IDs = get_dependent_node_IDs (nodes)
+num_PUs = get_num_nodes (nodes)
+PU_costs = get_PU_costs (num_PUs)
 
 #-------------------------------------------------------------------------------
 
@@ -240,7 +240,8 @@ timepoints_df =
 PU_spp_pair_indices_sextet = create_PU_spp_pair_indices (edge_list, 
                                                           nodes, 
                                                           dependent_node_IDs, 
-                                                          PU_costs) 
+                                                          PU_costs, 
+                                                         num_PUs) 
 }
 
 #-------------------------------------------------------------------------------
@@ -277,6 +278,11 @@ correct_optimum_cost = PU_spp_pair_indices_sextet$correct_solution_cost
 if (read_Xu_problem_from_file)
     {
     max_allowed_num_spp = num_spp
+    
+        #  Also need to create costs, but hadn't decoded the num_PUs until 
+        #  just before now.
+    PU_costs = get_PU_costs (num_PUs)
+
     } else
     {
     max_allowed_num_spp = parameters$max_allowed_num_spp
@@ -334,11 +340,19 @@ if (num_spp > max_allowed_num_spp)
                             ERROR_STATUS_optimal_solution_is_not_optimal, 
                                                     emulatingTzar) 
     
+
+        #  See if there are any duplicate edges/spp in the problem.
+    see_if_there_are_any_duplicate_links (bpm, num_spp)
+
     #===============================================================================
     #                   Add error to the species occupancy data.
     #===============================================================================
     
-    if (parameters$add_error_to_spp_occupancy_data)
+    add_error = FALSE   
+    if (! is.null (parameters$add_error_to_spp_occupancy_data))
+        add_error = parameters$add_error_to_spp_occupancy_data
+
+    if (add_error)
         {
         double_return = add_error_to_spp_occupancy_data (parameters, 
                                                          bpm, num_PU_spp_pairs, 
