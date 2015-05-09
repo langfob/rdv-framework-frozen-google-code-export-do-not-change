@@ -118,52 +118,176 @@ if (TESTING) test_add_const_error_to_spp_occupancy_data ()
 
 #===============================================================================
 
+set_const_FP_and_FN_rates = function (parameters)
+    {
+        #----------------------------
+        #  Set False Positive rate.
+        #----------------------------
+    
+    spp_occ_FP_error_type = parameters$spp_occ_FP_error_type
+    
+    FP_const_rate = NA
+    if (spp_occ_FP_error_type == "CONSTANT")
+        {
+        FP_const_rate = parameters$spp_occ_FP_const_rate
+        
+        } else if (spp_occ_FP_error_type == "RANDOM_UNIFORM_CONSTANT")
+        {
+        lower_bound = parameters$spp_occ_FP_rate_lower_bound
+        upper_bound = parameters$spp_occ_FP_rate_upper_bound
+            
+        FP_const_rate = runif (1, min=lower_bound, max=upper_bound)
+            
+        } else  #  unknown type of error to add
+        {
+        cat ("\n\nERROR: Unknown spp_occ_FP_error_type = '", 
+             spp_occ_FP_error_type, "'.\n", sep='')
+        quit (save="no", ERROR_STATUS_unknown_spp_occ_FP_error_type)
+        }
+    
+        #----------------------------
+        #  Set False Negative rate.
+        #----------------------------
+    
+    spp_occ_FN_error_type = parameters$spp_occ_FN_error_type
+    
+    FN_const_rate = NA
+    if (spp_occ_FN_error_type == "CONSTANT")
+        {
+        FN_const_rate = parameters$spp_occ_FN_const_rate
+        
+        } else if (spp_occ_FN_error_type == "RANDOM_UNIFORM_CONSTANT")
+        {
+        lower_bound = parameters$spp_occ_FN_rate_lower_bound
+        upper_bound = parameters$spp_occ_FN_rate_upper_bound
+            
+        FN_const_rate = runif (1, min=lower_bound, max=upper_bound)
+            
+        } else  #  unknown type of error to add
+        {
+        cat ("\n\nERROR: Unknown spp_occ_FN_error_type = '", 
+             spp_occ_FN_error_type, "'.\n", sep='')
+        quit (save="no", ERROR_STATUS_unknown_spp_occ_FN_error_type)
+        }
+    
+    #--------------------
+
+    return (list (FP_const_rate = FP_const_rate, 
+                  FN_const_rate = FN_const_rate))
+    }
+
+#===============================================================================
+
+    #  Usually, the number of TNs and TPs will be unbalanced.
+    #  Therefore, there will be far more opportunities to inject 
+    #  FPs than FNs or vice versa.  
+    #  Consequently, even if the FP and FN rates are set to the  
+    #  same value, there are likely to be far more FPs than FNs  
+    #  or vice versa in the apparent matrix.
+    #  If you want to keep the opportunities for each of them 
+    #  to be more balanced, then you can multiply the dominant 
+    #  one by the lesser one's fraction of occurrence and 
+    #  reset the rate for the dominant so that both end up 
+    #  with the same counts.
+    #
+    #  Example: if there are 
+    #       - 100 entries total 
+    #       - 70 TNs
+    #       - 30 TPs 
+    #  and you want 0.1 probability of FN, then you should get 
+    #  approximately 3 FNs.  If you want the FPs to match the FNs,  
+    #  then x * 70 FPs must equal 3 FPs too.  
+    #  So, the multiplier x = 3 / 70 = 3 / 0.7 ~ 0.0429
+    #  i.e., the adjusted_P(FP) = num_FNs / num_TNs
+        
+match_FP_and_FN_counts_to_smaller_of_the_two = function (num_TPs, num_TNs, 
+                                      FP_const_rate, FN_const_rate)
+    {
+    approx_num_FNs = round (FN_const_rate * num_TPs)    
+    approx_num_FPs = round (FP_const_rate * num_TNs)
+
+    cat ("\n\nBefore matching of FP and FN const_rates:", 
+         "\n\tnum_TPs = ", num_TPs, 
+         "\n\tnum_TNs = ", num_TNs, 
+         "\n\tapprox_num_FNs = ", approx_num_FNs, 
+         "\n\tapprox_num_FPs = ", approx_num_FPs, 
+         "\n")
+
+    if ((num_TNs > 0) & (num_TPs > 0))
+        {
+        if (num_TNs > num_TPs)
+            {
+            FP_const_rate = approx_num_FNs / num_TNs 
+            
+            } else 
+            {
+            FN_const_rate = approx_num_FPs / num_TPs            
+            }        
+        } else
+        {
+        cat ("\n\nNot matching FP and FN counts since num_TNs or num_TPs = 0.\n")
+        }
+    
+    approx_num_FNs = round (FN_const_rate * num_TPs)    
+    approx_num_FPs = round (FP_const_rate * num_TNs)
+
+    cat ("\n\nAfter matching of FP and FN const_rates:", 
+         "\n\tFP_const_rate = ", FP_const_rate,
+         "\n\tFN_const_rate = ", FN_const_rate,
+         "\n\tapprox_num_FNs = ", approx_num_FNs, 
+         "\n\tapprox_num_FPs = ", approx_num_FPs, 
+         "\n")
+
+
+    return (list (FP_const_rate = FP_const_rate,
+                  FN_const_rate = FN_const_rate))
+    }
+
+#-------------------------------------------------------------------------------
+
+test_match_FP_and_FN_counts_to_smaller_of_the_two = function ()
+    {
+        #  All of these test should end up showing their 
+        #  approx_num_FNs = approx_num_FPs (to within rounding error).
+    
+    match_FP_and_FN_counts_to_smaller_of_the_two (num_TPs = 30, num_TNs = 70, 
+                               FP_const_rate = 0.1, FN_const_rate = 0.1)
+    match_FP_and_FN_counts_to_smaller_of_the_two (num_TPs = 70, num_TNs = 30, 
+                               FP_const_rate = 0.1, FN_const_rate = 0.1)
+    
+    match_FP_and_FN_counts_to_smaller_of_the_two (num_TPs = 70, num_TNs = 30, 
+                               FP_const_rate = 0.2, FN_const_rate = 0.1)
+    match_FP_and_FN_counts_to_smaller_of_the_two (num_TPs = 30, num_TNs = 70, 
+                               FP_const_rate = 0.1, FN_const_rate = 0.2)
+    }
+
+#-------------------------------------------------------------------------------
+
+if (TESTING)
+    test_match_FP_and_FN_counts_to_smaller_of_the_two ()
+
+#===============================================================================
+
 add_error_to_spp_occupancy_data = 
         function (parameters, bpm, num_PU_spp_pairs, num_PUs, num_spp) 
     {
-    FP_const_rate = parameters$spp_occ_FP_const_rate
-    FN_const_rate = parameters$spp_occ_FN_const_rate
+    FP_and_FN_const_rates = set_const_FP_and_FN_rates (parameters)
     
-    stratify_error_probabilities = FALSE
-    if (! is.null (parameters$stratify_error_probabilities))
-        stratify_error_probabilities = parameters$stratify_error_probabilities
+    FP_const_rate = FP_and_FN_const_rates$FP_const_rate
+    FN_const_rate = FP_and_FN_const_rates$FN_const_rate
+    
+    match_error_counts = FALSE
+    if (! is.null (parameters$match_error_counts))
+        match_error_counts = parameters$match_error_counts
         
-    if (stratify_error_probabilities)
+    if (match_error_counts)
         {
-            #  Usually, TNs will far outnumber TPs.
-            #  Therefore, there will be far more opportunities to inject 
-            #  FPs than FNs.  
-            #  Consequently, even if the FP and FN rates are set to the  
-            #  same value, there are likely to be far more FPs than FNs  
-            #  in the apparent matrix.
-            #  If you want to keep the opportunities for each of them 
-            #  to be more balanced, then you can multiply the dominant 
-            #  one by the lesser one's fraction of occurrence.
-            #
-            #  Example: if there are 
-            #       - 100 entries total 
-            #       - 70 TNs
-            #       - 30 TPs 
-            #  and you want 0.1 probability of FN, then you should get 
-            #  approximately 3 FNs.  If you want the FPs to be balanced 
-            #  by their opporunity but to have the same probability, 
-            #  then x * 70 FPs must equal 3 FPs too.  
-            #  So, the multiplier x = 3 / 70 = 3 / 0.7 ~ 0.0429
-            #  i.e.,
-            #  the adjusted_P(FP) = num_FNs / num_TNs
-            
         num_TPs = sum (bpm)
-        approx_num_FNs = round (FN_const_rate * num_TPs)
-        
-        num_TNs = length (bpm) - num_TPs
-        FP_const_rate = approx_num_FNs / num_TNs
-        
-        cat ("\n\nComputing stratified version of FP_const_rate:", 
-             "\n\tnum_TPs = ", num_TPs, 
-             "\n\tapprox_num_FNs = ", approx_num_FNs, 
-             "\n\tnum_TNs = ", num_TNs, 
-             "\n\tFP_const_rate = ", FP_const_rate,
-             "\n")             
+        num_TNs = length (bpm) - num_TPs        
+
+        match_FP_and_FN_counts_to_smaller_of_the_two (num_TPs, num_TNs, 
+                                                      FP_const_rate, 
+                                                      FN_const_rate)
         }
     
     FP_rates = matrix (rep (FP_const_rate, (num_PUs * num_spp)), 

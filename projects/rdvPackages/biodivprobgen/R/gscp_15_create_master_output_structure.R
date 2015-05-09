@@ -12,10 +12,10 @@ timepoints_df =
 
 #  Build a master table containing:
     #  planning unit ID
-            #  marxan_best_df$PUID
+            #  marxan_best_df_sorted$PUID
     #  correct (optimal) answer (as boolean flags on sorted planning units)
     #  best marxan guess
-            #  marxan_best_df$SOLUTION
+            #  marxan_best_df_sorted$SOLUTION
     #  marxan number of votes for each puid
             #  marxan_ssoln_df$number
     #  difference between correct and best (i.e., (cor - best), FP, FN, etc)
@@ -43,11 +43,26 @@ timepoints_df =
 
     #  Create table holding all the information to compare solutions.
 
+#===============================================================================
+
+#-------------------------------------------------------------------------------
+#      Initialize the data frame holding correct and apparent solutions.
+#-------------------------------------------------------------------------------
+
+    #---------------------------------------------------------------------
+    #  Need to separate the case of reading a Xu problem from one of his 
+    #  his benchmark files vs. generating a problem from scratch.
+    #  When you read it from a benchmark file, the correct solution cost 
+    #  is known, but not the correct solution vector.
+    #  So, when reading a problem from a benchmark file, initialize all 
+    #  kinds of things to NA.
+    #---------------------------------------------------------------------
+
 if (read_Xu_problem_from_file)
     {
-    correct_solution_vector = rep (NA, num_PUs)
-    signed_difference = rep (NA, num_PUs)
-    abs_val_signed_difference = rep (NA, num_PUs)
+    cor_solution_vector = rep (NA, num_PUs)
+    cor_signed_difference = rep (NA, num_PUs)
+    cor_abs_val_signed_difference = rep (NA, num_PUs)
 
             #  Xu options
     n__num_groups = NA
@@ -58,8 +73,8 @@ if (read_Xu_problem_from_file)
         #  Derived Xu options
     num_nodes_per_group = NA
     tot_num_nodes = num_PUs
-    num_independent_set_nodes = tot_num_nodes - correct_optimum_cost
-    num_dependent_set_nodes = correct_optimum_cost
+    num_independent_set_nodes = tot_num_nodes - cor_optimum_cost
+    num_dependent_set_nodes = cor_optimum_cost
     num_rounds_of_linking_between_groups = NA
     target_num_links_between_2_groups_per_round = NA
     num_links_within_one_group = NA
@@ -67,95 +82,86 @@ if (read_Xu_problem_from_file)
     max_possible_num_links_between_groups = NA
     max_possible_tot_num_links = NA
     
-    opt_solution_as_frac_of_tot_num_nodes = correct_optimum_cost / tot_num_nodes
+    opt_solution_as_frac_of_tot_num_nodes = cor_optimum_cost / tot_num_nodes
     
-    } else
+    } else  #  generated the problem
     {
-    correct_solution_vector = nodes$dependent_set_member
-    signed_difference = marxan_best_df$SOLUTION - nodes$dependent_set_member
-    abs_val_signed_difference = abs (signed_difference)
+    cor_solution_vector = nodes$dependent_set_member
+    cor_signed_difference = marxan_best_df_sorted$SOLUTION - nodes$dependent_set_member
+    cor_abs_val_signed_difference = abs (cor_signed_difference)
     }
 
-solutions_df = data.frame (puid = marxan_best_df$PUID,
-                           optimal_solution = correct_solution_vector, 
-                           marxan_best_solution = marxan_best_df$SOLUTION, 
+solutions_df = data.frame (puid = marxan_best_df_sorted$PUID,
+                           optimal_solution = cor_solution_vector, 
+                           marxan_best_solution = marxan_best_df_sorted$SOLUTION, #  assumes already sorted by PU_ID
                            marxan_votes = marxan_ssoln_df$number, 
-                           signed_diff = signed_difference, 
-                           abs_val_diff = abs_val_signed_difference, 
-                           num_spp_on_patch = final_link_counts_for_each_node$freq
+                           cor_signed_diff = cor_signed_difference, 
+                           cor_abs_val_diff = cor_abs_val_signed_difference, 
+                           cor_num_spp_on_patch = final_link_counts_for_each_node$freq
                            )
 
-#  STILL NEED TO DO THIS
-#       However, might be able to read these values from the marxan summary 
-#       file that talks about missing values.  I'm just not sure how to 
-#       tell which line in there corresponds to the "best" solution.
-#
-#       - marxan best solution % of species covered
-#               - sum of number of uniques species in marxan best solution set
-#                       - unique (select (species) where (puid in best solution))
-#               - This suggests that there should be a function that computes 
-#                 these values for ANY given solution.
-#                         percentSppCovered = function (solutionAs01, sppPuidDB)
-#                             {
-#                             unique (select (species) where puids[which (solutionAs01==TRUE)])   
-#                             }
-#       - representation shortfall:  marxan best solution err fraction
-#               - (1 - marxan best solution % of species covered)
-
+    #  Will probably get rid of this soon, but want it to run right now.
+    #  BTL - 2015 05 09
+old_DEBUG_LEVEL = DEBUG_LEVEL
+if (DEBUG_LEVEL > 0)
+    {
+    cat ("\n\n----->  ARE ALL COLUMNS OF solutions_df THE SAME LENGTH?  <-----\n")
+    cat ("\nlength (puid) = ", length (solutions_df$puid))
+    cat ("\nlength (optimal_solution) = ", length (solutions_df$optimal_solution))
+    cat ("\nlength (marxan_best_solution) = ", length (solutions_df$marxan_best_solution))
+    cat ("\nlength (marxan_votes) = ", length (solutions_df$marxan_votes))
+    cat ("\nlength (cor_signed_diff) = ", length (solutions_df$cor_signed_diff))
+    cat ("\nlength (cor_abs_val_diff) = ", length (solutions_df$cor_abs_val_diff))
+    cat ("\nlength (cor_num_spp_on_patch) = ", length (solutions_df$cor_num_spp_on_patch))
+    cat ("\n\n----->  END OF COLUMN LENGTHS  <-----\n")
+    }  
+DEBUG_LEVEL = old_DEBUG_LEVEL
 
 #---------------------------------------------------------------------------
-#  Aggregate measures not in binding (may be computed From the bound data)
+#            Compute aggregate measures not already in binding.
 #---------------------------------------------------------------------------
 
-    #  correct/optimal number of patches (cost)
-    #  This is also just the size of the dependent set...
-#       - correct/optimal number of patches (cost)
-#               - sum of 0/1 bits in correct solution
-#                 Although, this is more directly available as the size of 
-#                 the dependent set.  Still, it's more reusable to compute it 
-#                 rather than assume the existance of a dependent set. 
-#cor_num_patches = sum (solutions_df$optimal_solution)
-cor_num_patches = correct_optimum_cost    #  assuming cost = number of patches
-cat ("\n\ncor_num_patches =", cor_num_patches)
+cor_num_patches = sum (solutions_df$optimal_solution)
+    #cor_num_patches = cor_optimum_cost    #  assuming cost = number of patches
+    cat ("\n\ncor_num_patches =", cor_num_patches)
 
-    #  marxan best solution number of patches (cost)
-#       - marxan best solution number of patches (cost)
-#               - sum of 0/1 bits in marxan solution
-marxan_best_num_patches = sum (solutions_df$marxan_best_solution)
-cat ("\nmarxan_best_num_patches =", marxan_best_num_patches)
+marxan_best_solution_PU_IDs = which (marxan_best_df_sorted$SOLUTION > 0)
+marxan_best_num_patches = length (marxan_best_solution_PU_IDs)
+    #marxan_best_num_patches = sum (marxan_best_df_sorted$SOLUTION)
+    cat ("\nmarxan_best_num_patches =", marxan_best_num_patches)
 
-    #  signed marxan best solution err fraction
-#       - marxan best solution err fraction
-#               - abs (1 - (correct/optimal number of patches - 
-#                           marxan best solution number of patches))
-marxan_best_solution_cost_err_frac = 
-    (marxan_best_num_patches - cor_num_patches) / cor_num_patches
-cat ("\nmarxan_best_solution_cost_err_frac =", marxan_best_solution_cost_err_frac)
+    #  Compute costs.
+    #  Assumes equal cost for all patches, i.e., cost per patch = 1.
+marxan_best_solution_cost_err_frac = (marxan_best_num_patches - cor_num_patches) / cor_num_patches
+    cat ("\nmarxan_best_solution_cost_err_frac =", marxan_best_solution_cost_err_frac)
 
-    #  unsigned marxan best solution err fraction
-abs_marxan_best_solution_cost_err_frac = 
-    abs (marxan_best_solution_cost_err_frac)
-cat ("\nabs_marxan_best_solution_cost_err_frac =", 
-     abs_marxan_best_solution_cost_err_frac)
+abs_marxan_best_solution_cost_err_frac = abs (marxan_best_solution_cost_err_frac)
+    cat ("\nabs_marxan_best_solution_cost_err_frac =", abs_marxan_best_solution_cost_err_frac)
 
-#       - marxan best solution % of species covered
-#               - sum of number of uniques species in marxan best solution set
-#                       - unique (select (species) where (puid in best solution))
-#               - This suggests that there should be a function that computes 
-#                 these values for ANY given solution.
-#                         percentSppCovered = function (solutionAs01, sppPuidDB)
-#                             {
-#                             unique (select (species) where puids[which (solutionAs01==TRUE)])   
-#                             }
-#       - representation shortfall:  marxan best solution err fraction
-#               - (1 - marxan best solution % of species covered)
-marxan_best_solution_NUM_spp_covered = sum (marxan_mvbest_df$MPM)
-marxan_best_solution_FRAC_spp_covered = marxan_best_solution_NUM_spp_covered / num_spp
-spp_rep_shortfall = 1 - marxan_best_solution_FRAC_spp_covered
+#---------------------------------------------------------------------------
+#       Compute correct and apparent scores for marxan solution.
+#---------------------------------------------------------------------------
 
-cat ("\n\nmarxan_best_solution_NUM_spp_covered =", marxan_best_solution_NUM_spp_covered)
-cat ("\nmarxan_best_solution_FRAC_spp_covered =", marxan_best_solution_FRAC_spp_covered)
-cat ("\nspp_rep_shortfall =", spp_rep_shortfall)
+    #  Apparent scores...
+app_marxan_best_solution_NUM_spp_covered = sum (marxan_mvbest_df$MPM)
+app_marxan_best_solution_FRAC_spp_covered = app_marxan_best_solution_NUM_spp_covered / num_spp
+app_marxan_best_spp_rep_shortfall = 1 - app_marxan_best_solution_FRAC_spp_covered
+    cat ("\n\napp_marxan_best_solution_NUM_spp_covered =", app_marxan_best_solution_NUM_spp_covered)
+    cat ("\napp_marxan_best_solution_FRAC_spp_covered =", app_marxan_best_solution_FRAC_spp_covered)
+    cat ("\napp_marxan_best_spp_rep_shortfall =", app_marxan_best_spp_rep_shortfall)
+
+    #  Correct scores...
+spp_rep_targets = rep (1, num_spp)    #  Seems like this should already have been set long before now.
+marxan_best_solution_spp_rep_fracs = 
+    compute_rep_fraction (cor_bpm, marxan_best_solution_PU_IDs, DEBUG_LEVEL, spp_rep_targets)
+cor_marxan_best_solution_unmet_spp_rep_frac_indices = which (marxan_best_solution_spp_rep_fracs < 1)
+
+cor_marxan_best_solution_NUM_spp_covered = num_spp - length (cor_marxan_best_solution_unmet_spp_rep_frac_indices)
+cor_marxan_best_solution_FRAC_spp_covered = cor_marxan_best_solution_NUM_spp_covered / num_spp
+cor_marxan_best_spp_rep_shortfall = 1 - cor_marxan_best_solution_FRAC_spp_covered
+    cat ("\n\ncor_marxan_best_solution_NUM_spp_covered =", cor_marxan_best_solution_NUM_spp_covered)
+    cat ("\ncor_marxan_best_solution_FRAC_spp_covered =", cor_marxan_best_solution_FRAC_spp_covered)
+    cat ("\ncor_marxan_best_spp_rep_shortfall =", cor_marxan_best_spp_rep_shortfall)
 
 #===============================================================================
 
@@ -166,6 +172,9 @@ cat ("\nspp_rep_shortfall =", spp_rep_shortfall)
 #   (e.g., SELECT planning unit ID WHERE species == curSpeciesID))
 #       - planning unit IDs
 #       - set of species on planning unit
+
+#     ALSO STILL NEED TO ADD THE FP AND FN RATES AND OTHER ERROR MODEL 
+#     ATTRIBUTES TO THE OUTPUT DATA FRAME AND CSV FILE.
 
 #-------------------------------------------------------------------------------
 
@@ -194,9 +203,9 @@ results_df =
                 marxan_best_num_patches = rep (NA, num_runs), 
                 abs_marxan_best_solution_cost_err_frac = rep (NA, num_runs), 
                 marxan_best_solution_cost_err_frac = rep (NA, num_runs), 
-                spp_rep_shortfall = rep (NA, num_runs),                
-                marxan_best_solution_NUM_spp_covered = rep (NA, num_runs), 
-                marxan_best_solution_FRAC_spp_covered = rep (NA, num_runs), 
+                cor_marxan_best_spp_rep_shortfall = rep (NA, num_runs),                
+                cor_marxan_best_solution_NUM_spp_covered = rep (NA, num_runs), 
+                cor_marxan_best_solution_FRAC_spp_covered = rep (NA, num_runs), 
                 
                     #  Derived options
                 num_nodes_per_group = rep (NA, num_runs),
@@ -268,9 +277,9 @@ results_df$cor_num_patches [cur_result_row]                                  = c
 results_df$marxan_best_num_patches [cur_result_row]                          = marxan_best_num_patches
 results_df$abs_marxan_best_solution_cost_err_frac [cur_result_row]           = abs_marxan_best_solution_cost_err_frac
 results_df$marxan_best_solution_cost_err_frac [cur_result_row]               = marxan_best_solution_cost_err_frac
-results_df$spp_rep_shortfall [cur_result_row]                                = spp_rep_shortfall                
-results_df$marxan_best_solution_NUM_spp_covered [cur_result_row]             = marxan_best_solution_NUM_spp_covered
-results_df$marxan_best_solution_FRAC_spp_covered [cur_result_row]            = marxan_best_solution_FRAC_spp_covered
+results_df$cor_marxan_best_spp_rep_shortfall [cur_result_row]                                = cor_marxan_best_spp_rep_shortfall                
+results_df$cor_marxan_best_solution_NUM_spp_covered [cur_result_row]             = cor_marxan_best_solution_NUM_spp_covered
+results_df$cor_marxan_best_solution_FRAC_spp_covered [cur_result_row]            = cor_marxan_best_solution_FRAC_spp_covered
 
     #  Derived Xu options
 results_df$num_nodes_per_group [cur_result_row]                             = num_nodes_per_group

@@ -251,7 +251,7 @@ PU_col_name          = PU_spp_pair_indices_sextet$PU_col_name
 spp_col_name         = PU_spp_pair_indices_sextet$spp_col_name
 num_PUs              = PU_spp_pair_indices_sextet$num_PUs
 num_spp              = PU_spp_pair_indices_sextet$num_spp
-correct_optimum_cost = PU_spp_pair_indices_sextet$correct_solution_cost
+cor_optimum_cost     = PU_spp_pair_indices_sextet$correct_solution_cost
     
 #===============================================================================
 
@@ -345,6 +345,22 @@ if (num_spp > max_allowed_num_spp)
     see_if_there_are_any_duplicate_links (bpm, num_spp)
 
     #===============================================================================
+    #                   Save the values for the correct problem.
+    #===============================================================================
+    
+        #  The problem structures built so far represent the correct values.
+        #  Adding error to the problem structure will create an apparent 
+        #  problem structure that is probably different from the correct 
+        #  structure.
+        #  When we compute scores at the end of all this, we need to compute 
+        #  them with respect to the correct problem rather than the apparent.
+        #  So, before we add error, we need to save the values defining the 
+        #  correct structure.
+
+    cor_PU_spp_pair_indices = PU_spp_pair_indices
+    cor_bpm = bpm
+
+    #===============================================================================
     #                   Add error to the species occupancy data.
     #===============================================================================
     
@@ -358,8 +374,10 @@ if (num_spp > max_allowed_num_spp)
                                                          bpm, num_PU_spp_pairs, 
                                                          num_PUs, num_spp)
         
-        PU_spp_pair_indices = double_return$app_PU_spp_pair_indices
-        bpm                 = double_return$app_spp_occupancy_data
+            #  Set the values for the apparent problem structure.
+        
+        PU_spp_pair_indices      = double_return$app_PU_spp_pair_indices
+        bpm                      = double_return$app_spp_occupancy_data        
         }
 
     #===============================================================================

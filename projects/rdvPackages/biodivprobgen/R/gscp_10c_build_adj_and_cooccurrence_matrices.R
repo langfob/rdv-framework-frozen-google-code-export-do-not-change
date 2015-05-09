@@ -36,6 +36,7 @@ verify_that_generated_solution_really_is_a_solution =
                                             spp_rep_targets)
     
     unmet_spp_rep_frac_indices = which (spp_rep_fracs < 1)
+
     if (length (unmet_spp_rep_frac_indices) > 0)
         {
         cat ("\n\nSERIOUS ERROR: The generated optimal solution is not a solution.",
