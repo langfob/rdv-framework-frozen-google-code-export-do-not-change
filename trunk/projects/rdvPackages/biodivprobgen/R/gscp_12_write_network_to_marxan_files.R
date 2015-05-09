@@ -41,9 +41,9 @@ write_network_to_marxan_files =
     num_spp = length (spp_IDs)
     
     spp_PU_amount_table =
-    data.frame (species = PU_spp_pair_indices [,spp_col_name],
-                pu      = PU_spp_pair_indices [,PU_col_name],
-                amount  = rep (sppAmount, num_PU_spp_pairs))
+        data.frame (species = PU_spp_pair_indices [,spp_col_name],
+                    pu      = PU_spp_pair_indices [,PU_col_name],
+                    amount  = rep (sppAmount, num_PU_spp_pairs))
     
     #----------------------------------------------------------------------
     #  Sort the table in ascending order by species within planning unit.

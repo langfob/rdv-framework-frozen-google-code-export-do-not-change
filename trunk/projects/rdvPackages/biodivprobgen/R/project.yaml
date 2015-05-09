@@ -68,7 +68,7 @@ base_params:
         #  generating it, you need to give the input file name and the 
         #  cost of the correct solution (since it's not specified in the file).
         
-    read_Xu_problem_from_file: TRUE
+    read_Xu_problem_from_file: FALSE
     
     Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-1.msc"
     given_correct_solution_cost: 420
@@ -243,7 +243,7 @@ base_params:
         #  Error models.
         
     add_error_to_spp_occupancy_data: FALSE
-    stratify_error_probabilities: TRUE
+    match_error_counts: TRUE
     
     #--------------------
 
@@ -390,17 +390,72 @@ scenarios:
         
     - name: marxan_simulated_annealing
       parameters:
-            read_Xu_problem_from_file: TRUE
-#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-1.msc"
-#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-2.msc"
-            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-3.msc"
-#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-4.msc"
-#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-5.msc"
-            given_correct_solution_cost: 420
-            
             marxan_runmode: 1 
             marxan_heurtype: -1 
-            marxan_num_reps: 100
+            marxan_num_reps: 3        #  TO SPEED UP SOME CURRENT TESTING
+
+            use_unif_rand_alpha__: FALSE
+            alpha__: 0.52
+    
+            use_unif_rand_n__num_groups: TRUE
+            n__num_groups_lower_bound: 8
+            n__num_groups_upper_bound: 100
+    
+            use_unif_rand_r__density: FALSE
+            r__density: 0.8
+
+            #--------------------
+        
+            add_error_to_spp_occupancy_data: TRUE
+            match_error_counts: TRUE
+            
+            #--------------------
+        
+                #  Constant errors
+                
+            spp_occ_FP_error_type: "CONSTANT"
+            spp_occ_FP_const_rate: 0.1
+            
+            spp_occ_FN_error_type: "CONSTANT"
+            spp_occ_FN_const_rate: 0.1        
+        
+            #--------------------
+        
+                #  Uniform random errors.
+                
+        #    spp_occ_FP_error_type: "RANDOM_UNIFORM_CONSTANT"
+        #    spp_occ_FP_rate_lower_bound: 0
+        #    spp_occ_FP_rate_upper_bound: 0.1
+            
+        #    spp_occ_FN_error_type: "RANDOM_UNIFORM_CONSTANT"
+        #    spp_occ_FN_rate_lower_bound: 0       
+        #    spp_occ_FN_rate_upper_bound: 0.1
+
+
+###    - name: marxan_simulated_annealing
+###      parameters:
+###            read_Xu_problem_from_file: TRUE
+            
+###            given_correct_solution_cost: 420
+            
+###            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-1.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-2.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-3.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-4.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb30-15-msc with MSC 420/frb30-15-5.msc"
+
+
+#            given_correct_solution_cost: 560
+            
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb35-17-msc with MSC 560/frb35-17-1.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb35-17-msc with MSC 560/frb35-17-2.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb35-17-msc with MSC 560/frb35-17-3.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb35-17-msc with MSC 560/frb35-17-4.msc"
+#            Xu_problem_input_file_name: "/Users/bill/Desktop/Papers downloaded/Problem difficulty/Problem difficulty datasets/Xu - problem difficulty datasets/frb35-17-msc with MSC 560/frb35-17-5.msc"
+
+###            marxan_runmode: 1 
+###            marxan_heurtype: -1 
+###            marxan_num_reps: 100
 
 
 #    - name: marxan_heuristic_richness

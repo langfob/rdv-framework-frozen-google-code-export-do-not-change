@@ -154,7 +154,7 @@ test_see_if_there_are_any_duplicate_links = function ()
         
         #  Test the kind of matrix you expect to see, i.e., 
         #  all lines legal in the matrix...
-#     bpm = matrix (c(0,1,1,0,
+#     spp_occ_matrix = matrix (c(0,1,1,0,
 #                     0,1,0,1, 
 #                     1,1,0,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
 
@@ -162,7 +162,7 @@ test_see_if_there_are_any_duplicate_links = function ()
     
         #  Test generation of warnings.
         #  One bad line (too many 1s) and one line with no occupancy.
-    bpm = matrix (c(0,1,1,1,  #  more than 2 patches occupied
+    spp_occ_matrix = matrix (c(0,1,1,1,  #  more than 2 patches occupied
                     0,1,0,1,  #  dup 1 
                     0,0,0,0,  #  no patches occupied 
                     1,0,0,1,
@@ -178,14 +178,14 @@ test_see_if_there_are_any_duplicate_links = function ()
     #--------------------
     
     cat ("\n\nIn test_build_edge_list_from_occ_matrix() before start of test.")
-    cat ("\nbpm = \n")
-    print (bpm)
+    cat ("\nspp_occ_matrix = \n")
+    print (spp_occ_matrix)
    
     #--------------------
     
-    edge_list = build_edge_list_from_occ_matrix (bpm, num_spp)
+    edge_list = build_edge_list_from_occ_matrix (spp_occ_matrix, num_spp)
     
-    cat ("\n\nedge_list from bpm = \n")
+    cat ("\n\nedge_list from spp_occ_matrix = \n")
     print (edge_list)
 
     unique_edge_list = unique (edge_list)
@@ -239,23 +239,63 @@ test_build_PU_spp_pair_indices_from_occ_matrix = function ()
 
     #--------------------
         
-    bpm = matrix (c(0,1,1,
+    spp_occ_matrix = matrix (c(0,1,1,
                     0,1,0), nrow=num_spp, ncol=num_PUs, byrow=TRUE)
     cat ("\n\nIn test_build_PU_spp_pair_indices_from_occ_matrix() before start of test.")
-    cat ("\nbpm = \n")
-    print (bpm)
+    cat ("\nspp_occ_matrix = \n")
+    print (spp_occ_matrix)
     
     #--------------------
     
     PU_spp_pair_indices = 
-            build_PU_spp_pair_indices_from_occ_matrix (bpm, num_PUs, num_spp)
+            build_PU_spp_pair_indices_from_occ_matrix (spp_occ_matrix, num_PUs, num_spp)
     
-    cat ("\n\nPU_spp_pair_indices from bpm = \n")
+    cat ("\n\nPU_spp_pair_indices from spp_occ_matrix = \n")
     print (PU_spp_pair_indices)
     cat ("\n\nShould look like:\n\t1      2\n\t1      3\n\t2      2\n")
     }
 
 if (TESTING) test_build_PU_spp_pair_indices_from_occ_matrix ()
+
+#===============================================================================
+#     Compute what fraction of species meet their representation targets.
+#===============================================================================
+
+find_indices_of_spp_with_unmet_rep = function (spp_occ_matrix, 
+                                               candidate_solution_PU_IDs, 
+                                               num_spp, 
+                                               DEBUG_LEVEL, 
+                                               spp_rep_targets
+                                               ) 
+    {
+    spp_rep_fracs = compute_rep_fraction (spp_occ_matrix, 
+                                          candidate_solution_PU_IDs, 
+                                          DEBUG_LEVEL, 
+                                          spp_rep_targets
+                                          )
+    
+    return (which (spp_rep_fracs < 1))
+    }
+
+#-------------------------------------------------------------------------------
+
+compute_frac_spp_covered = 
+        function (spp_occ_matrix, 
+                  candidate_solution_PU_IDs, 
+                  num_spp, 
+                  spp_rep_targets
+                  ) 
+    {
+    indices_of_spp_with_unmet_rep = 
+        find_indices_of_spp_with_unmet_rep (spp_occ_matrix, 
+                                            candidate_solution_PU_IDs, 
+                                            num_spp, 
+                                            DEBUG_LEVEL, 
+                                            spp_rep_targets
+                                            ) 
+
+    return (1 - (length (indices_of_spp_with_unmet_rep) / num_spp))
+    }
 
 #===============================================================================
 
