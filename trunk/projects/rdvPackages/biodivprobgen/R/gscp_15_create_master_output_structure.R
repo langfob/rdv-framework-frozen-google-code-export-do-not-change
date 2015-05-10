@@ -100,10 +100,13 @@ solutions_df = data.frame (puid = marxan_best_df_sorted$PUID,
                            cor_num_spp_on_patch = final_link_counts_for_each_node$freq
                            )
 
+cor_num_patches_in_solution = sum (solutions_df$optimal_solution)
+    #cor_num_patches_in_solution = cor_optimum_cost    #  assuming cost = number of patches
+    cat ("\n\ncor_num_patches_in_solution =", cor_num_patches_in_solution)
+
     #  Will probably get rid of this soon, but want it to run right now.
     #  BTL - 2015 05 09
-old_DEBUG_LEVEL = DEBUG_LEVEL
-if (DEBUG_LEVEL > 0)
+if (TRUE)
     {
     cat ("\n\n----->  ARE ALL COLUMNS OF solutions_df THE SAME LENGTH?  <-----\n")
     cat ("\nlength (puid) = ", length (solutions_df$puid))
@@ -115,27 +118,20 @@ if (DEBUG_LEVEL > 0)
     cat ("\nlength (cor_num_spp_on_patch) = ", length (solutions_df$cor_num_spp_on_patch))
     cat ("\n\n----->  END OF COLUMN LENGTHS  <-----\n")
     }  
-DEBUG_LEVEL = old_DEBUG_LEVEL
 
 #---------------------------------------------------------------------------
-#            Compute aggregate measures not already in binding.
+#               Summarize marxan solution features.
 #---------------------------------------------------------------------------
-
-cor_num_patches = sum (solutions_df$optimal_solution)
-    #cor_num_patches = cor_optimum_cost    #  assuming cost = number of patches
-    cat ("\n\ncor_num_patches =", cor_num_patches)
 
 marxan_best_solution_PU_IDs = which (marxan_best_df_sorted$SOLUTION > 0)
-marxan_best_num_patches = length (marxan_best_solution_PU_IDs)
-    #marxan_best_num_patches = sum (marxan_best_df_sorted$SOLUTION)
-    cat ("\nmarxan_best_num_patches =", marxan_best_num_patches)
+marxan_best_num_patches_in_solution = length (marxan_best_solution_PU_IDs)
+    cat ("\nmarxan_best_num_patches_in_solution =", marxan_best_num_patches_in_solution)
 
-    #  Compute costs.
+    #  Compute marxan costs.
     #  Assumes equal cost for all patches, i.e., cost per patch = 1.
-marxan_best_solution_cost_err_frac = (marxan_best_num_patches - cor_num_patches) / cor_num_patches
-    cat ("\nmarxan_best_solution_cost_err_frac =", marxan_best_solution_cost_err_frac)
-
+marxan_best_solution_cost_err_frac = (marxan_best_num_patches_in_solution - cor_num_patches_in_solution) / cor_num_patches_in_solution
 abs_marxan_best_solution_cost_err_frac = abs (marxan_best_solution_cost_err_frac)
+    cat ("\nmarxan_best_solution_cost_err_frac =", marxan_best_solution_cost_err_frac)
     cat ("\nabs_marxan_best_solution_cost_err_frac =", abs_marxan_best_solution_cost_err_frac)
 
 #---------------------------------------------------------------------------
@@ -146,6 +142,9 @@ abs_marxan_best_solution_cost_err_frac = abs (marxan_best_solution_cost_err_frac
 app_marxan_best_solution_NUM_spp_covered = sum (marxan_mvbest_df$MPM)
 app_marxan_best_solution_FRAC_spp_covered = app_marxan_best_solution_NUM_spp_covered / num_spp
 app_marxan_best_spp_rep_shortfall = 1 - app_marxan_best_solution_FRAC_spp_covered
+    cat ("\n\nnum_spp =", num_spp)
+    cat ("\n\nlength (app_marxan_best_solution_unmet_spp_rep_frac_indices) = ", 
+         length (app_marxan_best_solution_unmet_spp_rep_frac_indices))
     cat ("\n\napp_marxan_best_solution_NUM_spp_covered =", app_marxan_best_solution_NUM_spp_covered)
     cat ("\napp_marxan_best_solution_FRAC_spp_covered =", app_marxan_best_solution_FRAC_spp_covered)
     cat ("\napp_marxan_best_spp_rep_shortfall =", app_marxan_best_spp_rep_shortfall)
@@ -159,6 +158,8 @@ cor_marxan_best_solution_unmet_spp_rep_frac_indices = which (marxan_best_solutio
 cor_marxan_best_solution_NUM_spp_covered = num_spp - length (cor_marxan_best_solution_unmet_spp_rep_frac_indices)
 cor_marxan_best_solution_FRAC_spp_covered = cor_marxan_best_solution_NUM_spp_covered / num_spp
 cor_marxan_best_spp_rep_shortfall = 1 - cor_marxan_best_solution_FRAC_spp_covered
+    cat ("\n\nlength (cor_marxan_best_solution_unmet_spp_rep_frac_indices) = ", 
+         length (cor_marxan_best_solution_unmet_spp_rep_frac_indices))
     cat ("\n\ncor_marxan_best_solution_NUM_spp_covered =", cor_marxan_best_solution_NUM_spp_covered)
     cat ("\ncor_marxan_best_solution_FRAC_spp_covered =", cor_marxan_best_solution_FRAC_spp_covered)
     cat ("\ncor_marxan_best_spp_rep_shortfall =", cor_marxan_best_spp_rep_shortfall)
@@ -178,7 +179,8 @@ cor_marxan_best_spp_rep_shortfall = 1 - cor_marxan_best_solution_FRAC_spp_covere
 
 #-------------------------------------------------------------------------------
 
-num_runs = 1
+num_runs = 1    #  Vestigial?  Not sure it will ever be anything but 1.
+                #  2015 05 09 - BTL.
 
 results_df = 
     data.frame (runset_abbrev = rep (NA, num_runs), 
@@ -199,13 +201,26 @@ results_df =
 
                     #  Results
                 opt_solution_as_frac_of_tot_num_nodes = rep (NA, num_runs),
-                cor_num_patches = rep (NA, num_runs),
-                marxan_best_num_patches = rep (NA, num_runs), 
+                cor_num_patches_in_solution = rep (NA, num_runs),
+                marxan_best_num_patches_in_solution = rep (NA, num_runs), 
                 abs_marxan_best_solution_cost_err_frac = rep (NA, num_runs), 
                 marxan_best_solution_cost_err_frac = rep (NA, num_runs), 
+                
                 cor_marxan_best_spp_rep_shortfall = rep (NA, num_runs),                
                 cor_marxan_best_solution_NUM_spp_covered = rep (NA, num_runs), 
                 cor_marxan_best_solution_FRAC_spp_covered = rep (NA, num_runs), 
+                
+                app_marxan_best_spp_rep_shortfall = rep (NA, num_runs),                
+                app_marxan_best_solution_NUM_spp_covered = rep (NA, num_runs), 
+                app_marxan_best_solution_FRAC_spp_covered = rep (NA, num_runs), 
+                
+                    #  Error generation parameters
+                add_error = rep (NA, num_runs), 
+                FP_const_rate = rep (NA, num_runs), 
+                FN_const_rate = rep (NA, num_runs), 
+                match_error_counts = rep (NA, num_runs), 
+                original_FP_const_rate = rep (NA, num_runs), 
+                original_FÑ_const_rate = rep (NA, num_runs), 
                 
                     #  Derived options
                 num_nodes_per_group = rep (NA, num_runs),
@@ -273,14 +288,27 @@ results_df$r__density [cur_result_row]                                       = r
 
     #  Results
 results_df$opt_solution_as_frac_of_tot_num_nodes [cur_result_row]            = opt_solution_as_frac_of_tot_num_nodes
-results_df$cor_num_patches [cur_result_row]                                  = cor_num_patches
-results_df$marxan_best_num_patches [cur_result_row]                          = marxan_best_num_patches
+results_df$cor_num_patches_in_solution [cur_result_row]                                  = cor_num_patches_in_solution
+results_df$marxan_best_num_patches_in_solution [cur_result_row]                          = marxan_best_num_patches_in_solution
 results_df$abs_marxan_best_solution_cost_err_frac [cur_result_row]           = abs_marxan_best_solution_cost_err_frac
 results_df$marxan_best_solution_cost_err_frac [cur_result_row]               = marxan_best_solution_cost_err_frac
+
 results_df$cor_marxan_best_spp_rep_shortfall [cur_result_row]                                = cor_marxan_best_spp_rep_shortfall                
 results_df$cor_marxan_best_solution_NUM_spp_covered [cur_result_row]             = cor_marxan_best_solution_NUM_spp_covered
 results_df$cor_marxan_best_solution_FRAC_spp_covered [cur_result_row]            = cor_marxan_best_solution_FRAC_spp_covered
 
+results_df$app_marxan_best_spp_rep_shortfall [cur_result_row]                                = app_marxan_best_spp_rep_shortfall                
+results_df$app_marxan_best_solution_NUM_spp_covered [cur_result_row]             = app_marxan_best_solution_NUM_spp_covered
+results_df$app_marxan_best_solution_FRAC_spp_covered [cur_result_row]            = app_marxan_best_solution_FRAC_spp_covered
+
+    #  Error generation parameters
+results_df$add_error [cur_result_row]                                       = add_error
+results_df$FP_const_rate [cur_result_row]                                   = FP_const_rate
+results_df$FN_const_rate [cur_result_row]                                   = FN_const_rate
+results_df$match_error_counts [cur_result_row]                              = match_error_counts
+results_df$original_FP_const_rate [cur_result_row]                          = original_FP_const_rate
+results_df$original_FÑ_const_rate [cur_result_row]                          = original_FÑ_const_rate
+                
     #  Derived Xu options
 results_df$num_nodes_per_group [cur_result_row]                             = num_nodes_per_group
 results_df$tot_num_nodes [cur_result_row]                                    = tot_num_nodes

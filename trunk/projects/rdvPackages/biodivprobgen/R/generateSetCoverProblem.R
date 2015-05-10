@@ -370,14 +370,21 @@ if (num_spp > max_allowed_num_spp)
 
     if (add_error)
         {
-        double_return = add_error_to_spp_occupancy_data (parameters, 
-                                                         bpm, num_PU_spp_pairs, 
-                                                         num_PUs, num_spp)
-        
-            #  Set the values for the apparent problem structure.
-        
-        PU_spp_pair_indices      = double_return$app_PU_spp_pair_indices
-        bpm                      = double_return$app_spp_occupancy_data        
+        ret_vals_from_add_errors = 
+            add_error_to_spp_occupancy_data (parameters, bpm, 
+                                             num_PU_spp_pairs, 
+                                             num_PUs, num_spp)
+
+            #  Save the chosen error parameters to output later with results.
+        original_FP_const_rate = ret_vals_from_add_errors$original_FP_const_rate
+        original_FN_const_rate = ret_vals_from_add_errors$original_FN_const_rate
+        match_error_counts = ret_vals_from_add_errors$match_error_counts
+        FP_const_rate = ret_vals_from_add_errors$FP_const_rate
+        FN_const_rate = ret_vals_from_add_errors$FN_const_rate
+
+            #  Set the values for the apparent problem structure.        
+        PU_spp_pair_indices      = ret_vals_from_add_errors$app_PU_spp_pair_indices
+        bpm                      = ret_vals_from_add_errors$app_spp_occupancy_data        
         }
 
     #===============================================================================
