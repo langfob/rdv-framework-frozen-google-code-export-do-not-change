@@ -407,29 +407,29 @@ scenarios:
             #--------------------
         
             add_error_to_spp_occupancy_data: TRUE
-            match_error_counts: TRUE
+            match_error_counts: FALSE
             
             #--------------------
         
                 #  Constant errors
                 
-            spp_occ_FP_error_type: "CONSTANT"
-            spp_occ_FP_const_rate: 0.1
+#            spp_occ_FP_error_type: "CONSTANT"
+#            spp_occ_FP_const_rate: 0.1
             
-            spp_occ_FN_error_type: "CONSTANT"
-            spp_occ_FN_const_rate: 0.1        
+#            spp_occ_FN_error_type: "CONSTANT"
+#            spp_occ_FN_const_rate: 0.1        
         
             #--------------------
         
                 #  Uniform random errors.
                 
-        #    spp_occ_FP_error_type: "RANDOM_UNIFORM_CONSTANT"
-        #    spp_occ_FP_rate_lower_bound: 0
-        #    spp_occ_FP_rate_upper_bound: 0.1
+            spp_occ_FP_error_type: "RANDOM_UNIFORM_CONSTANT"
+            spp_occ_FP_rate_lower_bound: 0
+            spp_occ_FP_rate_upper_bound: 0.2
             
-        #    spp_occ_FN_error_type: "RANDOM_UNIFORM_CONSTANT"
-        #    spp_occ_FN_rate_lower_bound: 0       
-        #    spp_occ_FN_rate_upper_bound: 0.1
+            spp_occ_FN_error_type: "RANDOM_UNIFORM_CONSTANT"
+            spp_occ_FN_rate_lower_bound: 0       
+            spp_occ_FN_rate_upper_bound: 0.2
 
 
 ###    - name: marxan_simulated_annealing

@@ -285,9 +285,13 @@ add_error_to_spp_occupancy_data =
         num_TPs = sum (bpm)
         num_TNs = length (bpm) - num_TPs        
 
-        match_FP_and_FN_counts_to_smaller_of_the_two (num_TPs, num_TNs, 
-                                                      FP_const_rate, 
-                                                      FN_const_rate)
+        FP_FN_const_rate_pair = 
+            match_FP_and_FN_counts_to_smaller_of_the_two (num_TPs, num_TNs, 
+                                                          FP_const_rate, 
+                                                          FN_const_rate)
+        
+        FP_const_rate = FP_FN_const_rate_pair$FP_const_rate
+        FN_const_rate = FP_FN_const_rate_pair$FN_const_rate
         }
     
     FP_rates = matrix (rep (FP_const_rate, (num_PUs * num_spp)), 
@@ -315,7 +319,12 @@ add_error_to_spp_occupancy_data =
         build_PU_spp_pair_indices_from_occ_matrix (app_spp_occupancy_data, 
                                                     num_PUs, num_spp)
     
-    return (list (app_PU_spp_pair_indices = app_PU_spp_pair_indices, 
+    return (list (original_FP_const_rate = FP_and_FN_const_rates$FP_const_rate, 
+                  original_FN_const_rate = FP_and_FN_const_rates$FN_const_rate, 
+                  match_error_counts = match_error_counts,
+                  FP_const_rate = FP_const_rate, 
+                  FN_const_rate = FN_const_rate, 
+                  app_PU_spp_pair_indices = app_PU_spp_pair_indices, 
                   app_spp_occupancy_data = app_spp_occupancy_data))
     }
 
