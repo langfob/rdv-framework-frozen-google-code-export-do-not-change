@@ -102,11 +102,11 @@ plot_incremental_marxan_summed_solution_representations =
                     cur_optimal_frac_cost
                 
                 cat ("\n\n>>>>> For marxan summed solution:")
-                cat ("\n", cor_app_prefix_string, "cost_thresh_for_all_spp_meeting_targets = ", 
+                cat ("\n", cor_app_prefix_string, "_", "cost_thresh_for_all_spp_meeting_targets = ", 
                    cost_thresh_for_all_spp_meeting_targets, sep='')
-                cat ("\n", cor_app_prefix_string, "landscape_frac_cost_thresh_for_all_spp_meeting_targets = ", 
+                cat ("\n", cor_app_prefix_string, "_", "landscape_frac_cost_thresh_for_all_spp_meeting_targets = ", 
                    landscape_frac_cost_thresh_for_all_spp_meeting_targets, sep='')
-                cat ("\n", cor_app_prefix_string, "optimal_frac_cost_thresh_for_all_spp_meeting_targets = ", 
+                cat ("\n", cor_app_prefix_string, "_", "optimal_frac_cost_thresh_for_all_spp_meeting_targets = ", 
                    optimal_frac_cost_thresh_for_all_spp_meeting_targets, sep='')
                 
                 }  #  end if - all targets met
@@ -120,12 +120,12 @@ plot_incremental_marxan_summed_solution_representations =
             print (cur_run_indices)
             cat ("cur_solution_PUs = ")
             print (cur_solution_PUs)
-            cat ("\n", cor_app_prefix_string, "cur_frac_of_all_spp_meeting_their_target = ", 
+            cat ("\n", cor_app_prefix_string, "_", "cur_frac_of_all_spp_meeting_their_target = ", 
             cur_frac_of_all_spp_meeting_their_target)
-            cat ("\n", cor_app_prefix_string, "cur_cost = ", cur_cost)
-            cat ("\n", cor_app_prefix_string, "cur_landscape_frac_cost = ", cur_landscape_frac_cost)
-            cat ("\n", cor_app_prefix_string, "cur_optimal_frac_cost = ", cur_optimal_frac_cost)
-            cat ("\n", cor_app_prefix_string, "cur_frac_rep_met_over_optimal_frac_cost = ", cur_frac_rep_met_over_optimal_frac_cost)
+            cat ("\n", cor_app_prefix_string, "_", "cur_cost = ", cur_cost)
+            cat ("\n", cor_app_prefix_string, "_", "cur_landscape_frac_cost = ", cur_landscape_frac_cost)
+            cat ("\n", cor_app_prefix_string, "_", "cur_optimal_frac_cost = ", cur_optimal_frac_cost)
+            cat ("\n", cor_app_prefix_string, "_", "cur_frac_rep_met_over_optimal_frac_cost = ", cur_frac_rep_met_over_optimal_frac_cost)
             
             }  #  end if - debugging
         
@@ -136,8 +136,28 @@ plot_incremental_marxan_summed_solution_representations =
         cur_run_start_idx = cur_run_end_idx_in_PU_IDs + 1
         }
     
-    #--------------------
+    #-------------------------------------------
+    #-------------------------------------------
     
+###  2015 05 14 - BTL
+###  Try converting this to "natural" spline instead of using loess().
+###  It may be better-behaved.
+###  See the code I saved in running notes file today for an example.
+
+# splined_data <- stats::splinefun (cost, frac_of_all_spp_meeting_their_target,  
+#                                     method="natural")
+
+# curve (splined_data, 0.5, 5, 
+#         lwd=6, 
+#         col="darkblue", 
+#         xlab="Experience",
+#         ylab="Perceived difficulty",
+#          axes=FALSE, 
+#         xlim=c(0.4,5)
+#         )
+
+    #--------------------
+
         #  2015 04 10 - BTL
         #  NOTE:  In the following code, the call to loess() is used to make 
         #         a smoother looking approximation to the curve.  
@@ -152,18 +172,31 @@ plot_incremental_marxan_summed_solution_representations =
         #  http://www.statmethods.net/advgraphs/parameters.html 
         #  for help on plot labelling if I need to modify these plots.
     
-    pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "marxan_ssoln_frac_rep_vs_raw_cost.pdf")))
+    pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "_", "marxan_ssoln_frac_rep_vs_raw_cost.pdf")))
     plot (cost, frac_of_all_spp_meeting_their_target, 
           main="Marxan summed solutions\nFraction of spp meeting targets vs. Raw costs", 
           xlab="Solution cost", 
           ylab="Fraction of spp meeting target")
+
     lines (suppressWarnings (loess (frac_of_all_spp_meeting_their_target ~ cost)))    #  good fit
     #lines (lowess (cost, frac_of_all_spp_meeting_their_target))    #  terrible fit
+
+# splined_data <- stats::splinefun (cost, frac_of_all_spp_meeting_their_target,  
+#                                   method="natural")
+# curve (splined_data, #0.5, 5, 
+#         lwd=6, 
+#         col="darkblue" 
+# #        xlab="Experience",
+# #        ylab="Perceived difficulty",
+# #         axes=FALSE, 
+# #        xlim=c(0.4,5)
+#         )
+
     abline (v=optimum_cost, lty=2)
     abline (h=1.0, lty=2)
     dev.off()
     
-    pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "marxan_ssoln_frac_rep_vs_normalized_cost.pdf")))
+    pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "_", "marxan_ssoln_frac_rep_vs_normalized_cost.pdf")))
     plot (landscape_frac_cost, frac_of_all_spp_meeting_their_target, 
           main="Marxan summed solutions\nFraction of spp meeting targets vs. Normalized costs", 
           xlab="Solution cost as fraction of total landscape cost", 
@@ -182,7 +215,7 @@ plot_incremental_marxan_summed_solution_representations =
         #  inflection point where the plot starts to bend.
         #  I'll leave them in for now, but could probably chuck them.
     
-    pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "marxan_ssoln_frac_rep_vs_frac_optimal_cost.pdf")))
+    pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "_", "marxan_ssoln_frac_rep_vs_frac_optimal_cost.pdf")))
     plot (optimal_frac_cost, frac_of_all_spp_meeting_their_target, 
           main="Marxan summed solutions\nFraction of spp meeting targets vs. Fraction of optimal cost", 
           xlab="Solution cost as fraction of optimal cost", 
@@ -192,7 +225,7 @@ plot_incremental_marxan_summed_solution_representations =
     abline (h=1.0, lty=5)
     dev.off()
     
-    pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "marxan_ssoln_frac_rep_over_frac_optimal_cost.pdf")))
+    pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "_", "marxan_ssoln_frac_rep_over_frac_optimal_cost.pdf")))
     plot (optimal_frac_cost, frac_rep_met_over_optimal_frac_cost, 
           main="Marxan summed solutions\nRatio: sppFrac/optCostFrac vs. optCostFrac", 
           xlab="Solution cost as fraction of optimal cost", 
@@ -240,6 +273,13 @@ marxan_output_mvbest_file_name = "output_mvbest.csv"
 library (plyr)      #  for arrange()
 
 #---------------------------------
+
+    #  2015 05 15 - BTL 
+    #  The marxan mailing list digest has had some entries in the last few 
+    #  days saying that the *nix version of marxan does not always return 
+    #  its best vector in the vector it has labelled as the best.  
+    #  So, I need to change this to go through all of the vectors marxan 
+    #  generates and figure out which one is the best myself.
 
 marxan_best_df_unsorted = 
     read.csv (paste (marxan_output_dir_path, marxan_output_best_file_name, sep=''), 
@@ -299,6 +339,10 @@ if (DEBUG_LEVEL > 0)
     }
 
 #---------------------------------
+
+    #  Load the summed solutions vector.
+    #  For each PU ID, it shows the number of solution vectors that 
+    #  included that PU in the solution.
 
 marxan_ssoln_df = 
     read.csv (paste (marxan_output_dir_path, marxan_output_ssoln_file_name, sep=''),

@@ -190,6 +190,10 @@ source (paste0 (sourceCodeLocationWithSlash, "gscp_11aa_write_abbreviated_result
 source (paste0 (sourceCodeLocationWithSlash, "gscp_11a_network_measures_using_bipartite_package.R"))
 source (paste0 (sourceCodeLocationWithSlash, "gscp_12_write_network_to_marxan_files.R"))
 
+#-------------------------------------------------------------------------------
+
+source (paste0 (sourceCodeLocationWithSlash, "compute_solution_scores.R"))
+
 #===============================================================================
 
 
