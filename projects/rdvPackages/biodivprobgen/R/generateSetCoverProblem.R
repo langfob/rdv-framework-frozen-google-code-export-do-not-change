@@ -207,7 +207,6 @@ nodes = create_nodes_data_structure (tot_num_nodes,
                                       n__num_groups, 
                                       num_independent_nodes_per_group 
                                      )
-
 correct_solution_vector_is_known = TRUE
 dependent_node_IDs = get_dependent_node_IDs (nodes)
 num_PUs = get_num_nodes (nodes)
@@ -395,7 +394,31 @@ if (num_spp > max_allowed_num_spp)
         timepoint (timepoints_df, "gscp_11", 
                    "Starting gscp_11_summarize_and_plot_graph_structure_information.R")
     
-    final_link_counts_for_each_node = count (PU_spp_pair_indices, vars=PU_col_name)
+#    final_link_counts_for_each_node = count (PU_spp_pair_indices, vars=PU_col_name)
+
+############
+
+final_link_counts_for_each_node_without_missing_rows = count (PU_spp_pair_indices, vars=PU_col_name)
+
+all_correct_node_IDs = nodes$node_ID
+
+final_link_counts_for_each_node = 
+    add_missing_PUs_to_marxan_solutions (final_link_counts_for_each_node_without_missing_rows,
+                                         all_correct_node_IDs, 
+                                         "PU_ID", "freq")
+
+if (DEBUG_LEVEL > 0)
+    {
+    cat ("\n\nAfter loading output_best.csv")
+    cat ("\nfinal_link_counts_for_each_node_without_missing_rows =")
+    print (final_link_counts_for_each_node_without_missing_rows)
+    cat ("\nfinal_link_counts_for_each_node =")
+    print (final_link_counts_for_each_node)
+    }
+
+############
+
+        #####  DOES THIS NEED THE SAME FIX AS FOR THE NODES?  #####
     final_node_counts_for_each_link = count (PU_spp_pair_indices, vars=spp_col_name)
     
     plot_degree_and_abundance_dists_for_node_graph (final_link_counts_for_each_node, 
@@ -419,7 +442,7 @@ if (num_spp > max_allowed_num_spp)
     PU_spp_pair_names = PU_spp_pair_names_triple$PU_spp_pair_names
     PU_vertex_names = PU_spp_pair_names_triple$PU_vertex_names
     spp_vertex_names = PU_spp_pair_names_triple$spp_vertex_names
-    
+
     #===============================================================================
     #                       Compute network metrics.
     #===============================================================================

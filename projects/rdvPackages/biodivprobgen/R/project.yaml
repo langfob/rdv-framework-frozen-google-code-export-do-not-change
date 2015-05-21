@@ -321,22 +321,6 @@ base_params:
 #                p__prop_of_links_between_cliques: 0.8
 #                r__density: 0.8
 
-#    - name: scen_rand_61_to_80_PUs_0.5_optFrac_random_r_and_p
-#      parameters:
-#            derive_alpha_from_n__num_groups_and_opt_frac_0.5: TRUE
-#            
-#            use_unif_rand_n__num_groups: TRUE
-#            n__num_groups_lower_bound: 61
-#            n__num_groups_upper_bound: 80
-#    
-#            use_unif_rand_r__density: TRUE
-#            r__density_lower_bound: 0.01
-#            r__density_upper_bound: 5.0
-#
-#            use_unif_rand_p__prop_of_links_between_groups: TRUE
-#            p__prop_of_links_between_groups_lower_bound: 0.01
-#            p__prop_of_links_between_groups_upper_bound: 0.99
-            
 #-------------------------------------------------------------------------------
     
     #  3 hard cases from Xu "simple model" paper.
@@ -394,44 +378,76 @@ scenarios:
             marxan_heurtype: -1 
             marxan_num_reps: 3        #  TO SPEED UP SOME CURRENT TESTING
 
-            use_unif_rand_alpha__: FALSE
-            alpha__: 0.52
-    
+            #--------------------
+        
+            derive_alpha_from_n__num_groups_and_opt_frac_0.5: TRUE
+            
             use_unif_rand_n__num_groups: TRUE
-            n__num_groups_lower_bound: 8
-            n__num_groups_upper_bound: 100
+            n__num_groups_lower_bound: 61
+            n__num_groups_upper_bound: 80
     
-            use_unif_rand_r__density: FALSE
-            r__density: 0.8
+            use_unif_rand_r__density: TRUE
+            r__density_lower_bound: 0.01
+            r__density_upper_bound: 5.0
+
+            use_unif_rand_p__prop_of_links_between_groups: TRUE
+            p__prop_of_links_between_groups_lower_bound: 0.01
+            p__prop_of_links_between_groups_upper_bound: 0.99
+
+#            use_unif_rand_alpha__: FALSE
+#            alpha__: 0.52
+    
+#            use_unif_rand_n__num_groups: TRUE
+#            n__num_groups_lower_bound: 8
+#            n__num_groups_upper_bound: 100
+    
+#            use_unif_rand_r__density: FALSE
+#            r__density: 0.8
 
             #--------------------
         
             add_error_to_spp_occupancy_data: TRUE
-            match_error_counts: FALSE
+            match_error_counts: TRUE
             
             #--------------------
         
                 #  Constant errors
                 
-#            spp_occ_FP_error_type: "CONSTANT"
-#            spp_occ_FP_const_rate: 0.1
+            spp_occ_FP_error_type: "CONSTANT"
+            spp_occ_FP_const_rate: 0.1
             
-#            spp_occ_FN_error_type: "CONSTANT"
-#            spp_occ_FN_const_rate: 0.1        
+            spp_occ_FN_error_type: "CONSTANT"
+            spp_occ_FN_const_rate: 0.1        
         
             #--------------------
         
                 #  Uniform random errors.
                 
-            spp_occ_FP_error_type: "RANDOM_UNIFORM_CONSTANT"
-            spp_occ_FP_rate_lower_bound: 0
-            spp_occ_FP_rate_upper_bound: 0.2
+#            spp_occ_FP_error_type: "RANDOM_UNIFORM_CONSTANT"
+#            spp_occ_FP_rate_lower_bound: 0
+#            spp_occ_FP_rate_upper_bound: 0.1
             
-            spp_occ_FN_error_type: "RANDOM_UNIFORM_CONSTANT"
-            spp_occ_FN_rate_lower_bound: 0       
-            spp_occ_FN_rate_upper_bound: 0.2
+#            spp_occ_FN_error_type: "RANDOM_UNIFORM_CONSTANT"
+#            spp_occ_FN_rate_lower_bound: 0       
+#            spp_occ_FN_rate_upper_bound: 0.1
 
 
+#    - name: scen_rand_61_to_80_PUs_0.5_optFrac_random_r_and_p
+#      parameters:
+#            derive_alpha_from_n__num_groups_and_opt_frac_0.5: TRUE
+#            
+#            use_unif_rand_n__num_groups: TRUE
+#            n__num_groups_lower_bound: 61
+#            n__num_groups_upper_bound: 80
+#    
+#            use_unif_rand_r__density: TRUE
+#            r__density_lower_bound: 0.01
+#            r__density_upper_bound: 5.0
+#
+#            use_unif_rand_p__prop_of_links_between_groups: TRUE
+#            p__prop_of_links_between_groups_lower_bound: 0.01
+#            p__prop_of_links_between_groups_upper_bound: 0.99
+            
 ###    - name: marxan_simulated_annealing
 ###      parameters:
 ###            read_Xu_problem_from_file: TRUE
@@ -480,7 +496,7 @@ repetitions:
     generators:
         - key: seed
           generator_type: linear_step
-          start: 10001    #  10105
+          start: 10102
           step_size: 1
           count: 1
           

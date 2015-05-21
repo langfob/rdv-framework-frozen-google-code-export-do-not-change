@@ -89,7 +89,7 @@ if (read_Xu_problem_from_file)
     cor_signed_difference = marxan_best_df_sorted$SOLUTION - nodes$dependent_set_member
     cor_abs_val_signed_difference = abs (cor_signed_difference)
     }
-
+#browser()
 solutions_df = data.frame (puid = marxan_best_df_sorted$PUID,
                            optimal_solution = cor_solution_vector, 
                            marxan_best_solution = marxan_best_df_sorted$SOLUTION, #  assumes already sorted by PU_ID
