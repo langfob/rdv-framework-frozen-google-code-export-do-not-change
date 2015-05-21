@@ -299,3 +299,56 @@ compute_frac_spp_covered =
 
 #===============================================================================
 
+    #  When error is added to the input data, it sometimes results in 
+    #  planning units who appear to have no species on them.  
+    #  When the pu_spp_pair_indices are written out in marxan's input 
+    #  format, there is no record of the empty planning units in those 
+    #  pairs since each pair is a planning unit ID followed by the ID 
+    #  of a species on that planning unit. 
+    #  Consequently, marxan's output solutions will have fewer planning 
+    #  units than the problem generator generated and you will get size
+    #  warnings (that should be errors) when comparing them to things 
+    #  like nodes$dependent_set_member.
+    #  For example, here is the error that showed this was happening:
+    #
+    #       Error in marxan_best_df_sorted$SOLUTION - nodes$dependent_set_member : 
+    #       (converted from warning) longer object length is not a multiple of shorter object length
+    #
+    #  To fix this, you need to add entries for each of the missing PUs.
+    
+add_missing_PUs_to_marxan_solutions = function (marxan_solution,
+                                                all_correct_node_IDs, 
+                                                PU_col_name,
+                                                presences_col_name)
+    {
+        #  Marxan solutions are data frames with one row for each planning unit.
+        #  They have 2 columns, one for the planning unit IDs and the other 
+        #  for the count or indicator of presence/absence.
+        #  The second column usually contains 0 or 1 to indicate presence 
+        #  or absence of that PU in the marxan solution.
+        #  However, in the case of marxan's summed solution, the second  
+        #  column contains the number of iterations (restarts) where that  
+        #  planning unit appeared in marxan's solution.
+        #
+        #  Search for the missing planning unit IDs, then add one line 
+        #  to the table for each missing planning unit ID.
+        #  Set the presences field for each of those lines to be 0.
+    
+    missing_PU_IDs = setdiff (all_correct_node_IDs, marxan_solution [ , PU_col_name])
+    num_missing_PU_IDs = length (missing_PU_IDs)
+    
+    if (num_missing_PU_IDs > 0)
+        {
+        missing_rows = matrix (c(missing_PU_IDs, rep(0,num_missing_PU_IDs)), 
+                               nrow=num_missing_PU_IDs,
+                               ncol=2,
+                               dimnames=list(NULL,c(PU_col_name,presences_col_name)))
+        
+        marxan_solution = rbind (marxan_solution, missing_rows)
+        }
+                                           
+    return (marxan_solution)                  
+    }
+
+#===============================================================================
+

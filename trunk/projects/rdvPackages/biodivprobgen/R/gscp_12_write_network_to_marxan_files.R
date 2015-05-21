@@ -62,7 +62,7 @@ write_network_to_marxan_files =
     #  that no one can write the table out incorrectly if they use that 
     #  call.
     #----------------------------------------------------------------------
-    
+
     spp_PU_amount_table = arrange (spp_PU_amount_table, pu, species)
     
     #-------------------------------------------------------------------------------

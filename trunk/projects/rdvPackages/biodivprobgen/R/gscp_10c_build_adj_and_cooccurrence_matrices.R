@@ -164,7 +164,6 @@ create_adj_matrix_with_spp_rows_vs_PU_cols =
                   )
     
     cat ("\n\nAbout to fill in bpm matrix.")
-    
     num_PU_spp_pairs = dim (PU_spp_pair_indices)[1]
     for (edge_idx in 1:num_PU_spp_pairs)
         {

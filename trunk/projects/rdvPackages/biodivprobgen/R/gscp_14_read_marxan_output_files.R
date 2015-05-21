@@ -281,12 +281,21 @@ library (plyr)      #  for arrange()
     #  So, I need to change this to go through all of the vectors marxan 
     #  generates and figure out which one is the best myself.
 
-marxan_best_df_unsorted = 
+marxan_best_df_unsorted_without_missing_rows = 
     read.csv (paste (marxan_output_dir_path, marxan_output_best_file_name, sep=''), 
               header=TRUE)
+
+marxan_best_df_unsorted = 
+    add_missing_PUs_to_marxan_solutions (marxan_best_df_unsorted_without_missing_rows,
+                                         all_correct_node_IDs, 
+                                         "PUID", "SOLUTION")
+
 if (DEBUG_LEVEL > 0)
     {
-    cat ("\n\nAfter loading output_best.csv, marxan_best_df_unsorted =")
+    cat ("\n\nAfter loading output_best.csv")
+    cat ("\nmarxan_best_df_unsorted_without_missing_rows =")
+    print (marxan_best_df_unsorted_without_missing_rows)
+    cat ("\nmarxan_best_df_unsorted =")
     print (marxan_best_df_unsorted)
     }
 
@@ -300,7 +309,7 @@ if (DEBUG_LEVEL > 0)
     }
 
 app_optimum_cost = sum (marxan_best_df_sorted$SOLUTION)
-    
+
 #---------------------------------
 
 marxan_mvbest_df = 
@@ -344,16 +353,25 @@ if (DEBUG_LEVEL > 0)
     #  For each PU ID, it shows the number of solution vectors that 
     #  included that PU in the solution.
 
-marxan_ssoln_df = 
+marxan_ssoln_df_unsorted_without_missing_rows = 
     read.csv (paste (marxan_output_dir_path, marxan_output_ssoln_file_name, sep=''),
               header=TRUE)
+
+marxan_ssoln_df_unsorted = 
+    add_missing_PUs_to_marxan_solutions (marxan_ssoln_df_unsorted_without_missing_rows,
+                                         all_correct_node_IDs, 
+                                         "planning_unit", "number")
+    
 if (DEBUG_LEVEL > 0)
     {
-    cat ("\n\nAfter loading output_ssoln.csv, marxan_ssoln_df =")
-    print (marxan_ssoln_df)    
+    cat ("\n\nAfter loading output_best.csv")
+    cat ("\nmarxan_ssoln_df_without_missing_rows =")
+    print (marxan_ssoln_df_without_missing_rows)
+    cat ("\nmarxan_ssoln_df_unsorted =")
+    print (marxan_ssoln_df_unsorted)
     }
 
-marxan_ssoln_df = arrange (marxan_ssoln_df, planning_unit)
+marxan_ssoln_df = arrange (marxan_ssoln_df_unsorted, planning_unit)
 
 if (DEBUG_LEVEL > 0)
     {
