@@ -390,6 +390,11 @@ if (num_spp > max_allowed_num_spp)
             #  Set the values for the apparent problem structure.        
         app_PU_spp_pair_indices      = ret_vals_from_add_errors$app_PU_spp_pair_indices
         bpm                      = ret_vals_from_add_errors$app_spp_occupancy_data        
+        } else
+        {
+            #  Since no error is being added, correct and apparent are the same.        
+        app_PU_spp_pair_indices      = app_PU_spp_pair_indices
+        bpm                      = cor_bpm        
         }
 
     #===============================================================================
@@ -404,22 +409,42 @@ if (num_spp > max_allowed_num_spp)
 
 ############
 
-final_link_counts_for_each_node_without_missing_rows = count (app_PU_spp_pair_indices, vars=PU_col_name)
+cor_final_link_counts_for_each_node_without_missing_rows = count (cor_PU_spp_pair_indices, vars=PU_col_name)
 
 all_correct_node_IDs = nodes$node_ID
 
-final_link_counts_for_each_node = 
-    add_missing_PUs_to_marxan_solutions (final_link_counts_for_each_node_without_missing_rows,
+cor_final_link_counts_for_each_node = 
+    add_missing_PUs_to_marxan_solutions (cor_final_link_counts_for_each_node_without_missing_rows,
                                          all_correct_node_IDs, 
                                          "PU_ID", "freq")
 
 if (DEBUG_LEVEL > 0)
     {
     cat ("\n\nAfter loading output_best.csv")
-    cat ("\nfinal_link_counts_for_each_node_without_missing_rows =")
-    print (final_link_counts_for_each_node_without_missing_rows)
-    cat ("\nfinal_link_counts_for_each_node =")
-    print (final_link_counts_for_each_node)
+    cat ("\ncor_final_link_counts_for_each_node_without_missing_rows =")
+    print (cor_final_link_counts_for_each_node_without_missing_rows)
+    cat ("\ncor_final_link_counts_for_each_node =")
+    print (cor_final_link_counts_for_each_node)
+    }
+
+############
+
+app_final_link_counts_for_each_node_without_missing_rows = count (app_PU_spp_pair_indices, vars=PU_col_name)
+
+all_correct_node_IDs = nodes$node_ID
+
+app_final_link_counts_for_each_node = 
+    add_missing_PUs_to_marxan_solutions (app_final_link_counts_for_each_node_without_missing_rows,
+                                         all_correct_node_IDs, 
+                                         "PU_ID", "freq")
+
+if (DEBUG_LEVEL > 0)
+    {
+    cat ("\n\nAfter loading output_best.csv")
+    cat ("\napp_final_link_counts_for_each_node_without_missing_rows =")
+    print (app_final_link_counts_for_each_node_without_missing_rows)
+    cat ("\napp_final_link_counts_for_each_node =")
+    print (app_final_link_counts_for_each_node)
     }
 
 ############
@@ -429,7 +454,7 @@ if (DEBUG_LEVEL > 0)
 
     final_node_counts_for_each_link = count (app_PU_spp_pair_indices, vars=spp_col_name)
     
-    plot_degree_and_abundance_dists_for_node_graph (final_link_counts_for_each_node, 
+    plot_degree_and_abundance_dists_for_node_graph (app_final_link_counts_for_each_node, 
                                                     final_node_counts_for_each_link,  
                                                     PU_col_name, 
                                                     plot_output_dir, 

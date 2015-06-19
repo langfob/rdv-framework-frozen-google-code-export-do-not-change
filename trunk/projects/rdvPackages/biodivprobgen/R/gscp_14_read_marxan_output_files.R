@@ -575,7 +575,7 @@ get_marxan_solution_choice_string = function (marxan_best_cost,
                                               sorted_best_cost, 
                                               sorted_best_rep)
     {
-    solution_choice_string = "OK_marxan_solution_IS_app_best"
+    solution_choice_string = "OK_marxan_solution_IS_apparent_best"
     if (marxan_best_cost > sorted_best_cost)
         {
             #  marxan's chosen best is NOT the best cost
@@ -586,12 +586,12 @@ get_marxan_solution_choice_string = function (marxan_best_cost,
             } else
             {
                 #  marxan's chosen best is not best score but is best representation
-            solution_choice_string = "BAD_HALF_marxan_solution_NOT_app_best_cost_and_IS_app_best_rep"
+            solution_choice_string = "BAD_HALF_marxan_solution_NOT_apparent_best_cost_and_IS_apparent_best_rep"
             }
         } else if (marxan_best_rep < sorted_best_rep)
         {
             #  marxan's chosen best is best score but is NOT best representation
-        solution_choice_string = "BAD_HALF_marxan_solution_IS_app_best_cost_and_NOT_app_best_rep"
+        solution_choice_string = "BAD_HALF_marxan_solution_IS_apparent_best_cost_and_NOT_apparent_best_rep"
         }
     
     return (solution_choice_string)
@@ -599,9 +599,9 @@ get_marxan_solution_choice_string = function (marxan_best_cost,
 
 if (FALSE)     #  a quick test
     {
-    get_marxan_solution_choice_string (10, 1, 10, 1)    #  OK_marxan_solution_IS_app_best
-    get_marxan_solution_choice_string (20, 1, 10, 1)    #  BAD_HALF_marxan_solution_NOT_app_best_cost_and_IS_app_best_rep
-    get_marxan_solution_choice_string (10, 0.8, 10, 1)  #  BAD_HALF_marxan_solution_IS_app_best_cost_and_NOT_app_best_rep
+    get_marxan_solution_choice_string (10, 1, 10, 1)    #  OK_marxan_solution_IS_apparent_best
+    get_marxan_solution_choice_string (20, 1, 10, 1)    #  BAD_HALF_marxan_solution_NOT_apparent_best_cost_and_IS_apparent_best_rep
+    get_marxan_solution_choice_string (10, 0.8, 10, 1)  #  BAD_HALF_marxan_solution_IS_apparent_best_cost_and_NOT_apparent_best_rep
     get_marxan_solution_choice_string (11, 0.5, 10, 1)  #  BAD_marxan_solution_NEITHER_best
     }
 
