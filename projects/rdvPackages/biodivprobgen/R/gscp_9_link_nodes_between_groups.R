@@ -26,7 +26,8 @@ link_nodes_between_groups =
         {
         for (cur_round in 1:num_rounds_of_linking_between_groups)
             {
-            cat ("\nRound", cur_round)
+            if (DEBUG_LEVEL > 0)
+                cat ("\nRound", cur_round)
             
                 #  Draw a random pair of groups to link in this round.
             cur_group_pair = safe_sample (1:n__num_groups, 2, replace=FALSE)
