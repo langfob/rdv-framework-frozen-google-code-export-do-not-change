@@ -503,6 +503,12 @@ for (cur_row in 1:num_marxan_solutions)
 cat ("\n\ndistances_between_marxan_solutions [1:5,1:5] = \n")
 print (distances_between_marxan_solutions [1:5,1:5])
 
+if (DEBUG_LEVEL > 0)
+    {
+    cat ("\n\ndistances_between_marxan_solutions = \n")
+    print (distances_between_marxan_solutions)
+    }
+
 cat ("\n\nIDs_of_vectors_matching_marxan_best_solution_choice = ", 
      IDs_of_vectors_matching_marxan_best_solution_choice)
 cat ("\nnumber of vectors matching marxan best solution choice = ", 
@@ -561,6 +567,8 @@ points (app_marxan_solution_scores [best_solution_ID_according_to_marxan, "cost"
 dev.off()
 #browser()    
 
+#--------------------
+
 get_marxan_solution_choice_string = function (marxan_best_cost, 
                                               marxan_best_rep, 
                                               sorted_best_cost, 
@@ -577,12 +585,12 @@ get_marxan_solution_choice_string = function (marxan_best_cost,
             } else
             {
                 #  marxan's chosen best is not best score but is best representation
-            solution_choice_string = "HALFBAD_marxan_solution_NOT_app_best_cost_and_IS_app_best_rep"
+            solution_choice_string = "BAD_HALF_marxan_solution_NOT_app_best_cost_and_IS_app_best_rep"
             }
         } else if (marxan_best_rep < sorted_best_rep)
         {
             #  marxan's chosen best is best score but is NOT best representation
-        solution_choice_string = "HALFBAD_marxan_solution_IS_app_best_cost_and_NOT_app_best_rep"
+        solution_choice_string = "BAD_HALF_marxan_solution_IS_app_best_cost_and_NOT_app_best_rep"
         }
     
     return (solution_choice_string)
@@ -591,8 +599,8 @@ get_marxan_solution_choice_string = function (marxan_best_cost,
 if (FALSE)     #  a quick test
     {
     get_marxan_solution_choice_string (10, 1, 10, 1)    #  OK_marxan_solution_IS_app_best
-    get_marxan_solution_choice_string (20, 1, 10, 1)    #  HALFBAD_marxan_solution_NOT_app_best_cost_and_IS_app_best_rep
-    get_marxan_solution_choice_string (10, 0.8, 10, 1)  #  HALFBAD_marxan_solution_IS_app_best_cost_and_NOT_app_best_rep
+    get_marxan_solution_choice_string (20, 1, 10, 1)    #  BAD_HALF_marxan_solution_NOT_app_best_cost_and_IS_app_best_rep
+    get_marxan_solution_choice_string (10, 0.8, 10, 1)  #  BAD_HALF_marxan_solution_IS_app_best_cost_and_NOT_app_best_rep
     get_marxan_solution_choice_string (11, 0.5, 10, 1)  #  BAD_marxan_solution_NEITHER_best
     }
 
@@ -606,13 +614,17 @@ marxan_solution_choice_check_string =
                                        sorted_best_cost, sorted_best_rep)
 cat ("\n\n=====>  ", marxan_solution_choice_check_string, "     <=====\n", sep='')
 
-if (DEBUG_LEVEL > 0)
-    {
-    cat ("\n\ndistances_between_marxan_solutions = \n")
-    print (distances_between_marxan_solutions)
-    }
+    #  Write an empty file whose name indicates whether marxan really did 
+    #  return its best guess.  
+    #  This will make it easy to quickly search a bunch of runs to see 
+    #  whether any of them had a bad marxan choice for best run by 
+    #  just looking for the existance of any files whose names begin 
+    #  with "BAD_".
+flag_file_name = paste0 (parameters$fullOutputDirWithSlash, 
+                         marxan_solution_choice_check_string)
+system (paste ("touch", flag_file_name), wait=FALSE)
 
-#browser()
+#--------------------
 
 #===============================================================================
 #                       end - Find best marxan solutions.
