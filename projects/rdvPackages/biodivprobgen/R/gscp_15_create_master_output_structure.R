@@ -96,7 +96,20 @@ solutions_df = data.frame (puid = marxan_best_df_sorted$PUID,
                            marxan_votes = marxan_ssoln_df$number, 
                            cor_signed_diff = cor_signed_difference, 
                            cor_abs_val_diff = cor_abs_val_signed_difference, 
-                           cor_num_spp_on_patch = final_link_counts_for_each_node$freq
+        #  2015 06 19 - BTL
+        #  Until now (3:04 pm), this said:
+        #       cor_num_spp_on_patch = final_link_counts_for_each_node$freq
+        #  That means that it was using the apparent, not the correct, 
+        #  final link counts for each node.  
+        #  I have now changed this to say cor_... instead.  
+        #  Not sure if this was a source of unknown bugs before or will be 
+        #  a source now.  Need to look more closely at this to see the 
+        #  consequences where solutions_df$cor_num_spp_on_patch is used 
+        #  downstream of here.  However, since this is the only place it 
+        #  appears in this file and this file (gscp_15) is at the end of 
+        #  the whole program, maybe it doesn't matter at all except being 
+        #  echoed in some output file.
+                           cor_num_spp_on_patch = cor_final_link_counts_for_each_node$freq
                            )
 
 cor_num_patches_in_solution = sum (solutions_df$optimal_solution)
