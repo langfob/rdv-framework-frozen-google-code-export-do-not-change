@@ -22,24 +22,24 @@ vertices = data.frame (name=c(spp_vertex_names, PU_vertex_names),
 
 cat ("\n\nJust before graph.data.frame()\n")
 
-cat ("\nnames (PU_spp_pair_indices = \n")
-print (names (PU_spp_pair_indices))
+cat ("\nnames (app_PU_spp_pair_indices = \n")
+print (names (app_PU_spp_pair_indices))
 
 cat ("\nnames (PU_spp_pair_names = \n")
 print (names (PU_spp_pair_names))
 
-#names (PU_spp_pair_indices) = c("from", "to")
+#names (app_PU_spp_pair_indices) = c("from", "to")
 #cat ("\n\nAfter changing names\n")
-#cat ("\nnames (PU_spp_pair_indices = \n")
-#print (names (PU_spp_pair_indices))
+#cat ("\nnames (app_PU_spp_pair_indices = \n")
+#print (names (app_PU_spp_pair_indices))
 
-#bg = graph.data.frame (PU_spp_pair_indices, directed=FALSE, vertices=vertices)
+#bg = graph.data.frame (app_PU_spp_pair_indices, directed=FALSE, vertices=vertices)
 bg = graph.data.frame (PU_spp_pair_names, directed=FALSE, vertices=vertices)
 
-#names (PU_spp_pair_indices) = c(PU_col_name, spp_col_name)
+#names (app_PU_spp_pair_indices) = c(PU_col_name, spp_col_name)
 #cat ("\n\nAfter reinstating old names\n")
-#cat ("\nnames (PU_spp_pair_indices = \n")
-#print (names (PU_spp_pair_indices))
+#cat ("\nnames (app_PU_spp_pair_indices = \n")
+#print (names (app_PU_spp_pair_indices))
 #}
 
 #===============================================================================

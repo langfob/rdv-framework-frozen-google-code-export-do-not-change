@@ -315,7 +315,7 @@ if (num_spp > max_allowed_num_spp)
                                           max_possible_tot_num_links
                                           ) 
     
-    } else
+    } else  #  A legal number of species
     {
     #===============================================================================
     #   Convert PU/spp data structure into other formats needed downstream.
@@ -381,8 +381,14 @@ if (num_spp > max_allowed_num_spp)
         FP_const_rate = ret_vals_from_add_errors$FP_const_rate
         FN_const_rate = ret_vals_from_add_errors$FN_const_rate
 
+# 2015 06 19 - 1 PM
+# NEED TO ADD app_ TO THESE 2 VARIABLES AND ALL OF THEIR DOWNSTREAM CONSEQUENCES, 
+# INCLUDING OTHER VARIABLES DERIVED FROM THEM.
+# Also need to clone the distribution output stuff below so that it's done for 
+# both correct and apparent.  Right now, it's only done for apparent.
+
             #  Set the values for the apparent problem structure.        
-        PU_spp_pair_indices      = ret_vals_from_add_errors$app_PU_spp_pair_indices
+        app_PU_spp_pair_indices      = ret_vals_from_add_errors$app_PU_spp_pair_indices
         bpm                      = ret_vals_from_add_errors$app_spp_occupancy_data        
         }
 
@@ -398,7 +404,7 @@ if (num_spp > max_allowed_num_spp)
 
 ############
 
-final_link_counts_for_each_node_without_missing_rows = count (PU_spp_pair_indices, vars=PU_col_name)
+final_link_counts_for_each_node_without_missing_rows = count (app_PU_spp_pair_indices, vars=PU_col_name)
 
 all_correct_node_IDs = nodes$node_ID
 
@@ -419,7 +425,9 @@ if (DEBUG_LEVEL > 0)
 ############
 
         #####  DOES THIS NEED THE SAME FIX AS FOR THE NODES?  #####
-    final_node_counts_for_each_link = count (PU_spp_pair_indices, vars=spp_col_name)
+#It's only used here and in gscp_11, so maybe not?
+
+    final_node_counts_for_each_link = count (app_PU_spp_pair_indices, vars=spp_col_name)
     
     plot_degree_and_abundance_dists_for_node_graph (final_link_counts_for_each_node, 
                                                     final_node_counts_for_each_link,  
@@ -434,7 +442,7 @@ if (DEBUG_LEVEL > 0)
     
     PU_spp_pair_names_triple = create_PU_spp_pair_names (num_PUs, 
                                                           num_spp, 
-                                                          PU_spp_pair_indices, 
+                                                          app_PU_spp_pair_indices, 
                                                           PU_col_name, 
                                                           spp_col_name
                                                           ) 
@@ -471,7 +479,7 @@ if (DEBUG_LEVEL > 0)
         timepoint (timepoints_df, "gscp_12", 
                    "Starting gscp_12_write_network_to_marxan_files.R")
     
-    spf_const = write_network_to_marxan_files (PU_spp_pair_indices,
+    spf_const = write_network_to_marxan_files (app_PU_spp_pair_indices,
                                                   PU_col_name, 
                                                   spp_col_name, 
                                                   parameters, 
