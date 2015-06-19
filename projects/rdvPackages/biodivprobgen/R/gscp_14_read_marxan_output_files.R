@@ -500,8 +500,9 @@ for (cur_row in 1:num_marxan_solutions)
         }
     }
 
-cat ("\n\ndistances_between_marxan_solutions [1:5,1:5] = \n")
-print (distances_between_marxan_solutions [1:5,1:5])
+short_range = min (num_marxan_solutions, 5)
+cat ("\n\ndistances_between_marxan_solutions [1:short_range,1:short_range] = \n")
+print (distances_between_marxan_solutions [1:short_range,1:short_range])
 
 if (DEBUG_LEVEL > 0)
     {
