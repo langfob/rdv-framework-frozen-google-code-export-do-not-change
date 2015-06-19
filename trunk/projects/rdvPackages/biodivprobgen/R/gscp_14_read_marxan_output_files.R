@@ -66,9 +66,9 @@ plot_incremental_marxan_summed_solution_representations =
                                         rep (1, num_spp))
         cur_num_spp_meeting_their_target = sum (cur_rep_fractions >= 1.0)  #  How best to give a tolerance here?
         cur_frac_of_all_spp_meeting_their_target = 
-        cur_num_spp_meeting_their_target / num_spp
+            cur_num_spp_meeting_their_target / num_spp
         frac_of_all_spp_meeting_their_target [cur_run_index] = 
-        cur_frac_of_all_spp_meeting_their_target
+            cur_frac_of_all_spp_meeting_their_target
         
         #--------------------
         
@@ -84,8 +84,9 @@ plot_incremental_marxan_summed_solution_representations =
         #--------------------
         
         cur_frac_rep_met_over_optimal_frac_cost = 
-        cur_frac_of_all_spp_meeting_their_target / cur_optimal_frac_cost
-        frac_rep_met_over_optimal_frac_cost [cur_run_index] = cur_frac_rep_met_over_optimal_frac_cost
+            cur_frac_of_all_spp_meeting_their_target / cur_optimal_frac_cost
+        frac_rep_met_over_optimal_frac_cost [cur_run_index] = 
+            cur_frac_rep_met_over_optimal_frac_cost
         
         #--------------------
         
@@ -264,7 +265,7 @@ marxan_output_dir_path = paste0 (marxan_output_dir, .Platform$file.sep)
 marxan_output_best_file_name = "output_best.csv"
 marxan_output_ssoln_file_name = "output_ssoln.csv"
 marxan_output_mvbest_file_name = "output_mvbest.csv"
-
+output_solutionsmatrix_file_name = "output_solutionsmatrix.csv"
 
     #  Make sure both are sorted in increasing order of planning unit ID.
     #  "arrange()" syntax taken from Wickham comment in:
@@ -300,11 +301,14 @@ if (DEBUG_LEVEL > 0)
     }
 
 marxan_best_df_sorted = arrange (marxan_best_df_unsorted, PUID)
+marxan_best_df_sorted_as_vector = as.vector (t(marxan_best_df_sorted [,"SOLUTION"]))
 
 if (DEBUG_LEVEL > 0)
     {
     cat ("\n\nAfter sorting, marxan_best_df_sorted = \n")
     print (marxan_best_df_sorted)
+    cat ("\n\nAfter sorting, marxan_best_df_sorted_as_vector = \n")
+    print (marxan_best_df_sorted_as_vector)
     cat ("\n\n-------------------")
     }
 
@@ -347,6 +351,275 @@ if (DEBUG_LEVEL > 0)
     cat ("\n\n-------------------")
     }
 
+#---------------------------------
+#---------------------------------
+#---------------------------------
+
+#===============================================================================
+#                          Find best marxan solutions.
+#
+#  Added 2015 06 18 - BTL.
+#===============================================================================
+
+library (plyr)    #  For arrange()
+library (stringr)
+
+convert_name_str_to_ID_num = function (str, lead_str="P")
+    {
+    return (as.numeric (str_replace (str, lead_str, "")))
+    }
+
+dist_between_marxan_solutions = function (solution_1, solution_2)
+    {
+    return (sum (abs (solution_1 - solution_2)))
+    }
+
+#---------------------------------
+
+    #  Load output_solutionsmatrix.csv
+
+marxan_output_solutionsmatrix_df_unsorted_without_missing_rows = 
+    read.csv (paste (marxan_output_dir_path, output_solutionsmatrix_file_name, sep=''), as.is=TRUE, 
+              header=TRUE)
+
+    #  Get the planning unit names as they appear as solution column headings.
+PU_names = names (marxan_output_solutionsmatrix_df_unsorted_without_missing_rows)
+PU_names = PU_names [-1]  #  Get rid of first column's label, i.e., "solutionsmatrix"
+
+num_marxan_solutions = dim (marxan_output_solutionsmatrix_df_unsorted_without_missing_rows)[1]
+
+largest_PU_ID = num_PUs
+marxan_solutions_matrix = matrix (0, nrow = num_marxan_solutions,
+                                  ncol = largest_PU_ID,
+                                  byrow=TRUE)
+
+for (cur_PU_name in PU_names)
+    {
+    cur_PU_ID = convert_name_str_to_ID_num (cur_PU_name, "P")
+    cat ("\ncur_PU_ID = ", cur_PU_ID)
+
+    marxan_solutions_matrix [,cur_PU_ID] = 
+        marxan_output_solutionsmatrix_df_unsorted_without_missing_rows [,cur_PU_name] 
+    }
+
+    #  Ready now to go through the matrix and compute the representation and 
+    #  cost values for each solution row.
+
+cor_marxan_solution_scores = data.frame (solution_num=1:num_marxan_solutions,
+                                        representation=0,
+                                        cost=0)
+app_marxan_solution_scores = cor_marxan_solution_scores
+
+targets = rep (1, num_spp)
+PU_costs = rep (1, num_PUs)
+total_landscape_cost = sum (PU_costs)
+
+compute_marxan_solution_scores <- function (spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU, 
+                                            marxan_solution_PU_IDs,
+                                            DEBUG_LEVEL, 
+                                            targets, 
+                                            num_spp, 
+                                            marxan_solutions_matrix, 
+                                            cur_solution_num, 
+                                            marxan_solution_scores, 
+                                            PU_costs, 
+                                            total_landscape_cost
+                                            )
+    {
+    cur_rep_fractions = 
+        compute_rep_fraction (spp_rows_by_PU_cols_matrix_of_spp_cts_per_PU, 
+                              marxan_solution_PU_IDs,
+                              DEBUG_LEVEL, 
+                              targets)
+    cur_frac_of_all_spp_meeting_their_target = sum (cur_rep_fractions >= 1.0) / num_spp    #  How best to give a tolerance here?
+    marxan_solution_scores [cur_solution_num, "representation"] = cur_frac_of_all_spp_meeting_their_target
+    
+    cur_solution_PUs = which (marxan_solutions_matrix [cur_solution_num,] > 0)
+    cur_cost = compute_solution_cost (cur_solution_PUs, PU_costs)
+    marxan_solution_scores [cur_solution_num, "cost"] = cur_cost / total_landscape_cost
+    
+    return (marxan_solution_scores)
+    }
+
+
+for (cur_solution_num in 1:num_marxan_solutions)
+    {
+    cor_marxan_solution_scores [cur_solution_num, "solution_num"] = cur_solution_num
+    app_marxan_solution_scores [cur_solution_num, "solution_num"] = cur_solution_num
+        
+    cur_marxan_solution_PU_IDs = which (marxan_solutions_matrix [cur_solution_num,] > 0)
+    if (DEBUG_LEVEL > 0)
+        cat ("\n\ncur_marxan_solution_PU_IDs = ", cur_marxan_solution_PU_IDs)
+
+    cor_marxan_solution_scores = compute_marxan_solution_scores (cor_bpm, 
+                                                                 cur_marxan_solution_PU_IDs,
+                                                                 DEBUG_LEVEL, 
+                                                                 targets, 
+                                                                 num_spp, 
+                                                                 marxan_solutions_matrix, 
+                                                                 cur_solution_num, 
+                                                                 cor_marxan_solution_scores, 
+                                                                 PU_costs,
+                                                                 total_landscape_cost)
+    
+    app_marxan_solution_scores = compute_marxan_solution_scores (bpm, 
+                                                                 cur_marxan_solution_PU_IDs,
+                                                                 DEBUG_LEVEL, 
+                                                                 targets, 
+                                                                 num_spp, 
+                                                                 marxan_solutions_matrix, 
+                                                                 cur_solution_num, 
+                                                                 app_marxan_solution_scores, 
+                                                                 PU_costs,
+                                                                 total_landscape_cost)
+    }
+
+cor_sorted_marxan_solution_scores = arrange (cor_marxan_solution_scores, -representation, -cost)
+app_sorted_marxan_solution_scores = arrange (app_marxan_solution_scores, -representation, -cost)
+
+distances_between_marxan_solutions = matrix (0, nrow=num_marxan_solutions, 
+                                             ncol=num_marxan_solutions, byrow=TRUE)
+
+IDs_of_vectors_matching_marxan_best_solution_choice = c()
+for (cur_row in 1:num_marxan_solutions)
+    {
+    cur_dist_from_marxan_best_df_sorted_as_vector = 
+#        distances_between_marxan_solutions [cur_row, cur_col] = 
+            dist_between_marxan_solutions (marxan_solutions_matrix [cur_row, ],
+                                           marxan_best_df_sorted_as_vector)
+    
+    if (cur_dist_from_marxan_best_df_sorted_as_vector == 0)
+        IDs_of_vectors_matching_marxan_best_solution_choice = 
+            c (IDs_of_vectors_matching_marxan_best_solution_choice, cur_row)
+    
+    for (cur_col in 1:num_marxan_solutions)
+        {
+        distances_between_marxan_solutions [cur_row, cur_col] = 
+            dist_between_marxan_solutions (marxan_solutions_matrix [cur_row, ],
+                                           marxan_solutions_matrix [cur_col, ])
+        }
+    }
+
+cat ("\n\ndistances_between_marxan_solutions [1:5,1:5] = \n")
+print (distances_between_marxan_solutions [1:5,1:5])
+
+cat ("\n\nIDs_of_vectors_matching_marxan_best_solution_choice = ", 
+     IDs_of_vectors_matching_marxan_best_solution_choice)
+cat ("\nnumber of vectors matching marxan best solution choice = ", 
+     length (IDs_of_vectors_matching_marxan_best_solution_choice))
+
+    #  Marxan returns a best solution, but I have not been able to find 
+    #  anyplace where it tells you what solution number it was.  
+    #  Since you can have multiple identical solutions, there may be 
+    #  multiple solution IDs that could be identified as the best solution.  
+    #  I need any one of them to use to get the corresponding solution vector. 
+    #  I will arbitrarily choose the first one in the list of vectors that 
+    #  selected the same PUs as the vector that marxan returned.  
+best_solution_ID_according_to_marxan = 
+    IDs_of_vectors_matching_marxan_best_solution_choice [1]
+
+cor_app_prefix_string = "cor"
+pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "_", "marxan_all_solutions_frac_rep_vs_raw_cost.pdf")))
+plot (cor_marxan_solution_scores [, "cost"], 
+      cor_marxan_solution_scores [, "representation"], 
+      main="Marxan solutions\nCORRECT - Fraction of spp meeting targets vs. costs", 
+      xlab="Solution cost", 
+      ylab="Fraction of spp meeting target", 
+      col= "blue", pch = 19, cex = 1, lty = "solid", lwd = 2
+      )
+
+text(cor_marxan_solution_scores [, "cost"], 
+     cor_marxan_solution_scores [, "representation"], 
+     labels = cor_marxan_solution_scores [, "solution_num"], 
+     cex= 0.7, pos=4)
+
+    #  Color marxan's chosen solution red.
+points (cor_marxan_solution_scores [best_solution_ID_according_to_marxan, "cost"], 
+        cor_marxan_solution_scores [best_solution_ID_according_to_marxan, "representation"], 
+        col= "red", pch = 19, cex = 1, lty = "solid", lwd = 2) 
+dev.off()
+
+cor_app_prefix_string = "app"
+pdf (file.path (plot_output_dir, paste0 (cor_app_prefix_string, "_", "marxan_all_solutions_frac_rep_vs_raw_cost.pdf")))
+plot (app_marxan_solution_scores [, "cost"], 
+      app_marxan_solution_scores [, "representation"], 
+      main="Marxan solutions\nAPPARENT - Fraction of spp meeting targets vs. costs", 
+      xlab="Solution cost", 
+      ylab="Fraction of spp meeting target", 
+      col= "blue", pch = 19, cex = 1, lty = "solid", lwd = 2
+      )
+
+text(app_marxan_solution_scores [, "cost"], 
+     app_marxan_solution_scores [, "representation"], 
+     labels = cor_marxan_solution_scores [, "solution_num"], 
+     cex= 0.7, pos=4)
+
+    #  Color marxan's chosen solution red.
+points (app_marxan_solution_scores [best_solution_ID_according_to_marxan, "cost"], 
+        app_marxan_solution_scores [best_solution_ID_according_to_marxan, "representation"], 
+        col= "red", pch = 19, cex = 1, lty = "solid", lwd = 2) 
+dev.off()
+#browser()    
+
+get_marxan_solution_choice_string = function (marxan_best_cost, 
+                                              marxan_best_rep, 
+                                              sorted_best_cost, 
+                                              sorted_best_rep)
+    {
+    solution_choice_string = "OK_marxan_solution_IS_app_best"
+    if (marxan_best_cost > sorted_best_cost)
+        {
+            #  marxan's chosen best is NOT the best cost
+        if (marxan_best_rep < sorted_best_rep)
+            {
+                #  marxan's chosen best is also NOT the best representation
+            solution_choice_string = "BAD_marxan_solution_NEITHER_best"
+            } else
+            {
+                #  marxan's chosen best is not best score but is best representation
+            solution_choice_string = "HALFBAD_marxan_solution_NOT_app_best_cost_and_IS_app_best_rep"
+            }
+        } else if (marxan_best_rep < sorted_best_rep)
+        {
+            #  marxan's chosen best is best score but is NOT best representation
+        solution_choice_string = "HALFBAD_marxan_solution_IS_app_best_cost_and_NOT_app_best_rep"
+        }
+    
+    return (solution_choice_string)
+    }
+
+if (FALSE)     #  a quick test
+    {
+    get_marxan_solution_choice_string (10, 1, 10, 1)    #  OK_marxan_solution_IS_app_best
+    get_marxan_solution_choice_string (20, 1, 10, 1)    #  HALFBAD_marxan_solution_NOT_app_best_cost_and_IS_app_best_rep
+    get_marxan_solution_choice_string (10, 0.8, 10, 1)  #  HALFBAD_marxan_solution_IS_app_best_cost_and_NOT_app_best_rep
+    get_marxan_solution_choice_string (11, 0.5, 10, 1)  #  BAD_marxan_solution_NEITHER_best
+    }
+
+marxan_best_cost = app_marxan_solution_scores [best_solution_ID_according_to_marxan, "cost"]
+marxan_best_rep  = app_marxan_solution_scores [best_solution_ID_according_to_marxan, "representation"]
+sorted_best_cost = app_marxan_solution_scores [1, "cost"]
+sorted_best_rep  = app_marxan_solution_scores [1, "representation"]
+
+marxan_solution_choice_check_string = 
+    get_marxan_solution_choice_string (marxan_best_cost, marxan_best_rep, 
+                                       sorted_best_cost, sorted_best_rep)
+cat ("\n\n=====>  ", marxan_solution_choice_check_string, "     <=====\n", sep='')
+
+if (DEBUG_LEVEL > 0)
+    {
+    cat ("\n\ndistances_between_marxan_solutions = \n")
+    print (distances_between_marxan_solutions)
+    }
+
+#browser()
+
+#===============================================================================
+#                       end - Find best marxan solutions.
+#===============================================================================
+
+#---------------------------------
+#---------------------------------
 #---------------------------------
 
     #  Load the summed solutions vector.
