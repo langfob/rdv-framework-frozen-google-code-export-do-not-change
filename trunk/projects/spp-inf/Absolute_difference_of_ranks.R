@@ -16,3 +16,4 @@ for (i in 1:length(names)){
 }
 
 results
+save(results, file="C:/Users/hkujala/work/Species influence/src/Absolute_rank_difference.r")
