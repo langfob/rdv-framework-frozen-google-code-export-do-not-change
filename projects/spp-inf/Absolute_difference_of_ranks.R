@@ -1,6 +1,8 @@
 library(raster)
 library(sp)
-setwd("C:/Users/hkujala/work/Species influence/src/Zonation runs/Test data")
+
+
+setwd("Zonation runs/Test data")
 
 
 names <- c('Sp1', 'Sp2', 'Sp3', 'Sp4', 'Sp5', 'Sp6', 'Sp7')
@@ -15,5 +17,7 @@ for (i in 1:length(names)){
   results[i,2] <- sum(abs(getValues(diff)), na.rm=T)
 }
 
-results
-save(results, file="C:/Users/hkujala/work/Species influence/src/Absolute_rank_difference.r")
+(results)
+save(results, file="Absolute_rank_difference.rdump")
+
+setwd("../../")

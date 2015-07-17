@@ -1,4 +1,7 @@
 
+
+
+
 rm( list = ls( all=TRUE ))
 
 # read in the solution with all spp
@@ -74,7 +77,6 @@ colnames(overlaps.df) <- col.names
 
 
 # now plot the results
-
 plot.results <- function() {
     for( i in 1:length(sp)) {
 
