@@ -5,7 +5,7 @@ library(raster)
 library(sp)
 library(picante)
 
-setwd("C:/Users/hkujala/work/Species influence/src/Zonation runs/Test data")
+setwd("Zonation runs/Test data")
 names <- c('Sp1', 'Sp2', 'Sp3', 'Sp4', 'Sp5', 'Sp6', 'Sp7')
 
 
@@ -49,4 +49,6 @@ for (i in 1:length(names)){
   sp_info$mean_jaccard_similarity[i] <- mean(cooc[,i], na.rm=T)
 }
 
-save(sp_info, file='C:/Users/hkujala/work/Species influence/src/sp_info.r')
+setwd("../../" )
+
+save(sp_info, file='sp_info.rdump')
